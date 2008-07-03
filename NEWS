@@ -1,0 +1,65 @@
+       **************************************************
+       *                                                *
+       *               lmom package news                *
+       *                                                *
+       **************************************************
+
+
+Version 1.0     2008 Jul  3
+
+   o   Initial release.  Functions included:
+         cdfexp
+         cdfgam
+         cdfgev
+         cdfglo
+         cdfgno
+         cdfgpa
+         cdfgum
+         cdfkap
+         cdfnor
+         cdfpe3
+         cdfwak
+         evdistp
+         evdistq
+         evplot
+         evpoints
+         lmrd
+         lmrexp
+         lmrgam
+         lmrgev
+         lmrglo
+         lmrgno
+         lmrgpa
+         lmrgum
+         lmrkap
+         lmrnor
+         lmrp
+         lmrpe3
+         lmrq
+         lmrwak
+         pelexp
+         pelgam
+         pelgev
+         pelglo
+         pelgno
+         pelgpa
+         pelgum
+         pelkap
+         pelnor
+         pelp
+         pelpe3
+         pelq
+         pelwak
+         quaexp
+         quagam
+         quagev
+         quaglo
+         quagno
+         quagpa
+         quagum
+         quakap
+         quanor
+         quape3
+         quawak
+         samlmu
+         samlmu.s
