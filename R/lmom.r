@@ -61,10 +61,12 @@ lmom.dist<-list(
   gpa=list(name="gpa",npara=3,parnames=c("xi","alpha","k"),                   pardefaults=c(0,1,0),    himom=3,maxmom=20,lmrroutine=lmom.routines$lmrgpa,pelroutine=lmom.routines$pelgpa),
   gum=list(name="gum",npara=2,parnames=c("xi","alpha"),                       pardefaults=c(0,1),      himom=2,maxmom=20,lmrroutine=lmom.routines$lmrgum,pelroutine=lmom.routines$pelgum),
   kap=list(name="kap",npara=4,parnames=c("xi","alpha","k","h"),               pardefaults=c(0,1,0,0),  himom=4,maxmom=20,lmrroutine=lmom.routines$lmrkap,pelroutine=lmom.routines$pelkap),
+  ln3=list(name="ln3",npara=3,parnames=c("zeta","mu","sigma"),                pardefaults=c(0,0,1),    himom=3,maxmom=20,lmrroutine=NULL,                pelroutine=NULL),
   nor=list(name="nor",npara=2,parnames=c("mu","sigma"),                       pardefaults=c(0,1),      himom=2,maxmom=20,lmrroutine=lmom.routines$lmrnor,pelroutine=lmom.routines$pelnor),
   pe3=list(name="pe3",npara=3,parnames=c("mu","sigma","gamma"),               pardefaults=c(0,1,0),    himom=3,maxmom= 4,lmrroutine=lmom.routines$lmrpe3,pelroutine=lmom.routines$pelpe3),
   wak=list(name="wak",npara=5,parnames=c("xi","alpha","beta","gamma","delta"),pardefaults=c(0,1,0,0,0),himom=5,maxmom=20,lmrroutine=lmom.routines$lmrwak,pelroutine=lmom.routines$pelwak),
-  wa0=list(name="wa0",npara=5,parnames=c("xi","alpha","beta","gamma","delta"),pardefaults=c(0,1,0,0,0),himom=4,maxmom=20,lmrroutine=lmom.routines$lmrwak,pelroutine=lmom.routines$pelwa0)
+  wa0=list(name="wa0",npara=5,parnames=c("xi","alpha","beta","gamma","delta"),pardefaults=c(0,1,0,0,0),himom=4,maxmom=20,lmrroutine=lmom.routines$lmrwak,pelroutine=lmom.routines$pelwa0),
+  wei=list(name="wei",npara=3,parnames=c("zeta","beta","delta"),              pardefaults=c(0,1,0),    himom=3,maxmom=20,lmrroutine=NULL,                pelroutine=NULL)
 )
 
 cdfexp<-function(x,para=c(0,1)){
@@ -422,6 +424,99 @@ pelxxx<-function(xxx,lmom){
   para<-fort$para
   names(para)<-ddata$parnames
   return(list(para=para,ifail=fort$ifail))
+}
+
+cdfln3<-function(x, para=c(0,0,1)) {
+  if (length(para)!=3) stop("parameter vector has wrong length")
+  if (any(is.na(para))) stop("missing values in parameter vector")
+  if (para[3]<=0) stop("distribution parameters invalid")
+  plnorm(x-para[1],meanlog=para[2],sdlog=para[3])
+}
+
+qualn3<-function(f,para=c(0,0,1)) {
+  if (length(para)!=3) stop("parameter vector has wrong length")
+  if (any(is.na(para))) stop("missing values in parameter vector")
+  if (para[3]<=0) stop("distribution parameters invalid")
+  if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para[1]+qlnorm(f,meanlog=para[2],sdlog=para[3])
+}
+
+lmrln3<-function(para=c(0,0,1),nmom=3) {
+  if (length(para)!=3) stop("parameter vector has wrong length")
+  if (any(is.na(para))) stop("missing values in parameter vector")
+  if (para[3]<=0) stop("distribution parameters invalid")
+  expmu<-exp(para[2])
+  xmom<-lmrgno(c(para[1]+expmu,expmu*para[3],-para[3]),nmom=nmom)
+  return(xmom)
+}
+
+pelln3<-function(lmom, bound=NULL) {
+  if (is.null(bound)) {
+    if (length(lmom)<3) stop("need at least 3 L-moments")
+    if (any(is.na(lmom[1:3]))) stop("missing values in L-moment vector")
+    if (lmom[2]<=0 || lmom[3]>=1 || lmom[3]<=0) stop("L-moments invalid")
+    pargno<-pelgno(c(lmom[1],lmom[2],lmom[3]))
+    sigma<- -pargno[3]
+    expmu<-pargno[2]/sigma
+    out<-c(pargno[1]-expmu,log(expmu),sigma)
+  } else {
+    if (length(lmom)<2) stop("with 'bound' specified, need at least 2 L-moments")
+    if (any(is.na(lmom[1:2]))) stop("missing values in L-moment vector")
+    lam1<-lmom[1]-bound
+    if (lam1<=0 || lmom[2]<=0 || lmom[2]>=lam1) stop("L-moments invalid")
+    sigma<-sqrt(2)*qnorm((1+lmom[2]/lam1)/2)
+    mu<-log(lam1)-0.5*sigma^2
+    out<-c(bound,mu,sigma)
+  }
+  names(out)<-lmom.dist$ln3$parnames
+  return(out)
+}
+
+cdfwei<-function(x,para=c(0,1,0)) {
+  if (length(para)!=3) stop("parameter vector has wrong length")
+  if (any(is.na(para))) stop("missing values in parameter vector")
+  if (para[2]<=0 || para[3]<=0) stop("distribution parameters invalid")
+  ifelse(x<=para[1],0,1-exp(-((x-para[1])/para[2])^para[3]))
+}
+
+quawei<-function(f,para=c(0,1,0)) {
+  if (length(para)!=3) stop("parameter vector has wrong length")
+  if (any(is.na(para))) stop("missing values in parameter vector")
+  if (para[2]<=0 || para[3]<=0) stop("distribution parameters invalid")
+  if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para[1]+para[2]*((-log(1-f))^(1/para[3]))
+}
+
+lmrwei<-function(para=c(0,1,0),nmom=3) {
+  if (length(para)!=3) stop("parameter vector has wrong length")
+  if (any(is.na(para))) stop("missing values in parameter vector")
+  if (para[2]<=0 || para[3]<=0) stop("distribution parameters invalid")
+  xmom<-lmrgev(c(0,para[2]/para[3],1/para[3]),nmom=nmom)
+  xmom[1]<- para[1]+para[2]-xmom[1]
+  xmom[3]<- -xmom[3]
+  return(xmom)
+}
+
+pelwei<-function(lmom,bound=NULL) {
+  if (is.null(bound)) {
+    if (length(lmom)<3) stop("need at least 3 L-moments")
+    if (any(is.na(lmom[1:3]))) stop("missing values in L-moment vector")
+    if (lmom[2]<=0 || lmom[3]>=1 || lmom[3]<=-lmrgum(,3)[3]) stop("L-moments invalid")
+    pg<-pelgev(c(-lmom[1],lmom[2],-lmom[3]))
+    delta<-1/pg[3]
+    beta<-pg[2]/pg[3]
+    out<-c(-pg[1]-beta,beta,delta)
+  } else {
+    if (length(lmom)<2) stop("with 'bound' specified, need at least 2 L-moments")
+    if (any(is.na(lmom[1:2]))) stop("missing values in L-moment vector")
+    lam1<-lmom[1]-bound
+    if (lam1<=0 || lmom[2]<=0 || lmom[2]>=lam1) stop("L-moments invalid")
+    delta<- -log(2)/log(1-lmom[2]/lam1)
+    beta<-lam1/gamma(1+1/delta)
+    out<-c(bound,beta,delta)
+  }
+  names(out)<-lmom.dist$wei$parnames
+  return(out)
 }
 
 samlmu<-function(x,nmom=4,sort.data=TRUE){
@@ -831,13 +926,13 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
 
         # For type "n", compute L-moments (so that all elements of zmom
         # have approx. the same magnitude)
-        zmom<-do.call(lmrp,c(list(pfunc,bounds=bounds,order=order.shape,acc=acc/10),paralist))
+        zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=order.shape,acc=acc/10),paralist))
         if (nlmom>2) zmom[-(1:2)]<-zmom[-(1:2)]*zmom[2]
 
       } else if (type=="s") {
 
         # For type "s", scale the L-moments by lambda_1, not lambda_2
-        zmom<-do.call(lmrp,c(list(pfunc,bounds=bounds,order=1:npara,acc=acc/10),paralist))
+        zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=1:npara,acc=acc/10),paralist))
         if (nlmom>2) zmom[-(1:2)]<-zmom[-(1:2)]*zmom[2]
         zmom<-zmom[-1]/zmom[1]
 
@@ -846,7 +941,7 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
         # For type "ls", compute L-moment ratios
         # For type "lss", compute L-moment ratios via lmrp(...,symm=TRUE)
         symm<-if (type=="lss") 0 else FALSE
-        zmom<-do.call(lmrp,c(list(pfunc,bounds=bounds,order=order.shape,acc=acc/10,symm=symm),paralist))
+        zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=order.shape,acc=acc/10,symm=symm),paralist))
 
       }
 
@@ -871,7 +966,7 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
       if (is.null(dotargs$tol)) dotargs<-c(dotargs,tol=acc)
 
       # Call the root-finding function, uniroot()
-      opt<-do.call(uniroot,c(f=critfn,dotargs))
+      opt<-do.call(stats::uniroot,c(f=critfn,dotargs))
 
       # Copy estimated shape parameter values to output vector; set return code
       outpar[shape.pos]<-opt$root
@@ -885,7 +980,7 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
       if (is.null(dotargs$ndigit)) dotargs<-c(dotargs,ndigit=round(-2*log10(acc)))
 
       # Call the optimization function, nlm()
-      opt<-do.call(nlm,c(f=critfn,list(p=start[shape.pos]),dotargs))
+      opt<-do.call(stats::nlm,c(f=critfn,list(p=start[shape.pos]),dotargs))
 
       # Copy estimated shape parameter values to output vector; set return code
       outpar[shape.pos]<-opt$estimate
@@ -902,7 +997,7 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
         dotargs$control<-c(dotargs$control,abstol=acc^2)
 
       # Call the optimization function, optim()
-      opt<-do.call(optim,c(list(par=start[shape.pos]),fn=critfn,method=method,dotargs))
+      opt<-do.call(stats::optim,c(list(par=start[shape.pos]),fn=critfn,method=method,dotargs))
 
       # Copy estimated shape parameter values to output vector; set return code
       outpar[shape.pos]<-opt$par
@@ -922,7 +1017,7 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
     else if (type=="s") outpar[1]<-1
 
     paralist<- if (parvec) list(outpar) else as.list(outpar)
-    zmom<-do.call(lmrp,c(list(pfunc,bounds=bounds,order=1:2,acc=acc/10),paralist))
+    zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=1:2,acc=acc/10),paralist))
 
     if (is.element(type,c("ls","lss"))) {
       outpar[2]<-lmom[2]/zmom[2]
@@ -1136,14 +1231,14 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
         # For type "n", compute L-moments (so that all elements of zmom
         # have approx. the same magnitude)
         zmom<- if (parvec) lmrq(qfunc,order=order.shape,acc=acc/10,para)
-               else do.call(lmrq,c(list(qfunc,order=order.shape,acc=acc/10),para))
+               else do.call("lmrq",c(list(qfunc,order=order.shape,acc=acc/10),para))
         if (nlmom>2) zmom[-(1:2)]<-zmom[-(1:2)]*zmom[2]
 
       } else if (type=="s") {
 
         # For type "s", scale the L-moments by lambda_1, not lambda_2
         zmom<- if (parvec) lmrq(qfunc,order=1:npara,acc=acc/10,c(1,para))
-               else do.call(lmrq,c(list(qfunc,order=1:npara,acc=acc/10),1,para))
+               else do.call("lmrq",c(list(qfunc,order=1:npara,acc=acc/10),1,para))
         if (nlmom>2) zmom[-(1:2)]<-zmom[-(1:2)]*zmom[2]
         zmom<-zmom[-1]/zmom[1]
 
@@ -1152,7 +1247,7 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
         # For type "ls", compute L-moment ratios
         # For type "lss", compute L-moment ratios via lmrq(...,symm=TRUE)
         zmom<- if (parvec) lmrq(qfunc,order=order.shape,acc=acc/10,symm=(type=="lss"),c(0,1,para))
-               else do.call(lmrq,c(list(qfunc,order=order.shape,acc=acc/10,symm=(type=="lss")),0,1,para))
+               else do.call("lmrq",c(list(qfunc,order=order.shape,acc=acc/10,symm=(type=="lss")),0,1,para))
 
       }
       retval<-if (method=="uniroot") zmom-lmom[order.shape]
@@ -1172,7 +1267,7 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
       if (is.null(dotargs$tol)) dotargs<-c(dotargs,tol=acc)
 
       # Call the root-finding function, uniroot()
-      opt<-do.call(uniroot,c(f=critfn,dotargs))
+      opt<-do.call(stats::uniroot,c(f=critfn,dotargs))
 
       # Copy estimated shape parameter values to output vector; set return code
       outpar[shape.pos]<-opt$root
@@ -1186,7 +1281,7 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
       if (is.null(dotargs$ndigit)) dotargs<-c(dotargs,ndigit=round(-2*log10(acc)))
 
       # Call the optimization function, nlm()
-      opt<-do.call(nlm,c(f=critfn,list(p=start[shape.pos]),dotargs))
+      opt<-do.call(stats::nlm,c(f=critfn,list(p=start[shape.pos]),dotargs))
 
       # Copy estimated shape parameter values to output vector; set return code
       outpar[shape.pos]<-opt$estimate
@@ -1203,7 +1298,7 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
         dotargs$control<-c(dotargs$control,abstol=acc^2)
 
       # Call the optimization function, optim()
-      opt<-do.call(optim,c(list(par=start[shape.pos]),fn=critfn,method=method,dotargs))
+      opt<-do.call(stats::optim,c(list(par=start[shape.pos]),fn=critfn,method=method,dotargs))
 
       # Copy estimated shape parameter values to output vector; set return code
       outpar[shape.pos]<-opt$par
@@ -1220,7 +1315,7 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
 
     outpar[1:2]<-c(0,1)
     zmom<-if (parvec) lmrq(qfunc,outpar,order=1:2,acc=acc/10)
-          else do.call(lmrq,c(list(qfunc,order=1:2,acc=acc/10),outpar))
+          else do.call("lmrq",c(list(qfunc,order=1:2,acc=acc/10),outpar))
     outpar[2]<-lmom[2]/zmom[2]
     outpar[1]<-lmom[1]-outpar[2]*zmom[1]
 
@@ -1228,7 +1323,7 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
 
     outpar[1]<-1
     zmom<-if (parvec) lmrq(qfunc,outpar,order=1,acc=acc/10)
-          else do.call(lmrq,c(list(qfunc,order=1,acc=acc/10),outpar))
+          else do.call("lmrq",c(list(qfunc,order=1,acc=acc/10),outpar))
     outpar[1]<-lmom[1]/zmom[1]
 
   }

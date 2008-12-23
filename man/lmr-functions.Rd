@@ -8,9 +8,11 @@
 \alias{lmrgpa}
 \alias{lmrgum}
 \alias{lmrkap}
+\alias{lmrln3}
 \alias{lmrnor}
 \alias{lmrpe3}
 \alias{lmrwak}
+\alias{lmrwei}
 \title{L-moments of specific probability distributions}
 \description{Computes the \eqn{L}-moments of a probability distribution
 given its parameters.
@@ -21,12 +23,14 @@ The following distributions are recognized:
 \code{lmrgev} \tab generalized extreme-value \cr
 \code{lmrglo} \tab generalized logistic \cr
 \code{lmrgpa} \tab generalized Pareto \cr
-\code{lmrgno} \tab generalized normal (lognormal) \cr
+\code{lmrgno} \tab generalized normal \cr
 \code{lmrgum} \tab Gumbel (extreme-value type I) \cr
 \code{lmrkap} \tab kappa \cr
+\code{lmrln3} \tab three-parameter lognormal \cr
 \code{lmrnor} \tab normal \cr
 \code{lmrpe3} \tab Pearson type III \cr
 \code{lmrwak} \tab Wakeby \cr
+\code{lmrwei} \tab Weibull \cr
 }
 }
 \synopsis{
@@ -51,9 +55,11 @@ lmrgno(para = c(0, 1, 0), nmom = 3)
 lmrgpa(para = c(0, 1, 0), nmom = 3)
 lmrgum(para = c(0, 1), nmom = 2)
 lmrkap(para = c(0, 1, 0, 0), nmom = 4)
+lmrln3(para = c(0, 0, 1), nmom = 3)
 lmrnor(para = c(0, 1), nmom = 2)
 lmrpe3(para = c(0, 1, 0), nmom = 3)
 lmrwak(para = c(0, 1, 0, 0, 0), nmom = 5)
+lmrwei(para = c(0, 1, 0), nmom = 3)
 }
 
 \arguments{
@@ -62,7 +68,7 @@ lmrwak(para = c(0, 1, 0, 0, 0), nmom = 5)
 }
 
 \details{Numerical methods and accuracy are as described in
-Hosking (1996, pp.8-9).}
+Hosking (1996, pp. 8--9).}
 
 \value{Numeric vector containing the \eqn{L}-moments.}
 
@@ -91,12 +97,14 @@ For individual distributions, see their cumulative distribution functions:
 \code{\link{cdfgev}} \tab generalized extreme-value \cr
 \code{\link{cdfglo}} \tab generalized logistic \cr
 \code{\link{cdfgpa}} \tab generalized Pareto \cr
-\code{\link{cdfgno}} \tab generalized normal (lognormal) \cr
+\code{\link{cdfgno}} \tab generalized normal \cr
 \code{\link{cdfgum}} \tab Gumbel (extreme-value type I) \cr
 \code{\link{cdfkap}} \tab kappa \cr
+\code{\link{cdfln3}} \tab three-parameter lognormal \cr
 \code{\link{cdfnor}} \tab normal \cr
 \code{\link{cdfpe3}} \tab Pearson type III \cr
 \code{\link{cdfwak}} \tab Wakeby \cr
+\code{\link{cdfwei}} \tab Weibull \cr
 }
 }
 

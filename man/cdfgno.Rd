@@ -34,6 +34,9 @@ with a finite lower bound and positive skewness;
 the normal distribution, corresponding to \eqn{k=0}{k=0};
 and the reverse lognormal distribution, corresponding to \eqn{k>0}{k>0},
 with a finite upper bound and negative skewness.
+The two-parameter lognormal distribution,
+with a lower bound of zero and positive skewness,
+is obtained when \eqn{k<0}{k<0} and \eqn{\xi+\alpha/k=0}{xi+alpha/k=0}.
 }
 
 \value{\code{cdfgno} gives the distribution function;
@@ -46,11 +49,14 @@ distribution functions \code{pnorm}, \code{qnorm}, etc.}
 
 
 \seealso{
+\code{\link{cdfln3}} for the \pkg{lmom} package's version of the three-parameter
+lognormal distribution.
+
 \code{\link{cdfnor}} for the \pkg{lmom} package's version of the normal distribution.
 
 \code{\link{pnorm}} for the standard \R version of the normal distribution.
 
-\code{\link{qlnorm}} for the standard \R version of the lognormal distribution.
+\code{\link{plnorm}} for the standard \R version of the two-parameter lognormal distribution.
 }
 
 \examples{

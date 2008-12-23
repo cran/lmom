@@ -36,7 +36,7 @@ The probability density function is
 \deqn{f(x)={|x-\xi|^{\alpha-1}\exp(-|x-\xi|/\beta) \over \beta^\alpha\Gamma(\alpha)}}{f(x) = |x-xi|^(\alpha-1) exp(-|x-\xi|/\beta) / ( beta^alpha Gamma(alpha) )}
 with \eqn{x}{x} bounded by \eqn{\xi}{xi} from below if \eqn{\gamma>0}{gamma>0}
 and from above if \eqn{\gamma<0}{gamma<0}.
-If \eqn{\gamma=0}{gamma=0}, the distribution ius a normal distribution
+If \eqn{\gamma=0}{gamma=0}, the distribution is a normal distribution
 with mean \eqn{\mu}{mu} and standard deviation \eqn{\sigma}{sigma}.
 
 The Pearson type III distribution is usually regarded as consisting of

@@ -139,7 +139,7 @@ that the first parameter is the scale parameter.
 
 It is important that the length of \code{start} be equal to the number
 of parameters of the distribution.  Starting values for
-locaton and scale parameters should be included in \code{start},
+location and scale parameters should be included in \code{start},
 even though they are not used.
 If \code{start} has the wrong length, it is possible that
 meaningless results will be returned without any warning being issued.

@@ -20,7 +20,7 @@ the parameters of the distributions by equating sample and population
 \eqn{L}-moments (the ``method of \eqn{L}-moments'').  This package contains \R functions
 that should facilitate the use of \eqn{L}-moment-based methods.
 
-For each of eleven probability distributions, the package contains
+For each of 13 probability distributions, the package contains
 functions to evaluate the cumulative distribution function and quantile
 function of the distribution, to calculate the \eqn{L}-moments given the
 parameters and to calculate the parameters given the low-order
@@ -54,12 +54,14 @@ For example the cumulative distribution function of the gamma distribution is
 \code{gev} \tab generalized extreme-value \cr
 \code{glo} \tab generalized logistic \cr
 \code{gpa} \tab generalized Pareto \cr
-\code{gno} \tab generalized normal (lognormal) \cr
+\code{gno} \tab generalized normal \cr
 \code{gum} \tab Gumbel (extreme-value type I) \cr
 \code{kap} \tab kappa \cr
+\code{ln3} \tab lognormal \cr
 \code{nor} \tab normal \cr
 \code{pe3} \tab Pearson type III \cr
 \code{wak} \tab Wakeby \cr
+\code{wei} \tab Weibull \cr
 }
 
 The following functions are also contained in the package.

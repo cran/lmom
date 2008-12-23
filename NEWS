@@ -5,6 +5,20 @@
        **************************************************
 
 
+Version 1.1     2008 Dec 23
+
+   o   New functions, for the Weibull distribution: cdfwei(), lmrwei(),
+       pelwei(), quawei().
+
+   o   New functions, for the 3-parameter lognormal distribution: cdfln3(),
+       lmrln3(), pelln3(), qualn3(). (pelln3() also permits parameter
+       estimation for the 2-parameter lognormal distributon.)
+
+   o   Fixed: pelp() and pelq() would fail when the name of the
+       optimization routine (argument 'method') was also the name
+       of an object in the global environment.
+
+
 Version 1.0     2008 Jul  3
 
    o   Initial release.  Functions included:

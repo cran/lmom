@@ -100,7 +100,7 @@ either a single vector, or a separate argument for each parameter.
 }
 \author{J. R. M. Hosking \email{hosking@watson.ibm.com}}
 
-\section{Warning}{Arguments \code{symm}, \code{order}, \code{acc},
+\section{Warning}{Arguments \code{bounds}, \code{symm}, \code{order}, \code{acc},
 \code{subdiv}, and \code{verbose} cannot be abbreviated and must be
 specified by their full names (if abbreviated, the names would be
 matched to the arguments of \code{pfunc} or \code{qfunc}).}

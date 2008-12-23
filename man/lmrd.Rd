@@ -28,7 +28,7 @@ The following distributions are recognized:
 \code{GLO} \tab generalized logistic \cr
 \code{GEV} \tab generalized extreme-value \cr
 \code{GPA} \tab generalized Pareto \cr
-\code{GNO} \tab generalized normal (lognormal) \cr
+\code{GNO} \tab generalized normal \cr
 \code{PE3} \tab Pearson type III \cr
 \code{WAK.LB} \tab lower bound of \eqn{L}-kurtosis for given \eqn{L}-skewness, \cr
               \tab for the Wakeby distribution. \cr
@@ -41,7 +41,7 @@ The following distributions are recognized:
 %\item GLO -- generalized logistic
 %\item GEV -- generalized extreme-value
 %\item GPA -- generalized Pareto
-%\item GNO -- generalized normal (lognormal)
+%\item GNO -- generalized normal
 %\item PE3 -- Pearson type III
 %\item WAK.LB -- lower bound of \eqn{L}-kurtosis for given \eqn{L}-skewness, for the Wakeby distribution.
 %\item ALL.LB -- lower bound of \eqn{L}-kurtosis for given \eqn{L}-skewness, for all distributions.

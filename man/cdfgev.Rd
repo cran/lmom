@@ -46,6 +46,8 @@ distribution functions \code{pnorm}, \code{qnorm}, etc.}
 
 \code{\link{cdfkap}} for the kappa distribution,
 which generalizes the generalized extreme-value distribution.
+
+\code{\link{cdfwei}} for the Weibull distribution,
 }
 
 \examples{
