@@ -5,7 +5,7 @@
 \alias{evpoints}
 \title{Extreme-value plot}
 \description{
-\code{evplot} draws an ``extreme-value plot'', i.e. a quantile-quantile plot
+\code{evplot} draws an \dQuote{extreme-value plot}, i.e. a quantile-quantile plot
 in which the horizontal axis is the quantile of an
 extreme-value type I (Gumbel) distribution.
 
@@ -61,7 +61,7 @@ evpoints(y, ...)
   \code{"b"} for points connected by lines, etc.}
 \item{xlab}{X axis label.}
 \item{ylab}{Y axis label.}
-\item{rp.axis}{Logical. Whether to draw the ``Return period'' axis,
+\item{rp.axis}{Logical. Whether to draw the \dQuote{Return period} axis,
   a secondary horizontal axis.}
 \item{\dots}{Additional parameters are passed to the plotting routine.}
 }

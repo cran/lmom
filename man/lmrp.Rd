@@ -41,7 +41,7 @@ error for \eqn{L}-moment ratios.
 \item{subdiv}{Maximum number of subintervals used in numerical integration.}
 \item{verbose}{Logical.  If \code{FALSE}, only the values of the \eqn{L}-moments
 and \eqn{L}-moment ratios are returned.  If \code{TRUE}, more details of the
-numerical integration are returned: see ``Value'' section below.}
+numerical integration are returned: see \dQuote{Value} section below.}
 }
 
 \details{\eqn{L}-moments are computed by numerical integration,

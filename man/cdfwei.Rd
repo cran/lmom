@@ -5,8 +5,8 @@
 \description{Distribution function and quantile function
 of the Weibull distribution.}
 \usage{
-cdfwei(x, para = c(0, 1, 0))
-quawei(f, para = c(0, 1, 0))
+cdfwei(x, para = c(0, 1, 1))
+quawei(f, para = c(0, 1, 1))
 }
 
 \arguments{
@@ -42,7 +42,7 @@ of which the Weibull (reflected through the origin) is a special case.
 \examples{
 # Random sample from a 2-parameter Weibull distribution
 # with scale parameter 2 and shape parameter 1.5.
-quagev(runif(100), c(0,2,-0.5))
+quawei(runif(100), c(0,2,1.5))
 
 # Illustrate the relation between Weibull and GEV distributions.
 # weifit() fits a Weibull distribution to data and returns

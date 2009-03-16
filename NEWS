@@ -5,6 +5,15 @@
        **************************************************
 
 
+Version 1.2     2009 Mar 16
+
+   o   Default parameter values for the Weibull distribution are now 'c(0,1,1)'.
+       (The previous default, 'c(0,1,0)', used an invalid value for the third
+       parameter.)  Functions affected: cdfwei(), lmrwei(), quawei().
+
+   o   Fixed: cdfgum() gave incorrect results.
+
+
 Version 1.1     2008 Dec 23
 
    o   New functions, for the Weibull distribution: cdfwei(), lmrwei(),

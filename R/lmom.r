@@ -130,7 +130,7 @@ cdfgum<-function(x,para=c(0,1)){
   if (length(para)!=2) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
-  return(exp(-exp(-(x-para[1]))/para[2]))
+  return(exp(-exp(-(x-para[1])/para[2])))
 }
 
 cdfkap<-function(x,para=c(0,1,0,0)){
@@ -472,14 +472,14 @@ pelln3<-function(lmom, bound=NULL) {
   return(out)
 }
 
-cdfwei<-function(x,para=c(0,1,0)) {
+cdfwei<-function(x,para=c(0,1,1)) {
   if (length(para)!=3) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0 || para[3]<=0) stop("distribution parameters invalid")
   ifelse(x<=para[1],0,1-exp(-((x-para[1])/para[2])^para[3]))
 }
 
-quawei<-function(f,para=c(0,1,0)) {
+quawei<-function(f,para=c(0,1,1)) {
   if (length(para)!=3) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0 || para[3]<=0) stop("distribution parameters invalid")
@@ -487,7 +487,7 @@ quawei<-function(f,para=c(0,1,0)) {
   para[1]+para[2]*((-log(1-f))^(1/para[3]))
 }
 
-lmrwei<-function(para=c(0,1,0),nmom=3) {
+lmrwei<-function(para=c(0,1,1),nmom=3) {
   if (length(para)!=3) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0 || para[3]<=0) stop("distribution parameters invalid")

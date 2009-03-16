@@ -3,7 +3,7 @@
 \alias{samlmu.s}
 \title{Sample L-moments}
 \description{
-Computes the ``unbiased'' sample \eqn{L}-moments and \eqn{L}-moment ratios of a data vector.
+Computes the \dQuote{unbiased} sample \eqn{L}-moments and \eqn{L}-moment ratios of a data vector.
 }
 \usage{
 samlmu(x, nmom = 4, sort.data = TRUE)

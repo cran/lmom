@@ -17,7 +17,7 @@ of the theory of \eqn{L}-moments and \eqn{L}-moment ratios.  Hosking and Wallis
 (1997, Appendix) give, for many distributions in common use, expressions
 for the \eqn{L}-moments of the distributions and algorithms for estimating
 the parameters of the distributions by equating sample and population
-\eqn{L}-moments (the ``method of \eqn{L}-moments'').  This package contains \R functions
+\eqn{L}-moments (the \dQuote{method of \eqn{L}-moments}).  This package contains \R functions
 that should facilitate the use of \eqn{L}-moment-based methods.
 
 For each of 13 probability distributions, the package contains
@@ -41,7 +41,7 @@ parameters.
 calculates the parameters of the distribution given its \eqn{L}-moments.
 When the \eqn{L}-moments are the sample \eqn{L}-moments of a set of data,
 the resulting parameters are of course the
-``method of \eqn{L}-moments'' estimates of the parameters.
+\dQuote{method of \eqn{L}-moments} estimates of the parameters.
 
 Here \code{...} is a three-letter code used to identify the
 distribution, as given in the table below.
@@ -95,7 +95,7 @@ The following functions are also contained in the package.
   draws an \eqn{L}-moment ratio diagram.
 
 \code{\link{evplot}}
-  draws an ``extreme-value plot'', i.e. a quantile-quantile plot
+  draws an \dQuote{extreme-value plot}, i.e. a quantile-quantile plot
   in which the horizontal axis is the quantile of an
   extreme-value type I (Gumbel) distribution.
 

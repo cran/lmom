@@ -22,7 +22,7 @@ lower bound \eqn{\zeta}{zeta},
 mean on log scale \eqn{\mu}{mu}, and
 standard deviation on log scale \eqn{\sigma}{sigma} has distribution function
 \deqn{F(x)=\Phi(y),}{F(x) = Phi(y),} \eqn{x>0}, where
-\deqn{y=(\log(x-\zeta)-\mu)/\sigma}{y = (log(x-zeta) - mu) / sigma}
+\deqn{y=(\log(x - \zeta)-\mu)/\sigma}{y = (log(x-zeta) - mu) / sigma}
 and \eqn{\Phi(y)}{Phi(y)} is the distribution function of the standard
 normal distribution.
 }
