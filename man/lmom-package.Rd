@@ -1,4 +1,5 @@
-\name{lmom}
+\name{lmom-package}
+\docType{package}
 \alias{L-moments}
 \alias{Lmoments}
 \alias{lmom}
@@ -154,4 +155,4 @@ LMOMENTS package.
   Cambridge University Press.
 }
 \author{J. R. M. Hosking \email{hosking@watson.ibm.com}}
-\keyword{univar}
+\keyword{package}

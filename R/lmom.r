@@ -520,6 +520,7 @@ pelwei<-function(lmom,bound=NULL) {
 }
 
 samlmu<-function(x,nmom=4,sort.data=TRUE){
+  if (!is.numeric(x)) stop("'x' must be numeric")
   xok<-x[!is.na(x)]
   nxok<-length(xok)
   nnmom<-as.integer(nmom)
@@ -546,6 +547,7 @@ samlmu<-function(x,nmom=4,sort.data=TRUE){
 }
 
 samlmu.s<-function(x,nmom=4,sort.data=TRUE){
+  if (!is.numeric(x)) stop("'x' must be numeric")
   xok<-x[!is.na(x)]
   n<-length(xok)
   if (nmom<=0) return(numeric(0))
@@ -620,7 +622,7 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   out.msg<-rep("OK",maxord)
   if (is.function(bounds)) {
     out<-try(bounds(...),silent=TRUE)
-    if (class(out)=="try-error") {
+    if (inherits(out,"try-error")) {
       parstring<-if (length(c(...))==0) character(0)
         else paste(c(' for parameter values',...),collapse=" ")
       stop("unable to compute bounds of distribution",parstring)
@@ -1556,40 +1558,59 @@ lmrd.2par<-list(
 #----------------------------------------------------------------------
 
 lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
-               xlim, ylim, pch=3, col, lty, lwd=1,
+               xlim, ylim, pch=3, cex, col, lty, lwd=1,
                legend.lmrd = TRUE, xlegend, ylegend,
                xlab = expression(italic(L) * "-skewness"),
                ylab = expression(italic(L) * "-kurtosis"), ...) {
 #
 # check arguments
 #
-  if (missing(x)) x<-NA
-  if (missing(y)) { if (length(x)>=4) { y<-x[4]; x<-x[3] } else y<-NA }
-  if (distributions==FALSE) distributions<-""
+  x.missing<-missing(x)
+  if (x.missing) { x<-y<-numeric(0) }
+  else if (missing(y)) {
+    y<-NULL
+    if (inherits(x,"regdata")) {
+      y<-x[[6]]; x<-x[[5]]
+    } else if (length(dim(x))==2) {
+      dn2<-dimnames(x)[[2]]
+      mm<-match(c("t_3","t_4"),dn2)
+      if (any(is.na(mm))) mm<-match(c("tau_3","tau_4"),dn2)
+      if (!any(is.na(mm))) { y<-x[,mm[2] ]; x<-x[,mm[1] ] }
+    } else if (is.numeric(x)) {
+      nx<-names(x)
+      mm<-match(c("t_3","t_4"),nx)
+      if (any(is.na(mm))) mm<-match(c("tau_3","tau_4"),nx)
+      if (!any(is.na(mm))) { y<-x[mm[2] ]; x<-x[mm[1] ] }
+    }
+    if (is.null(y))
+      stop("could not find L-skewness and L-kurtosis values in 'x'")
+  }
+  if (identical(as.logical(distributions),FALSE)) distributions<-""
   if (length(distributions)==1) distributions<-make.words(distributions)
-  matchdist<-match(distributions,lmrd.3par$distributions)
-  if (any(is.na(matchdist))) stop("unknown distribution(s)",
+  matchdist<-match(toupper(distributions),lmrd.3par$distributions)
+  if (any(is.na(matchdist))) stop("unknown distribution(s) ",
     paste(distributions[is.na(matchdist)],collapse=" "))
   if (missing(twopar)) twopar<-lmrd.3par$twopar[matchdist]
   else if (twopar==FALSE) twopar<-""
   twopar<-unique(make.words(twopar))
-  match2<-pmatch(twopar,lmrd.2par$distributions)
+  match2<-pmatch(toupper(twopar),lmrd.2par$distributions)
   if (any(is.na(match2))) stop("unknown 2-parameter distribution(s)",
     paste(distributions[is.na(match2)],collapse=" "))
 #
 # three-parameter distributions
 #
-  if (missing(col)) col<-lmrd.3par$col[matchdist]
-  if (missing(lty)) lty<-lmrd.3par$lty[matchdist]
   if (missing(xlim)) xlim<-range(0,0.6,x,na.rm=TRUE)
-  if (missing(ylim)) ylim<-range(0,0.4,x,na.rm=TRUE)
+  if (missing(ylim)) ylim<-range(0,0.4,y,na.rm=TRUE)
   if (length(distributions)==0) {
     matplot(0,0,err=-1,type="n",xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,...)
     legend.lmrd<-FALSE
-  }
-  else matplot(round(lmrd.data[,1],2),lmrd.data[,distributions],
+  } else {
+   col.lines <- if (!missing(col) && (x.missing || length(col)>1)) col else lmrd.3par$col[matchdist]
+   if (missing(lty)) lty<-lmrd.3par$lty[matchdist]
+   matplot(round(lmrd.data[,1],2),lmrd.data[,toupper(distributions)],
                err=-1,type="l",xlim=xlim,ylim=ylim,
-               xlab=xlab,ylab=ylab,col=col,lty=lty,lwd=lwd,...)
+               xlab=xlab,ylab=ylab,col=col.lines,lty=lty,lwd=lwd,...)
+  }
 #
 # two-parameter distributions
 #
@@ -1616,23 +1637,34 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
   if (legend.lmrd) {
     if (missing(xlegend)) xlegend<-parusr[1]+0.01*(parusr[2]-parusr[1])
     if (missing(ylegend)) ylegend<-parusr[3]+0.99*(parusr[4]-parusr[3])
-    legend(xlegend,ylegend,distributions,bty="n",col=col,lty=lty,lwd=lwd)
+    legend(xlegend,ylegend,toupper(distributions),bty="n",col=col.lines,
+      lty=lty,lwd=lwd)
   }
 #
 # data points
 #
-  points(x,y,pch=pch)
+  if (!x.missing) {
+    if (missing(cex)) cex<-NULL
+    if (!missing(col) && length(col)==1) points(x,y,pch=pch,cex=cex,col=col)
+    else points(x,y,pch=pch,cex=cex)
+  }
 }
 
-evplot<-function(y,qfunc,para,npoints=101,plim,xlim=c(-2,5),ylim,type,
+
+
+evplot<-function(y,...)
+UseMethod("evplot")
+
+evplot.default<-function(y,qfunc,para,npoints=101,plim,xlim=c(-2,5),ylim,type,
         xlab=expression("Reduced variate,  " * -log(-log(italic(F)))),
         ylab="Quantile", rp.axis=TRUE, ...) {
 
   if (!missing(plim)) xlim<-c(-log(-log(plim)))
   missing.ylim<-missing(ylim)
   if (missing.ylim) ylim<-c(0,1) # now missing(ylim) is TRUE in S but not in R
-  if (missing(y)) {xx<-0; yy<-0; type<-"n"}
-  else {
+  if (missing(y)) {
+    xx<-0; yy<-0; type<-"n"
+  } else {
     yy<-sort(y[!is.na(y)])
     lyy<-length(yy)
     xx<--log(-log(((1:lyy)-0.44)/(lyy+0.12)))
@@ -1644,8 +1676,9 @@ evplot<-function(y,qfunc,para,npoints=101,plim,xlim=c(-2,5),ylim,type,
   if (!missing(qfunc)) {
     xval<-seq(from=xlim[1],to=xlim[2],length=npoints)
     pval<-exp(-exp(-xval))
-    yval<-if (is.list(para)) do.call(qfunc,c(list(pval),para)) else qfunc(pval,para)
-    ylim<-c(min(ylim[1],yval[1]),max(ylim[2],yval))
+    yval <- if (missing(para)) qfunc(pval) else
+      if (is.list(para)) do.call(qfunc,c(list(pval),para)) else qfunc(pval,para)
+    if (missing.ylim) ylim<-c(min(ylim[1],yval[1]),max(ylim[2],yval))
   }
 
   plot(xx,yy,xlab=xlab,ylab=ylab,xlim=xlim,ylim=ylim,type=type,...)
@@ -1684,14 +1717,16 @@ evdistq<-function(qfunc,para,npoints=101,...) {
   parusr<-par("usr")
   xval<-seq(from=parusr[1],to=parusr[2],length=npoints)
   pval<-exp(-exp(-xval))
-  yval<-if (is.list(para)) do.call(qfunc,c(list(pval),para)) else qfunc(pval,para)
+  yval <- if (missing(para)) qfunc(pval) else
+    if (is.list(para)) do.call(qfunc,c(list(pval),para)) else qfunc(pval,para)
   lines(xval,yval,...)
 }
 
 evdistp<-function(pfunc,para,npoints=101,...) {
   parusr<-par("usr")
   yval<-seq(from=parusr[3],to=parusr[4],length=npoints)
-  pval<-if (is.list(para)) do.call(pfunc,c(list(yval),para)) else pfunc(yval,para)
+  pval<-if (missing(para)) pfunc(yval) else
+    if (is.list(para)) do.call(pfunc,c(list(yval),para)) else pfunc(yval,para)
   xval<- -log(-log(pval))
   lines(xval,yval,...)
 }

@@ -5,6 +5,42 @@
        **************************************************
 
 
+Version 1.3     2009 Apr 30
+
+   o   evplot() is now a generic function, with (only) a default method.
+       (Further methods will be defined in package lmomRFA, version 2.0.)
+
+   o   evplot(), when argument 'qfunc' is present but 'para' is missing, no
+       longer gives an error but instead uses default values for the parameters
+       of the distribution, i.e. internally it calls function 'qfunc' with only
+       one argument.
+
+       evdistp() and evdistq(), when argument 'para' is missing, act similarly.
+
+   o   lmrd(), when 'x' is supplied but not 'y', now tries to identify
+       L-skewness and L-kurtosis elements in 'x' by name rather than by
+       position.
+
+   o   lmrd() now recognizes distribution identifiers ("GEV", etc.) in either
+       upper or lower case.
+
+   o   lmrd() gains an argument 'cex', to control the size of plotted points.
+
+   o   lmrd(), when given an argument 'col' of length 1, will apply it
+       to the plotted points rather than to all the lines.
+
+   o   samlmu() and samlmu.s() give a more direct error message when their
+       first argument is not numeric.
+
+   o   Fixed: evplot() would sometimes not honour the y-axis limits supplied
+       in 'ylim'.  Specifically, if argument 'qfunc' was specified, the y-axis
+       limits would be extended if necessary to include the range of quantile
+       values plotted.
+
+   o   Fixed: lmrd() would set default y axis limits based on the values
+       of 'x', not of 'y'.
+
+
 Version 1.2     2009 Mar 16
 
    o   Default parameter values for the Weibull distribution are now 'c(0,1,1)'.
@@ -20,8 +56,8 @@ Version 1.1     2008 Dec 23
        pelwei(), quawei().
 
    o   New functions, for the 3-parameter lognormal distribution: cdfln3(),
-       lmrln3(), pelln3(), qualn3(). (pelln3() also permits parameter
-       estimation for the 2-parameter lognormal distributon.)
+       lmrln3(), pelln3(), qualn3().  pelln3() also permits parameter
+       estimation for the 2-parameter lognormal distributon.
 
    o   Fixed: pelp() and pelq() would fail when the name of the
        optimization routine (argument 'method') was also the name

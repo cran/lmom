@@ -1,5 +1,6 @@
 \name{evplot}
 \alias{evplot}
+\alias{evplot.default}
 \alias{evdistp}
 \alias{evdistq}
 \alias{evpoints}
@@ -18,7 +19,9 @@ to an extreme-value plot.
 \code{evpoints} adds a set of data points to an extreme-value plot.
 }
 \usage{
-evplot(y, qfunc, para, npoints = 101, plim, xlim = c(-2, 5),
+evplot(y, ...)
+
+\method{evplot}{default}(y, qfunc, para, npoints = 101, plim, xlim = c(-2, 5),
        ylim, type,
        xlab = expression("Reduced variate,  " * -log(-log(italic(F)))),
        ylab = "Quantile", rp.axis = TRUE, ...)
