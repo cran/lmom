@@ -1650,7 +1650,29 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
   }
 }
 
+lmrdpoints<-function(x, y=NULL, type="p", ...) {
+## Add points to an L-moment ratio diagram
+  if (is.null(y)) {
+    if (inherits(x,"regdata")) {
+      y<-x[[6]]; x<-x[[5]]
+    } else if (length(dim(x))==2) {
+      dn2<-dimnames(x)[[2]]
+      mm<-match(c("t_3","t_4"),dn2)
+      if (any(is.na(mm))) mm<-match(c("tau_3","tau_4"),dn2)
+      if (!any(is.na(mm))) { y<-x[,mm[2] ]; x<-x[,mm[1] ] }
+    } else if (is.numeric(x)) {
+      nx<-names(x)
+      mm<-match(c("t_3","t_4"),nx)
+      if (any(is.na(mm))) mm<-match(c("tau_3","tau_4"),nx)
+      if (!any(is.na(mm))) { y<-x[mm[2] ]; x<-x[mm[1] ] }
+    }
+    if (is.null(y))
+      stop("could not find L-skewness and L-kurtosis values in 'x'")
+  }
+  points(x=x, y=y, type=type, ...)
+}
 
+lmrdlines<-function(x, y=NULL, type="l", ...) lmrdpoints(x=x, y=y, type=type, ...)
 
 evplot<-function(y,...)
 UseMethod("evplot")

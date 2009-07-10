@@ -95,6 +95,10 @@ The following functions are also contained in the package.
 \code{\link{lmrd}}
   draws an \eqn{L}-moment ratio diagram.
 
+\code{\link{lmrdpoints}} and \code{\link{lmrdlines}}
+  add points, or connected line segments, respectively,
+  to an \eqn{L}-moment ratio diagram.
+
 \code{\link{evplot}}
   draws an \dQuote{extreme-value plot}, i.e. a quantile-quantile plot
   in which the horizontal axis is the quantile of an

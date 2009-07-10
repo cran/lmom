@@ -5,6 +5,14 @@
        **************************************************
 
 
+Version 1.4     2009 Jul 10
+
+   o   New functions lmrdpoints() and lmrdlines(), to add points or lines
+       to an existing L_moment ratio diagram.
+
+   o   evplot.default() is now exported from the package namespace.
+
+
 Version 1.3     2009 Apr 30
 
    o   evplot() is now a generic function, with (only) a default method.
