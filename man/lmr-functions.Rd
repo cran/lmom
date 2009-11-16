@@ -33,19 +33,6 @@ The following distributions are recognized:
 \code{lmrwei} \tab Weibull \cr
 }
 }
-\synopsis{
-lmrexp(para = lmom.dist$exp$pardefaults, nmom = lmom.dist$exp$himom)
-lmrgam(para = lmom.dist$gam$pardefaults, nmom = lmom.dist$gam$himom)
-lmrgev(para = lmom.dist$gev$pardefaults, nmom = lmom.dist$gev$himom)
-lmrglo(para = lmom.dist$glo$pardefaults, nmom = lmom.dist$glo$himom)
-lmrgno(para = lmom.dist$gno$pardefaults, nmom = lmom.dist$gno$himom)
-lmrgpa(para = lmom.dist$gpa$pardefaults, nmom = lmom.dist$gpa$himom)
-lmrgum(para = lmom.dist$gum$pardefaults, nmom = lmom.dist$gum$himom)
-lmrkap(para = lmom.dist$kap$pardefaults, nmom = lmom.dist$kap$himom)
-lmrnor(para = lmom.dist$nor$pardefaults, nmom = lmom.dist$nor$himom)
-lmrpe3(para = lmom.dist$pe3$pardefaults, nmom = lmom.dist$pe3$himom)
-lmrwak(para = lmom.dist$wak$pardefaults, nmom = lmom.dist$wak$himom)
-}
 \usage{
 lmrexp(para = c(0, 1), nmom = 2)
 lmrgam(para = c(1, 1), nmom = 2)
@@ -59,7 +46,7 @@ lmrln3(para = c(0, 0, 1), nmom = 3)
 lmrnor(para = c(0, 1), nmom = 2)
 lmrpe3(para = c(0, 1, 0), nmom = 3)
 lmrwak(para = c(0, 1, 0, 0, 0), nmom = 5)
-lmrwei(para = c(0, 1, 0), nmom = 3)
+lmrwei(para = c(0, 1, 1), nmom = 3)
 }
 
 \arguments{

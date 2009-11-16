@@ -5,10 +5,24 @@
        **************************************************
 
 
+Version 1.5     2009 Nov 16
+
+   o   Quantile functions drawn by evplot() now extend across the entire
+       x range of the plot (previously, with 'par("xaxs")' at its default
+       value "r", gaps were left at the sides of the plot).
+
+   o   lmrexp(), lmrgam(), lmrgev(), lmrglo(), lmrgno(), lmrgpa(), lmrgum(),
+       lmrkap(), lmrnor(), lmrpe3(), lmrwak(), pelp(), and pelq() now have
+       a different specification of the default values for some of their
+       arguments.  The actual usage of the functions is unchanged.  The change
+       was made so that the help files can avoid the use of a "\synopsis"
+       section, which was giving unintended results in R 2.10.0.
+
+
 Version 1.4     2009 Jul 10
 
    o   New functions lmrdpoints() and lmrdlines(), to add points or lines
-       to an existing L_moment ratio diagram.
+       to an existing L-moment ratio diagram.
 
    o   evplot.default() is now exported from the package namespace.
 

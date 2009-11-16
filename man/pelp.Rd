@@ -5,26 +5,12 @@
 \description{Computes the parameters of a probability distribution
 as a function of the \eqn{L}-moments.
 }
-\synopsis{
-pelp(lmom, pfunc, start, bounds = c(-Inf, Inf),
-     type = c("n", "s", "ls", "lss"),
-     method=c("nlm", "uniroot", eval(formals(optim)$method)),
-     acc = 1e-5, ...)
-pelq(lmom, qfunc, start, type = c("n", "s", "ls", "lss"),
-     method=c("nlm", "uniroot", eval(formals(optim)$method)),
-     acc = 1e-5, ...)
-}
 \usage{
 pelp(lmom, pfunc, start, bounds = c(-Inf, Inf),
-     type = c("n", "s", "ls", "lss"),
-     method=c("nlm", "uniroot", "Nelder-Mead", "BFGS", "CG",
-              "L-BFGS-B", "SANN"),
-     acc = 1e-5, ...)
+     type = c("n", "s", "ls", "lss"), method = "nlm", acc = 1e-5, ...)
 
 pelq(lmom, qfunc, start, type = c("n", "s", "ls", "lss"),
-     method=c("nlm", "uniroot", "Nelder-Mead", "BFGS", "CG",
-             "L-BFGS-B", "SANN"),
-     acc = 1e-5, ...)
+     method = "nlm", acc = 1e-5, ...)
 }
 
 \arguments{

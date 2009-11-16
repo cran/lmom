@@ -7,7 +7,6 @@
 and \code{lmrdlines} adds connected line segments,
 to an \eqn{L}-moment ratio diagram.
 }
-%\synopsis{}
 \usage{
 lmrdpoints(x, y=NULL, type="p", ...)
 lmrdlines(x, y=NULL, type="l", ...)

@@ -51,12 +51,12 @@ using the \R function \code{integrate}.
 integral from 0 to 1 of Q(u) P*_{r-1}(u) du}
 where \eqn{Q(u)}{Q(u)} is the quantile function and
 \eqn{P^{*}_{r-1}(u)}{P*_{r-1}(u))} is a shifted Legendre polynomial of
-order \eqn{r}{r} (Hosking, 1990, eq.\ (2.2)).
+order \eqn{r}{r} (Hosking, 1990, eq. (2.2)).
 \code{lmrp} uses the expression
 \eqn{\lambda_r = \int Z_r(F(x)) dx}{lambda_r = integral of Z_r(F(x)) dx}
 where \eqn{F(x)} is the cumulative distribution function
 and \eqn{Z_r} is a polynomial of  degree \eqn{r}
-defined in Hosking (2007, eq.\ (3.5)).
+defined in Hosking (2007, eq. (3.5)).
 }
 
 \value{If \code{verbose=FALSE}, a numeric vector containing the \eqn{L}-moments

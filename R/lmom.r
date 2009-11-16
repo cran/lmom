@@ -321,17 +321,19 @@ lmom.parok.wak<-function(para) {
   return(TRUE)
 }
 
-lmrexp<-function(para=lmom.dist$exp$pardefaults,nmom=lmom.dist$exp$himom) lmrxxx("exp",para,nmom)$lmom
-lmrgam<-function(para=lmom.dist$gam$pardefaults,nmom=lmom.dist$gam$himom) lmrxxx("gam",para,nmom)$lmom
-lmrgev<-function(para=lmom.dist$gev$pardefaults,nmom=lmom.dist$gev$himom) lmrxxx("gev",para,nmom)$lmom
-lmrglo<-function(para=lmom.dist$glo$pardefaults,nmom=lmom.dist$glo$himom) lmrxxx("glo",para,nmom)$lmom
-lmrgno<-function(para=lmom.dist$gno$pardefaults,nmom=lmom.dist$gno$himom) lmrxxx("gno",para,nmom)$lmom
-lmrgpa<-function(para=lmom.dist$gpa$pardefaults,nmom=lmom.dist$gpa$himom) lmrxxx("gpa",para,nmom)$lmom
-lmrgum<-function(para=lmom.dist$gum$pardefaults,nmom=lmom.dist$gum$himom) lmrxxx("gum",para,nmom)$lmom
-lmrkap<-function(para=lmom.dist$kap$pardefaults,nmom=lmom.dist$kap$himom) lmrxxx("kap",para,nmom)$lmom
-lmrnor<-function(para=lmom.dist$nor$pardefaults,nmom=lmom.dist$nor$himom) lmrxxx("nor",para,nmom)$lmom
-lmrpe3<-function(para=lmom.dist$pe3$pardefaults,nmom=lmom.dist$pe3$himom) lmrxxx("pe3",para,nmom)$lmom
-lmrwak<-function(para=lmom.dist$wak$pardefaults,nmom=lmom.dist$wak$himom) lmrxxx("wak",para,nmom)$lmom
+# 'para' default values are from lmom.dist$...$pardefaults
+# 'nmom' default values are from lmom.dist$...$himom
+lmrexp<-function(para=c(0,1),      nmom=2) lmrxxx("exp",para,nmom)$lmom
+lmrgam<-function(para=c(1,1),      nmom=2) lmrxxx("gam",para,nmom)$lmom
+lmrgev<-function(para=c(0,1,0),    nmom=3) lmrxxx("gev",para,nmom)$lmom
+lmrglo<-function(para=c(0,1,0),    nmom=3) lmrxxx("glo",para,nmom)$lmom
+lmrgno<-function(para=c(0,1,0),    nmom=3) lmrxxx("gno",para,nmom)$lmom
+lmrgpa<-function(para=c(0,1,0),    nmom=3) lmrxxx("gpa",para,nmom)$lmom
+lmrgum<-function(para=c(0,1),      nmom=2) lmrxxx("gum",para,nmom)$lmom
+lmrkap<-function(para=c(0,1,0,0),  nmom=4) lmrxxx("kap",para,nmom)$lmom
+lmrnor<-function(para=c(0,1),      nmom=2) lmrxxx("nor",para,nmom)$lmom
+lmrpe3<-function(para=c(0,1,0),    nmom=3) lmrxxx("pe3",para,nmom)$lmom
+lmrwak<-function(para=c(0,1,0,0,0),nmom=5) lmrxxx("wak",para,nmom)$lmom
 
 lmrxxx<-function(xxx,para,nmom){
   ddata<-lmom.dist[[xxx]]
@@ -868,11 +870,11 @@ zpoly<-function(u,m) {
 }
 
 pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
-               type=c("n","s","ls","lss"),
-               method=c("nlm","uniroot",eval(formals(optim)$method)),
-               acc=1e-5, ...) {
+               type=c("n","s","ls","lss"), method="nlm", acc=1e-5, ...) {
   type<-match.arg(type)
-  method<-match.arg(method)
+  method<-try(match.arg(method,c("nlm", "uniroot", eval(formals(optim)$method))),
+    silent=TRUE)
+  if (class(method)=="try-error") stop(sub(".*'arg'","'method'",method))
   npara<-length(start)     # Number of parameters
   outpar<-numeric(npara)   # Vector to hold the estimated parameter values
 
@@ -1186,10 +1188,11 @@ slp<-function(u,m) {
 }
 
 pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
-              method=c("nlm","uniroot",eval(formals(optim)$method)),
-              acc=1e-5, ...) {
+               method="nlm", acc=1e-5, ...) {
   type<-match.arg(type)
-  method<-match.arg(method)
+  method<-try(match.arg(method,c("nlm", "uniroot", eval(formals(optim)$method))),
+    silent=TRUE)
+  if (class(method)=="try-error") stop(sub(".*'arg'","'method'",method))
   npara<-length(start)     # Number of parameters
   outpar<-numeric(npara)   # Vector to hold the estimated parameter values
 
@@ -1695,16 +1698,16 @@ evplot.default<-function(y,qfunc,para,npoints=101,plim,xlim=c(-2,5),ylim,type,
     if (missing(type)) type<-"p"
   }
 
-  if (!missing(qfunc)) {
-    xval<-seq(from=xlim[1],to=xlim[2],length=npoints)
+  if (!missing(qfunc) && missing.ylim ) {
+    xval<-range(xlim)
     pval<-exp(-exp(-xval))
     yval <- if (missing(para)) qfunc(pval) else
       if (is.list(para)) do.call(qfunc,c(list(pval),para)) else qfunc(pval,para)
-    if (missing.ylim) ylim<-c(min(ylim[1],yval[1]),max(ylim[2],yval))
+    ylim<-range(c(ylim,yval))
   }
 
   plot(xx,yy,xlab=xlab,ylab=ylab,xlim=xlim,ylim=ylim,type=type,...)
-  if (!missing(qfunc)) lines(xval,yval,...)
+  if (!missing(qfunc)) evdistq(qfunc,para,npoints=npoints,...)
 
 #  Return period axis:
 #  Define tick marks for a fixed set of return periods.
