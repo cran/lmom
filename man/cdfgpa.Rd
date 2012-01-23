@@ -21,11 +21,11 @@ location parameter \eqn{\xi}{xi},
 scale parameter \eqn{\alpha}{alpha} and
 shape parameter \eqn{k}{k} has distribution function
 \deqn{F(x)=1-\exp(-y)}{F(x) = 1 - exp(-y)} where
-\deqn{y=-k^{-1}\log(1-k(x-\xi)/\alpha),}{y = (-1/k) log(1-k(x-xi)/alpha) ,}
+\deqn{y=-k^{-1}\log\lbrace1-k(x-\xi)/\alpha\rbrace,}{y = (-1/k) log(1-k(x-xi)/alpha) ,}
 with \eqn{x}{x} bounded by \eqn{\xi+\alpha/k}{xi+alpha/k}
 from below if \eqn{k<0}{k<0} and from above if \eqn{k>0}{k>0},
 and quantile function
-\deqn{x(F)=\xi-{\alpha\over k}(1-(1-F)^k).}{x(F) = xi - alpha (1 - (1-F)^k) / k .}
+\deqn{x(F)=\xi+{\alpha\over k}\lbrace 1-(1-F)^k\rbrace.}{x(F) = xi + alpha (1 - (1-F)^k) / k .}
 
 The exponential distribution is the special case \eqn{k=0}{k=0}.
 The uniform distribution is the special case \eqn{k=1}{k=1}.

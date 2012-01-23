@@ -54,7 +54,7 @@ evpoints(y, ...)
   Not used if \code{qfunc} is omitted.}
 \item{plim}{X axis limits, specified as probabilities.}
 \item{xlim}{X axis limits, specified as values of the Gumbel reduced variate
-  \eqn{-\log(-\log(F))}{-log(-log(F))}, where \eqn{F}{F} is the
+  \eqn{-\log(-\log F)}{-log(-log(F))}, where \eqn{F}{F} is the
   nonexceedance probability.
   Not used if \code{plim} is specified.}
 \item{ylim}{Y axis limits.}
@@ -88,7 +88,7 @@ are the parameters of the distribution) or the \code{cdf\dots} or
 and the second argument is a vector containing the parameter values).
 }
 
-\author{J. R. M. Hosking \email{hosking@watson.ibm.com}}
+\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
 
 
 

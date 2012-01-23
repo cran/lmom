@@ -119,14 +119,17 @@ lmrd(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
       %WAK.LB \tab color 15, line type 4 (red, dashed) \cr
       %ALL.LB \tab color  1, line type 4 (black, dashed)
       % R colors
-      \code{GLO}    \tab color \code{"blue"},  solid line \cr
-      \code{GEV}    \tab color \code{"green"}, solid line \cr
-      \code{GPA}    \tab color \code{"red"},   solid line \cr
-      \code{GNO}    \tab color \code{"black"}, solid line \cr
-      \code{PE3}    \tab color \code{"cyan"},  solid line \cr
-      \code{WAK.LB} \tab color \code{"red"},   dashed line\cr
-      \code{ALL.LB} \tab color \code{"black"}, dashed line
+      \code{GLO}    \tab blue,  solid line \cr
+      \code{GEV}    \tab green, solid line \cr
+      \code{GPA}    \tab red,   solid line \cr
+      \code{GNO}    \tab black, solid line \cr
+      \code{PE3}    \tab cyan,  solid line \cr
+      \code{WAK.LB} \tab red,   dashed line\cr
+      \code{ALL.LB} \tab black, dashed line
       }
+      The green and cyan colors are less bright than the standard
+      \code{"green"} and \code{"cyan"}; they are defined to be
+      \code{"#00C000"} and \code{"#00E0E0"}, respectively.
       }
 
 \item{lwd}{Vector specifying the line widths to be used for the lines on the plot.}
@@ -134,13 +137,19 @@ lmrd(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
 \item{legend.lmrd}{Controls whether a legend,
       identifying the \eqn{L}-skewness--\eqn{L}-kurtosis
       relations of the three-parameter distributions, is plotted.
+      Either logical, indicating whether a legend is to be drawn,
+      or a list specifying arguments to the \code{legend} function.
+      Default arguments include \code{bty="n"}, which must be overridden
+      if a legend box is to be drawn; other arguments set by default are
+      \code{x}, \code{y}, \code{legend}, \code{col}, \code{lty}, and \code{lwd}.
+
       Not used if \code{distributions=FALSE}.}
 
 \item{xlegend}{x coordinate of the upper left corner of the legend.
       Default: the minimum x value.
       Not used if \code{distributions=FALSE} or \code{legend.lmrd=FALSE}.}
 
-      \item{ylegend}{y coordinate of the upper left corner of the legend.
+\item{ylegend}{y coordinate of the upper left corner of the legend.
       Default: the maximum y value.
       Not used if \code{distributions=FALSE} or \code{legend.lmrd=FALSE}.}
 
@@ -167,7 +176,7 @@ e.g. follow \code{lmrd(t3, t4)} by \code{points(t3, t4, col=c("red", "green"))}.
 
 %\value{ }
 
-\author{J. R. M. Hosking \email{hosking@watson.ibm.com}}
+\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
 
 \examples{
 data(airquality)

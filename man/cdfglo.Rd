@@ -20,12 +20,13 @@ in the order \eqn{\xi, \alpha, k}{xi, alpha, k} (location, scale, shape).}
 location parameter \eqn{\xi}{xi},
 scale parameter \eqn{\alpha}{alpha} and
 shape parameter \eqn{k}{k} has distribution function
-\deqn{F(x)=1/(1+\exp(-y))}{F(x)= 1 / (1+exp(-y))} where
-\deqn{y=-k^{-1}\log(1-k(x-\xi)/\alpha),}{y = (-1/k) log(1-k(x-xi)/alpha) ,}
+\deqn{F(x)=1/\lbrace 1+\exp(-y)\rbrace}{F(x)= 1 / (1+exp(-y))} where
+\deqn{y=-k^{-1}\log\lbrace1-k(x-\xi)/\alpha\rbrace,}{y = (-1/k) log(1-k(x-xi)/alpha) ,}
 with \eqn{x}{x} bounded by \eqn{\xi+\alpha/k}{xi+alpha/k}
 from below if \eqn{k<0}{k<0} and from above if \eqn{k>0}{k>0},
 and quantile function
-\deqn{x(F)=\xi-{\alpha\over k}(1-({1-F \over F})^k).}{x(F) = xi - alpha (1 - ((1-F)/F)^k) / k .}
+%\deqn{x(F)=\xi+{\alpha\over k}(1-({1-F \over F})^k).}{x(F) = xi + alpha (1 - ((1-F)/F)^k) / k .}
+\deqn{x(F)=\xi+{\alpha\over k}\biggl\lbrace1-\biggl({1-F \over F}\biggr)^k\biggr\rbrace.}{x(F) = xi + alpha (1 - ((1-F)/F)^k) / k .}
 
 The logistic distribution is the special case \eqn{k=0}{k=0}.
 }

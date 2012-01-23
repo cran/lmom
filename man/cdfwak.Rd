@@ -24,7 +24,7 @@ parameters \eqn{\xi}{xi},
 \eqn{\gamma}{gamma} and
 \eqn{\delta}{delta}
 has quantile function
-\deqn{x(F)=\xi+{\alpha\over\beta}(1-(1-F)^\beta)-{\gamma\over\delta}(1-(1-F)^\delta).}{x(F) = xi + alpha {1-(1-F)^beta}/beta - gamma {1-(1-F)^delta}/delta .}
+\deqn{x(F)=\xi+{\alpha\over\beta}\lbrace1-(1-F)^\beta\rbrace-{\gamma\over\delta}\lbrace1-(1-F)^{-\delta}\rbrace.}{x(F) = xi + alpha {1-(1-F)^beta}/beta - gamma {1-(1-F)^(-delta)}/delta .}
 
 The parameters are restricted as in Hosking and Wallis (1997, Appendix A.11):
 \itemize{

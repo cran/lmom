@@ -38,7 +38,7 @@ Calculations use the algorithm given in Hosking (1996, p.14).}
   Research Report RC20525, IBM Research Division, Yorktown Heights, N.Y.
 }
 
-\author{J. R. M. Hosking \email{hosking@watson.ibm.com}}
+\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
 
 \examples{
     data(airquality)

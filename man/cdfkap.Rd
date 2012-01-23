@@ -22,7 +22,7 @@ location parameter \eqn{\xi}{xi},
 scale parameter \eqn{\alpha}{alpha} and
 shape parameters \eqn{k}{k} and \eqn{h}{h}
 has quantile function
-\deqn{x(F)=\xi-{\alpha\over k}(1-({1-F^h \over h})^k).}{x(F) = xi - alpha (1 - ( (1-F^h)/h )^k) / k .}
+\deqn{x(F)=\xi+{\alpha\over k}\biggl\lbrace1-\biggl({1-F^h \over h}\biggr)^k\biggr\rbrace.}{x(F) = xi + alpha (1 - ( (1-F^h)/h )^k) / k .}
 
 Its special cases include the
 generalized logistic (\eqn{h=-1}{h=-1}),

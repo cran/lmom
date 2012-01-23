@@ -978,7 +978,7 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
 
     } else if (method=="nlm") {
 
-      # If user didn't provide "fscale" or "ndigits" arguments,
+      # If user didn't provide "fscale" or "ndigit" arguments,
       # set them to our own defaults
       if (is.null(dotargs$fscale)) dotargs<-c(dotargs,fscale=0)
       if (is.null(dotargs$ndigit)) dotargs<-c(dotargs,ndigit=round(-2*log10(acc)))
@@ -1280,7 +1280,7 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
 
     } else if (method=="nlm") {
 
-      # If user didn't provide "fscale" or "ndigits" arguments,
+      # If user didn't provide "fscale" or "ndigit" arguments,
       # set them to our own defaults
       if (is.null(dotargs$fscale)) dotargs<-c(dotargs,fscale=0)
       if (is.null(dotargs$ndigit)) dotargs<-c(dotargs,ndigit=round(-2*log10(acc)))
@@ -1544,7 +1544,7 @@ dimnames=list(NULL,c("tau_3","GLO","GEV","GPA","GNO","PE3","WAK.LB","ALL.LB")))
 
 lmrd.3par<-list(
   distributions=c("GLO","GEV","GPA","GNO","PE3","WAK.LB","ALL.LB"),
-  col=c("blue","green","red","black","cyan","red","black"),
+  col=c("blue","#00C000","red","black","#00E0E0","red","black"),
   lty=c("solid","solid","solid","solid","solid","longdash","longdash"),
   twopar=c("L","G","E U","N","E N","",""))
 
@@ -1605,15 +1605,22 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
   if (missing(xlim)) xlim<-range(0,0.6,x,na.rm=TRUE)
   if (missing(ylim)) ylim<-range(0,0.4,y,na.rm=TRUE)
   if (length(distributions)==0) {
-    matplot(0,0,err=-1,type="n",xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,...)
+    matplot(0,0,type="n",xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,frame.plot=FALSE,...)
     legend.lmrd<-FALSE
   } else {
    col.lines <- if (!missing(col) && (x.missing || length(col)>1)) col else lmrd.3par$col[matchdist]
    if (missing(lty)) lty<-lmrd.3par$lty[matchdist]
-   matplot(round(lmrd.data[,1],2),lmrd.data[,toupper(distributions)],
-               err=-1,type="l",xlim=xlim,ylim=ylim,
-               xlab=xlab,ylab=ylab,col=col.lines,lty=lty,lwd=lwd,...)
+   matplot(round(lmrd.data[,1],2), lmrd.data[,toupper(distributions)], type="l",
+     xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, col=col.lines, lty=lty, lwd=lwd,
+     frame.plot=FALSE, ...)
   }
+#
+# framing elements of plot (box, lines at x=0 and y=0)
+#
+  fg<-list(...)$fg
+  if (is.null(fg)) fg<-par("fg")
+  box(col=fg)
+  abline(h=0,v=0,col=fg)
 #
 # two-parameter distributions
 #
@@ -1629,19 +1636,17 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
          lmrd.2par$text[match2],adj=c(-0.5,-0.25),xpd=TRUE)
   }
 #
-# redraw axes (may have been overwritten by distribution curves)
-#
-  parusr<-par("usr")
-  lines(c(0,0),c(parusr[3],parusr[4]))
-  lines(c(parusr[1],parusr[2]),c(0,0))
-#
 # legend
 #
-  if (legend.lmrd) {
+  if (isTRUE(legend.lmrd)) legend.lmrd<-list()
+  if (is.list(legend.lmrd)) {
+    parusr<-par("usr")
     if (missing(xlegend)) xlegend<-parusr[1]+0.01*(parusr[2]-parusr[1])
-    if (missing(ylegend)) ylegend<-parusr[3]+0.99*(parusr[4]-parusr[3])
-    legend(xlegend,ylegend,toupper(distributions),bty="n",col=col.lines,
-      lty=lty,lwd=lwd)
+    if (missing(ylegend)) ylegend<-parusr[4]-0.01*(parusr[4]-parusr[3])*par("pin")[1]/par("pin")[2]
+    legend.args<-list(x=xlegend,y=ylegend,legend=toupper(distributions),
+      bty="n",col=col.lines,lty=lty,lwd=lwd)
+    legend.args[names(legend.lmrd)]<-legend.lmrd
+    do.call(legend,legend.args)
   }
 #
 # data points

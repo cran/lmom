@@ -1,14 +1,14 @@
 Package: lmom
-Version: 1.5
-Date: 2009-11-16
+Version: 1.6
+Date: 2012-01-23
 Title: L-moments
 Author: J. R. M. Hosking
-Maintainer: J. R. M. Hosking <hosking@watson.ibm.com>
+Maintainer: J. R. M. Hosking <hosking@us.ibm.com>
 Description: Functions related to L-moments: computation of L-moments
         of distributions and data samples; parameter estimation;
         L-moment ratio diagram; plot vs. quantiles of an extreme-value
         distribution.
 License: Common Public License Version 1.0
-Packaged: 2009-11-16 19:29:29 UTC; hosking
+Packaged: 2012-02-04 17:15:23 UTC; hosking
 Repository: CRAN
-Date/Publication: 2009-11-29 17:23:16
+Date/Publication: 2012-02-04 17:30:27

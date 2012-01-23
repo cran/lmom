@@ -20,7 +20,7 @@ in the order \eqn{\mu, \sigma}{mu, sigma} (location, scale).}
 location parameter \eqn{\mu}{mu} and
 scale parameter \eqn{\sigma}{sigma}
 has probability density function
-\deqn{f(x)={1\over \sigma\sqrt{2\pi}} \exp(-(x-\mu)^2/(2 \sigma^2)).}{f(x) = (1/ sigma sqrt(2 pi)) exp( -(x-mu)^2 / (2 sigma^2) ) .}
+\deqn{f(x)={1\over \sigma\sqrt{2\pi}} \exp\lbrace-(x-\mu)^2/(2 \sigma^2)\rbrace.}{f(x) = (1/ sigma sqrt(2 pi)) exp( -(x-mu)^2 / (2 sigma^2) ) .}
 }
 
 \value{\code{cdfnor} gives the distribution function;

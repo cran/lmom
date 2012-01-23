@@ -98,7 +98,7 @@ either a single vector, or a separate argument for each parameter.
   on their \eqn{L}-moments or expected order statistics.
   \emph{Journal of Statistical Planning and Inference}, \bold{137}, 2870-2891.
 }
-\author{J. R. M. Hosking \email{hosking@watson.ibm.com}}
+\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
 
 \section{Warning}{Arguments \code{bounds}, \code{symm}, \code{order}, \code{acc},
 \code{subdiv}, and \code{verbose} cannot be abbreviated and must be

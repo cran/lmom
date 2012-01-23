@@ -186,7 +186,7 @@ and solving the resulting equations for the parameters
 
 }
 
-\author{J. R. M. Hosking \email{hosking@watson.ibm.com}}
+\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
 
 \seealso{
 \code{\link{pelexp}} for parameter estimation of specific distributions.

@@ -65,7 +65,7 @@ Hosking (1996, pp. 8--9).}
   Research Report RC20525, IBM Research Division, Yorktown Heights, N.Y.
 }
 
-\author{J. R. M. Hosking \email{hosking@watson.ibm.com}}
+\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
 
 
 \seealso{

@@ -5,6 +5,25 @@
        **************************************************
 
 
+Version 1.6     2012 Jan 23
+
+   o   In lmrd(), the framing box and the lines at x=0 and y=0 are drawn in
+       colour 'par("fg")'.  The lines for distributions "GEV" and "PE3" use
+       less bright colours.
+
+   o   In lmrd(), argument 'legend.lmrd' can be a list of arguments to legend().
+
+   o   In lmrd() there is a small change to the default position of the legend,
+       ensuring that if a legend box is drawn (via the argument
+       'legend=list(bty="o")'), its top left corner is offset by 45 degrees
+       from the top left corner of the plot.
+
+   o   Removed inappropriate WRITE statements from Fortran code.
+
+   o   Fixed: some minor errors in the documentation (expressions for quantile
+       functions in help topics 'cdfgev', 'cdfglo', 'cdfgpa', and 'cdfkap').
+
+
 Version 1.5     2009 Nov 16
 
    o   Quantile functions drawn by evplot() now extend across the entire

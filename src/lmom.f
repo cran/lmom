@@ -2612,8 +2612,7 @@ C===================================================== DIGAMD.FOR
       DOUBLE PRECISION FUNCTION DIGAMD(X)
 C***********************************************************************
 C*                                                                     *
-C*  FORTRAN CODE WRITTEN FOR INCLUSION IN IBM RESEARCH REPORT RC20525, *
-C*  'FORTRAN ROUTINES FOR USE WITH THE METHOD OF L-MOMENTS, VERSION 3' *
+C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
 C*  J. R. M. HOSKING                                                   *
 C*  IBM RESEARCH DIVISION                                              *
@@ -2621,7 +2620,7 @@ C*  T. J. WATSON RESEARCH CENTER                                       *
 C*  YORKTOWN HEIGHTS                                                   *
 C*  NEW YORK 10598, U.S.A.                                             *
 C*                                                                     *
-C*  VERSION 3     AUGUST 1996                                          *
+C*  Version 1.6    January 2012                                        *
 C*                                                                     *
 C***********************************************************************
 C
@@ -2667,18 +2666,18 @@ C
       DIGAMD=DIGAMD-SUM
       RETURN
 C
- 1000 WRITE(6,7000)X
+C1000 WRITE(6,7000)X
+ 1000 DIGAMD=1D300
       RETURN
 C
- 7000 FORMAT(' *** ERROR *** ROUTINE DIGAMD :',
-     *  ' ARGUMENT OUT OF RANGE :',D24.16)
+C7000 FORMAT(' *** ERROR *** ROUTINE DIGAMD :',
+C    *  ' ARGUMENT OUT OF RANGE :',D24.16)
       END
 C===================================================== DLGAMA.FOR
       DOUBLE PRECISION FUNCTION DLGAMA(X)
 C***********************************************************************
 C*                                                                     *
-C*  FORTRAN CODE WRITTEN FOR INCLUSION IN IBM RESEARCH REPORT RC20525, *
-C*  'FORTRAN ROUTINES FOR USE WITH THE METHOD OF L-MOMENTS, VERSION 3' *
+C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
 C*  J. R. M. HOSKING                                                   *
 C*  IBM RESEARCH DIVISION                                              *
@@ -2686,7 +2685,7 @@ C*  T. J. WATSON RESEARCH CENTER                                       *
 C*  YORKTOWN HEIGHTS                                                   *
 C*  NEW YORK 10598, U.S.A.                                             *
 C*                                                                     *
-C*  VERSION 3     AUGUST 1996                                          *
+C*  Version 1.6    January 2012                                        *
 C*                                                                     *
 C***********************************************************************
 C
@@ -2751,9 +2750,10 @@ C
    70 DLGAMA=SUM1+SUM2
       RETURN
 C
- 1000 WRITE(6,7000)X
+C1000 WRITE(6,7000)X
+ 1000 DLGAMA=1D300
       RETURN
 C
- 7000 FORMAT(' *** ERROR *** ROUTINE DLGAMA :',
-     *  ' ARGUMENT OUT OF RANGE :',D24.16)
+C7000 FORMAT(' *** ERROR *** ROUTINE DLGAMA :',
+C    *  ' ARGUMENT OUT OF RANGE :',D24.16)
       END

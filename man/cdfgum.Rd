@@ -20,9 +20,9 @@ in the order \eqn{\xi, \alpha}{xi, alpha} (location, scale).}
 location parameter \eqn{\xi}{xi} and
 scale parameter \eqn{\alpha}{alpha}
 has distribution function
-\deqn{F(x)=\exp(-\exp(-(x-\xi)/\alpha))}{F(x) = exp(-exp(-(x-xi)/alpha))}
+\deqn{F(x)=\exp[-\exp\lbrace-(x-\xi)/\alpha\rbrace]}{F(x) = exp(-exp(-(x-xi)/alpha))}
 and quantile function
-\deqn{x(F)=\xi-\alpha\log(-\log(F)).}{x(F) = xi - alpha log(-log(F)) .}
+\deqn{x(F)=\xi-\alpha\log(-\log F).}{x(F) = xi - alpha log(-log F) .}
 }
 
 \value{\code{cdfgum} gives the distribution function;

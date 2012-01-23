@@ -19,7 +19,7 @@ in the order \eqn{\xi, \alpha}{xi, alpha} (location, scale).}
 \details{The exponential distribution with parameters
 \eqn{\xi}{xi} (lower bound) and \eqn{\alpha}{alpha} (mean)
 has distribution function
-\deqn{F(x)=1-\exp(-(x-\xi)/\alpha)}{F(x) = 1 - exp(-(x-xi)/alpha)}
+\deqn{F(x)=1-\exp\lbrace-(x-\xi)/\alpha\rbrace}{F(x) = 1 - exp(-(x-xi)/alpha)}
 for \eqn{x\ge0}{x >= 0}, and quantile function
 \deqn{x(F)=\xi-\alpha\log(1-F).}{x(F) = xi - alpha log(1-F) .}
 }
