@@ -1,8 +1,8 @@
 C
-C  Fortran code for R package "lmom", version 1.0.
+C  Fortran code for R package "lmom", version 2.0.
 C  Based on the LMOMENTS Fortran package, version 3.04.
 C
-C  (c) IBM Corporation, 2008.
+C  (c) IBM Corporation, 2008-2013.
 C
 C  The following routines are called from R functions:
 C
@@ -30,7 +30,7 @@ C    PELNOR
 C    PELPE3
 C    PELWAK
 C    PELWA0
-C    SAMLMU
+C    SAMLM  (in separate file samlm.f)
 C
 C  The following routines are called from other Fortran routines:
 C
@@ -58,10 +58,13 @@ C    Affected routines: LMRGNO, PELGNO.
 C
 C  * PELWAK uses a different procedure if unable to fit a Wakeby
 C    distribution using all 5 L-moments.  Rather than attempting to fit
-C    a Wakeby distribution wuith lowwr bound zero, it immediately fits
+C    a Wakeby distribution with lowwr bound zero, it immediately fits
 C    a generalized Pareto distribution to the first 3 L-moments.
 C
 C  * Routine PELWA0 is not in the LMOMENTS Fortran package.
+C
+C  * Routine SAMLM is based on routine SAMLMU in the LMOMENTS
+C    Forrtan package but has additional arguments.
 C
 C===================================================== CDFWAK.FOR
       SUBROUTINE CDFWAK(X,NX,PARA,CDF,IFAIL)
@@ -2423,121 +2426,6 @@ C
  1000 IFAIL=7000
       DO 1010 I=1,5
  1010 PARA(I)=ZERO
-      END
-C===================================================== SAMLMU.FOR
-      SUBROUTINE SAMLMU(X,N,XMOM,NMOM,IFAIL)
-C***********************************************************************
-C*                                                                     *
-C*  Fortran code written for R package "lmom"                          *
-C*                                                                     *
-C*  J. R. M. HOSKING                                                   *
-C*  IBM RESEARCH DIVISION                                              *
-C*  T. J. WATSON RESEARCH CENTER                                       *
-C*  YORKTOWN HEIGHTS                                                   *
-C*  NEW YORK 10598, U.S.A.                                             *
-C*                                                                     *
-C*  Version 1.0    July 2008                                           *
-C*                                                                     *
-C***********************************************************************
-C
-C  SAMPLE L-MOMENTS OF A DATA ARRAY
-C
-C  PARAMETERS OF ROUTINE:
-C  X      * INPUT* ARRAY OF LENGTH N. CONTAINS THE DATA, IN ASCENDING
-C                  ORDER.
-C  N      * INPUT* NUMBER OF DATA VALUES
-C  XMOM   *OUTPUT* ARRAY OF LENGTH NMOM. ON EXIT, CONTAINS THE SAMPLE
-C                  L-MOMENTS, IN THE ORDER L-1, L-2, T-3, T-4, ... .
-C  NMOM   * INPUT* NUMBER OF L-MOMENTS TO BE FOUND.
-C
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-C        Note: Fortran 77 would require dimension of COEF to be known
-C        at compile time.
-      DOUBLE PRECISION X(N),XMOM(NMOM),COEF(2,NMOM)
-      DATA ZERO/0D0/,ONE/1D0/,TWO/2D0/
-C
-      DN=N
-      DO 10 J=1,NMOM
-   10 XMOM(J)=ZERO
-      IF(NMOM.LE.2)GOTO 100
-C
-C         UNBIASED ESTIMATES OF L-MOMENTS -- THE 'DO 30' LOOP
-C         RECURSIVELY CALCULATES DISCRETE LEGENDRE POLYNOMIALS, VIA
-C         EQ.(9) OF NEUMAN AND SCHONBACH (1974, INT.J.NUM.METH.ENG.)
-C
-      DO 20 J=3,NMOM
-      TEMP=ONE/DFLOAT((J-1)*(N-J+1))
-      COEF(1,J)=DFLOAT(J+J-3)*TEMP
-      COEF(2,J)=DFLOAT((J-2)*(N+J-2))*TEMP
-   20 CONTINUE
-      TEMP=-DN-ONE
-      CONST=ONE/(DN-ONE)
-      NHALF=N/2
-      DO 40 I=1,NHALF
-      TEMP=TEMP+TWO
-      XI=X(I)
-      XII=X(N+1-I)
-      TERMP=XI+XII
-      TERMN=XI-XII
-      XMOM(1)=XMOM(1)+TERMP
-      S1=ONE
-      S=TEMP*CONST
-      XMOM(2)=XMOM(2)+S*TERMN
-      DO 30 J=3,NMOM,2
-      S2=S1
-      S1=S
-      S=COEF(1,J)*TEMP*S1-COEF(2,J)*S2
-      XMOM(J)=XMOM(J)+S*TERMP
-      IF(J.EQ.NMOM)GOTO 30
-      JJ=J+1
-      S2=S1
-      S1=S
-      S=COEF(1,JJ)*TEMP*S1-COEF(2,JJ)*S2
-      XMOM(JJ)=XMOM(JJ)+S*TERMN
-   30 CONTINUE
-   40 CONTINUE
-      IF(N.EQ.NHALF+NHALF)GOTO 60
-      TERM=X(NHALF+1)
-      S=ONE
-      XMOM(1)=XMOM(1)+TERM
-      DO 50 J=3,NMOM,2
-      S=-COEF(2,J)*S
-      XMOM(J)=XMOM(J)+S*TERM
-   50 CONTINUE
-C
-C         L-MOMENT RATIOS
-C
-   60 CONTINUE
-      XMOM(1)=XMOM(1)/DN
-      IF(XMOM(2).EQ.ZERO)GOTO 1010
-      DO 70 J=3,NMOM
-   70 XMOM(J)=XMOM(J)/XMOM(2)
-      XMOM(2)=XMOM(2)/DN
-      RETURN
-C
-C         AT MOST TWO L-MOMENTS
-C
-  100 CONTINUE
-      SUM1=ZERO
-      SUM2=ZERO
-      TEMP=-DN+ONE
-      DO 110 I=1,N
-      SUM1=SUM1+X(I)
-      SUM2=SUM2+X(I)*TEMP
-      TEMP=TEMP+TWO
-  110 CONTINUE
-      XMOM(1)=SUM1/DN
-      IF(NMOM.EQ.1)RETURN
-      XMOM(2)=SUM2/(DN*(DN-ONE))
-      RETURN
-C
- 1010 IFAIL=7010
-      DO 1020 J=2,NMOM
- 1020 XMOM(J)=ZERO
-      RETURN
-C
-C7010 FORMAT(' *** ERROR *** ROUTINE SAMLMU :',
-C    *  ' ALL DATA VALUES EQUAL')
       END
 C===================================================== DERF.FOR
       DOUBLE PRECISION FUNCTION DERF(X)

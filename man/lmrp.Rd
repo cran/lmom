@@ -2,61 +2,59 @@
 \alias{lmrp}
 \alias{lmrq}
 \title{L-moments of a general probability distribution}
-\description{Computes the \eqn{L}-moments of a probability distribution
+\description{Computes the \eqn{L}-moments or trimmed \eqn{L}-moments
+of a probability distribution
 given its cumulative distribution function (for function \code{lmrp})
 or quantile function (for function \code{lmrq}).
 }
 \usage{
-lmrp(pfunc, ..., bounds = c(-Inf, Inf), symm = FALSE, order = 1:4,
-     acc = 1e-6, subdiv = 100, verbose = FALSE)
+lmrp(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
+     ratios=TRUE, trim=0, acc=1e-6, subdiv=100, verbose=FALSE)
 
-lmrq(qfunc, ..., symm = FALSE, order = 1:4, acc = 1e-6,
-     subdiv = 100, verbose = FALSE)
+lmrq(qfunc, ..., symm=FALSE, order=1:4, ratios=TRUE, trim=0,
+     acc=1e-6, subdiv=100, verbose=FALSE)
 }
 
 \arguments{
-\item{pfunc}{Cumulative distribution function.}
-\item{qfunc}{Quantile function.}
-\item{\dots}{Arguments to \code{pfunc} or \code{qfunc}.}
-\item{bounds}{Either a vector of length 2, containing the lower
-and upper bounds of the distribution, or a function that calculates
-these bounds given the distribution parameters as inputs.}
-\item{symm}{
-For \code{lmrq}, a logical value indicating whether
-the distribution is symmetric about its median.
+  \item{pfunc}{Cumulative distribution function.}
+  \item{qfunc}{Quantile function.}
+  \item{\dots}{Arguments to \code{pfunc} or \code{qfunc}.}
+  \item{bounds}{Either a vector of length 2, containing the lower
+    and upper bounds of the distribution, or a function that calculates
+    these bounds given the distribution parameters as inputs.}
+  \item{symm}{
+    For \code{lmrq}, a logical value indicating whether
+    the distribution is symmetric about its median.
 
-For \code{lmrp}, either the logical value \code{FALSE}
-to indicate that the distribution is not symmetric,
-or a numeric value to indicate that the distribution is symmetric
-and that the specified value is the center of symmetry.
+    For \code{lmrp}, either the logical value \code{FALSE}
+    to indicate that the distribution is not symmetric,
+    or a numeric value to indicate that the distribution is symmetric
+    and that the specified value is the center of symmetry.
 
-If the distribution is symmetric, odd-order \eqn{L}-moment ratios
-are exactly zero and the symmetry is used to slightly speed up
-the computation of even-order \eqn{L}-moments.}
-\item{order}{Orders of the \eqn{L}-moments and \eqn{L}-moment ratios to be computed.}
-\item{acc}{Requested accuracy.  The function will try to achieve
-this level of accuracy, as relative error for \eqn{L}-moments and absolute
-error for \eqn{L}-moment ratios.
+    If the distribution is symmetric, odd-order \eqn{L}-moments
+    are exactly zero and the symmetry is used to slightly speed up
+    the computation of even-order \eqn{L}-moments.}
+  \item{order}{Orders of the \eqn{L}-moments and \eqn{L}-moment ratios to be computed.}
+  \item{ratios}{Logical. If \code{FALSE}, \eqn{L}-moments are computed;
+    if \code{TRUE} (the default), \eqn{L}-moment ratios are computed.}
+  \item{trim}{Degree of trimming.
+    If a single value, symmetric trimming of the specified degree will be used.
+    If a vector of length 2, the two values
+    indicate the degrees of trimming at the lower and upper ends of the
+    \dQuote{conceptual sample} (Elamir and Seheult, 2003) of order statistics
+    that is used to define the trimmed \eqn{L}-moments.}
+  \item{acc}{Requested accuracy.  The function will try to achieve
+    this level of accuracy, as relative error for \eqn{L}-moments and absolute
+    error for \eqn{L}-moment ratios.}
+  \item{subdiv}{Maximum number of subintervals used in numerical integration.}
+  \item{verbose}{Logical.  If \code{FALSE}, only the values of the \eqn{L}-moments
+    and \eqn{L}-moment ratios are returned.  If \code{TRUE}, more details of the
+    numerical integration are returned: see \dQuote{Value} section below.}
 }
-\item{subdiv}{Maximum number of subintervals used in numerical integration.}
-\item{verbose}{Logical.  If \code{FALSE}, only the values of the \eqn{L}-moments
-and \eqn{L}-moment ratios are returned.  If \code{TRUE}, more details of the
-numerical integration are returned: see \dQuote{Value} section below.}
-}
 
-\details{\eqn{L}-moments are computed by numerical integration,
-using the \R function \code{integrate}.
-\code{lmrq} uses the expression
-\eqn{\lambda_r = \int_0^1 Q(u) P^{*}_{r-1}(u) du}{lambda_r =
-integral from 0 to 1 of Q(u) P*_{r-1}(u) du}
-where \eqn{Q(u)}{Q(u)} is the quantile function and
-\eqn{P^{*}_{r-1}(u)}{P*_{r-1}(u))} is a shifted Legendre polynomial of
-order \eqn{r}{r} (Hosking, 1990, eq. (2.2)).
-\code{lmrp} uses the expression
-\eqn{\lambda_r = \int Z_r(F(x)) dx}{lambda_r = integral of Z_r(F(x)) dx}
-where \eqn{F(x)} is the cumulative distribution function
-and \eqn{Z_r} is a polynomial of  degree \eqn{r}
-defined in Hosking (2007, eq. (3.5)).
+\details{Computations use expressions in Hosking (2007):
+eq. (7) for \code{lmrp}, eq. (5) for \code{lmrq}.
+Integrals in those expressions are computed by numerical integration.
 }
 
 \value{If \code{verbose=FALSE}, a numeric vector containing the \eqn{L}-moments
@@ -87,31 +85,46 @@ the distribution parameter arguments of \code{pfunc}:
 either a single vector, or a separate argument for each parameter.
 }
 
-\references{
-  Hosking, J. R. M. (1990).
-  \eqn{L}-moments: analysis and estimation of distributions
-  using linear combinations of order statistics.
-  \emph{Journal of the Royal Statistical Society, Series B}, \bold{52}, 105-124.
+\note{
+In package \pkg{lmom} versions 1.6 and earlier, the \dQuote{Details} section stated that
+\dQuote{Integrals in those expressions are computed by numerical integration,
+using the \R function \code{integrate}}.
+As of version 2.0, numerical integration uses an internal function
+that directly calls (slightly modified versions of)
+the Fortran routines in QUADPACK (Piessens et al. 1983).
+\R{}'s own \code{integrate} function uses C code \dQuote{based on} the
+QUADPACK routines but since \R{} version 2.12.0 through at least
+\R{} version 3.0.1 does not in every case reproduce the results that
+would have been obtained with the Fortran code.
+(This is \R{} bug PR#15219, reported 2013 Feb 24 but not acted on as of 2013 Jun 1).
+}
 
-  Hosking, J. R. M. (2007).
-  Distributions with maximum entropy subject to constraints
-  on their \eqn{L}-moments or expected order statistics.
-  \emph{Journal of Statistical Planning and Inference}, \bold{137}, 2870-2891.
+\references{
+  Elamir, E. A. H., and Seheult, A. H. (2003).  Trimmed L-moments.
+  \emph{Computational Statistics and Data Analysis}, \bold{43}, 299-314.
+
+  Hosking, J. R. M. (2007).  Some theory and practical uses of trimmed L-moments.
+  \emph{Journal of Statistical Planning and Inference}, \bold{137}, 3024-3039.
+
+  Piessens, R., deDoncker-Kapenga, E., Uberhuber, C., and Kahaner, D. (1983).
+  \emph{Quadpack: a Subroutine Package for Automatic Integration}.
+  Springer Verlag.
 }
 \author{J. R. M. Hosking \email{hosking@us.ibm.com}}
 
-\section{Warning}{Arguments \code{bounds}, \code{symm}, \code{order}, \code{acc},
-\code{subdiv}, and \code{verbose} cannot be abbreviated and must be
-specified by their full names (if abbreviated, the names would be
-matched to the arguments of \code{pfunc} or \code{qfunc}).}
+\section{Warning}{Arguments \code{bounds}, \code{symm}, \code{order},
+\code{ratios}, \code{trim}, \code{acc}, \code{subdiv}, and \code{verbose}
+cannot be abbreviated and must be specified by their full names
+(if abbreviated, the names would be matched to the arguments of
+\code{pfunc} or \code{qfunc}).}
 
 \seealso{
-\code{\link{lmrexp}} to compute \eqn{L}-moments of specific distributions.
+\code{\link{lmrexp}} to compute (untrimmed) \eqn{L}-moments of specific distributions.
 
-\code{\link{samlmu}} to compute \eqn{L}-moments of a data sample.
+\code{\link{samlmu}} to compute (trimmed or untrimmed) \eqn{L}-moments of a data sample.
 
 \code{\link{pelp}} and \code{\link{pelexp}},
-to compute the parameters of a distribution given its \eqn{L}-moments.
+to compute the parameters of a distribution given its (trimmed or untrimmed) \eqn{L}-moments.
 }
 
 \examples{
@@ -167,10 +180,13 @@ lmrq(function(p) (1-p)^(-1.5))
 
 # And sometimes the integral is divergent but that's not what
 # the warning says (at least on the author's system)
-lmrq(qcauchy)
+lmrp(pcauchy)
+
+# Trimmed L-moments for Cauchy distribution are finite
+lmrp(pcauchy, symm=0, trim=1)
 
 # Works for discrete distributions too, but often requires
-# a larger-than-default value of subdiv
-lmrp(pbinom, size=20, prob=0.8, bounds=c(0,20), subdiv=1000)
+# a larger-than-default value of 'subdiv'
+lmrp(ppois, lambda=5, subdiv=1000)
 }
 \keyword{distribution}

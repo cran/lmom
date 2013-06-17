@@ -3,56 +3,74 @@
 \alias{pelq}
 \title{Parameter estimation for a general distribution by the method of L-moments}
 \description{Computes the parameters of a probability distribution
-as a function of the \eqn{L}-moments.
+as a function of the \eqn{L}-moments or trimmed \eqn{L}-moments.
 }
 \usage{
 pelp(lmom, pfunc, start, bounds = c(-Inf, Inf),
-     type = c("n", "s", "ls", "lss"), method = "nlm", acc = 1e-5, ...)
+     type = c("n", "s", "ls", "lss"),
+     ratios = NULL, trim = NULL, method = "nlm", acc = 1e-5, ...)
 
 pelq(lmom, qfunc, start, type = c("n", "s", "ls", "lss"),
-     method = "nlm", acc = 1e-5, ...)
+     ratios = NULL, trim = NULL, method = "nlm", acc = 1e-5, ...)
 }
 
 \arguments{
-\item{lmom}{Numeric vector containing the \eqn{L}-moments of the distribution
-or of a data sample.}
-\item{pfunc}{Cumulative distribution function of the distribution.}
-\item{qfunc}{Quantile function of the distribution.}
-\item{start}{Vector of starting values for the parameters.}
-\item{bounds}{Either a vector of length 2, containing the lower
-and upper bounds of the distribution, or a function that calculates
-these bounds given the distribution parameters as inputs.}
-\item{type}{Type of distribution, i.e. how it is parametrized.
-Must be one of the following:
-\describe{
-\item{\code{"ls"}}{The distribution has a location parameter and a scale parameter.}
-\item{\code{"lss"}}{The distribution has a location parameter and a scale parameter,
-and is symmetric about its median.}
-\item{\code{"s"}}{The distribution has a scale parameter but not a location parameter.}
-\item{\code{"n"}}{The distribution has neither a location parameter
-nor a scale parameter.}}
+  \item{lmom}{Numeric vector containing the \eqn{L}-moments of the distribution
+    or of a data sample.}
+  \item{pfunc}{Cumulative distribution function of the distribution.}
+  \item{qfunc}{Quantile function of the distribution.}
+  \item{start}{Vector of starting values for the parameters.}
+  \item{bounds}{Either a vector of length 2, containing the lower
+    and upper bounds of the distribution, or a function that calculates
+    these bounds given the distribution parameters as inputs.}
+  \item{type}{Type of distribution, i.e. how it is parametrized.
+    Must be one of the following:
+    \describe{
+    \item{\code{"ls"}}{The distribution has a location parameter and a scale parameter.}
+    \item{\code{"lss"}}{The distribution has a location parameter and a scale parameter,
+      and is symmetric about its median.}
+    \item{\code{"s"}}{The distribution has a scale parameter but not a location parameter.}
+    \item{\code{"n"}}{The distribution has neither a location parameter
+      nor a scale parameter.}}
 
-For more details, see the \dQuote{Distribution type} section below.
-}
-\item{method}{Method used to estimate the shape parameters
-(i.e. all parameters other than the location and scale parameters, if any).
-Valid values are \code{"nlm"} (the default), \code{"uniroot"}
-(which is valid only if the distribution has at most one shape parameter),
-and any of the values of the \code{method} argument of function \code{optim}.
-See the \dQuote{Details} section below.
-}
-\item{acc}{Requested accuracy for the estimated parameters.
-This will be absolute accuracy for shape parameters,
-relative accuracy for a scale parameter, and
-absolute accuracy of the location parameter divided by the scale parameter
-for a location parameter.}
-\item{\dots}{Further arguments will be passed to the optimization function
-(\code{nlm}, \code{uniroot}, or \code{optim}).}
+    For more details, see the \dQuote{Distribution type} section below.
+  }
+  \item{ratios}{Logical or \code{NULL}.
+    If \code{FALSE}, \code{lmom} should contain \eqn{L}-moments;
+    if \code{TRUE}, \code{lmom} should contain \eqn{L}-moment ratios.
+    If \code{NULL} and \code{lmom} has names, the contents of \code{lmom}
+    will be inferred from these names - see section
+    \dQuote{Inferring \sQuote{ratios} and \sQuote{trim}} below.
+    The default value (if \code{ratios} is \code{NULL} and \code{lmom} has no names)
+    is \code{TRUE}.}
+  \item{trim}{The degree of trimming corresponding to the \eqn{L}-moments in \code{lmom}.
+    Can be a single value or a vector length 2, as for \code{samlmu}.
+    Can also be \code{NULL}: in this case if \code{lmom} has names,
+    the degree of trimming will be inferred from these names - see section
+    \dQuote{Inferring \sQuote{ratios} and \sQuote{trim}} below.
+    The default value (if \code{trim} is \code{NULL} and \code{lmom} has no names)
+    is \code{0}.}
+  \item{method}{Method used to estimate the shape parameters
+    (i.e. all parameters other than the location and scale parameters, if any).
+    Valid values are \code{"nlm"} (the default), \code{"uniroot"}
+    (which is valid only if the distribution has at most one shape parameter),
+    and any of the values of the \code{method} argument of function \code{optim}.
+    See the \dQuote{Details} section below.
+  }
+  \item{acc}{Requested accuracy for the estimated parameters.
+    This will be absolute accuracy for shape parameters,
+    relative accuracy for a scale parameter, and
+    absolute accuracy of the location parameter divided by the scale parameter
+    for a location parameter.}
+  \item{\dots}{Further arguments will be passed to the optimization function
+    (\code{nlm}, \code{uniroot}, or \code{optim}).}
 }
 
 \details{For shape parameters, numerical optimization is used to
 find parameter values for which the population \eqn{L}-moments or \eqn{L}-moment ratios
 are equal to the values supplied in \code{lmom}.
+Computation of \eqn{L}-moments or \eqn{L}-moment ratios
+uses functions \code{lmrp} (for \code{pelp}) or \code{lmrq} (for \code{pelq}).
 Numerical optimization uses \R functions \code{nlm} (if \code{method="nlm"}),
 \code{uniroot} (if \code{method="uniroot"}), or
 \code{optim} with the specified method (for the other values of \code{method}).
@@ -186,6 +204,27 @@ and solving the resulting equations for the parameters
 
 }
 
+\section{Inferring \sQuote{ratios} and \sQuote{trim}}{
+If \code{ratios} or \code{trim} is \code{NULL}, appropriate values will be inferred
+by inspecting the names of \code{lmom}. It is assumed that \code{lmom}
+was generated by a call to \code{samlmu}, \code{lmrp}, or \code{lmrq};
+in this case its names will reflect the values of \code{ratios} and \code{trim}
+used in that  call.
+If in this case \code{lmom} has no names, default values
+\code{ratios=TRUE} and \code{trim=0} will be used.
+
+This inference is made in order to reduce the need to specify the
+orders of trimming repetitivelty.
+For example, a distribution with quantile function \code{qfunc} can be
+fitted to (1,1)-trimmed \eqn{L}-moments of data in \code{x} by
+\preformatted{
+  lmom <- samlmu(x, trim=1)
+  fit <- pelq(lmom, qfunc, start=...)
+}
+There is no need to specify \code{trim} both in the call to \code{samlmu}
+and the call to \code{pelq}.
+}
+
 \author{J. R. M. Hosking \email{hosking@us.ibm.com}}
 
 \seealso{
@@ -260,7 +299,18 @@ pelq(c(3,5,0,0.2345), qstu2, start=c(0,1,0.1), type="lss")
 # Or try a different optimization method
 pelq(c(3,5,0,0.2345), qstu, start=c(0,1,10), type="lss",
     method="uniroot", lower=2, upper=100)
-rm(qstu,qstu2)
+
+## With trimmed L-moments, we can fit this distribution even when
+## it does not have a finite mean ('df' less than 1)
+set.seed(123456)
+dat <- qstu(runif(1000), xi=3, alpha=5, df=0.75)
+lmom <- samlmu(dat, trim=1)
+lmom
+# Note that pelq() infers 'trim=1' from the names of 'lmom'
+pelq(lmom, qstu, start=c(0,1,10), type="lss",  method="uniroot",
+  lower=0.51, upper=100)
+
+rm(qstu, qstu2, dat, lmom)
 
 }
 \keyword{models}

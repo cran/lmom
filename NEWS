@@ -5,6 +5,30 @@
        **************************************************
 
 
+Version 2.0     2013 Jun 17
+
+   o   Some support added for trimmed L-moments: samlmu(), samlmu.s(), lmrp(),
+       lmrq(), pelp(), and pelq() each gain an argument 'trim'.
+
+   o   Some support added for computing L-moments rather than L-moment ratios:
+       samlmu(), samlmu.s(), lmrp(), lmrq(), pelp(), and pelq() each gain an
+       argument 'ratios'.
+
+   o   New function .samlmu() for fast computation of (untrimmed) L-moment
+       ratios.
+
+   o   lmrp() and lmrq() use an internal function for numerical integration,
+       to avoid the bugs introduced into R's own integrate() function in R
+       version 2.12.0.
+
+   o   In lmrp(), modified the computation method for lambda_1: should make
+       computations a little faster.
+
+   o   LICENSE file no longer included in package, to avoid a NOTE when
+       building the package for CRAN under R version 3.0.0.  The license can
+       be found at http://www.eclipse.org/legal/cpl-v10.html.
+
+
 Version 1.6     2012 Jan 23
 
    o   In lmrd(), the framing box and the lines at x=0 and y=0 are drawn in

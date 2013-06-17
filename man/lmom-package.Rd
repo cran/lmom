@@ -5,6 +5,16 @@
 \alias{lmom}
 \alias{lmoments}
 \alias{lmom-package}
+%%%%%%%%%%%%%%%%%%%%%%
+\alias{xsamlmu}
+\alias{xsamlmu.s}
+\alias{xlmrp}
+\alias{xlmrq}
+\alias{xpelp}
+\alias{xpelq}
+\alias{xzpoly}
+\alias{xslp}
+%%%%%%%%%%%%%%%%%%%%%%
 \title{The lmom package}
 \description{
   \R functions for use with the method of \eqn{L}-moments
@@ -44,25 +54,28 @@ When the \eqn{L}-moments are the sample \eqn{L}-moments of a set of data,
 the resulting parameters are of course the
 \dQuote{method of \eqn{L}-moments} estimates of the parameters.
 
-Here \code{...} is a three-letter code used to identify the
-distribution, as given in the table below.
-For example the cumulative distribution function of the gamma distribution is
-\code{cdfgam}.
+Here \code{...} is a three-letter code used to identify the distribution,
+as given in the table below.
+For example the cumulative distribution function of the gamma distribution
+is \code{cdfgam}.
 
-\tabular{ll}{
-\code{exp} \tab exponential \cr
-\code{gam} \tab gamma \cr
-\code{gev} \tab generalized extreme-value \cr
-\code{glo} \tab generalized logistic \cr
-\code{gpa} \tab generalized Pareto \cr
-\code{gno} \tab generalized normal \cr
-\code{gum} \tab Gumbel (extreme-value type I) \cr
-\code{kap} \tab kappa \cr
-\code{ln3} \tab lognormal \cr
-\code{nor} \tab normal \cr
-\code{pe3} \tab Pearson type III \cr
-\code{wak} \tab Wakeby \cr
-\code{wei} \tab Weibull \cr
+% This (and all \tabular{rll}'s) started as \tabular{ll} without the initial "\tab"
+% on each line.  Change was made because first column in pdf help file was not
+% properly aligned, as of R 2.15.2.
+\tabular{rll}{
+\tab \code{exp} \tab exponential \cr
+\tab \code{gam} \tab gamma \cr
+\tab \code{gev} \tab generalized extreme-value \cr
+\tab \code{glo} \tab generalized logistic \cr
+\tab \code{gpa} \tab generalized Pareto \cr
+\tab \code{gno} \tab generalized normal \cr
+\tab \code{gum} \tab Gumbel (extreme-value type I) \cr
+\tab \code{kap} \tab kappa \cr
+\tab \code{ln3} \tab lognormal \cr
+\tab \code{nor} \tab normal \cr
+\tab \code{pe3} \tab Pearson type III \cr
+\tab \code{wak} \tab Wakeby \cr
+\tab \code{wei} \tab Weibull \cr
 }
 
 The following functions are also contained in the package.
@@ -108,6 +121,23 @@ The following functions are also contained in the package.
   add, respectively, a set of points, a cumulative distribution function,
   and a quantile function to an extreme-value plot.
 }
+\section{Trimmed \eqn{L}-moments}{
+Some functions support the trimmed \eqn{L}-moments defined by Elamir and Seheult (2003).
+Trimmed \eqn{L}-moments are based on linear combinations of order statistics
+that give zero weight to the most extreme order statistics and thereby can be
+defined for very heavy-tailed distributions that do not have a finite mean.
+
+Function \code{\link{samlmu}} can compute sample trimmed \eqn{L}-moments.
+Functions \code{\link{lmrp}} and \code{\link{lmrq}} can compute trimmed \eqn{L}-moments
+of probability distributions.
+Functions \code{\link{pelp}} and \code{\link{pelq}} can calculate parameters
+of a probability distribution given its trimmed \eqn{L}-moments.
+
+The distribution-specific functions \code{lmr...} and \code{pel...} and the
+functions for \eqn{L}-moment ratio diagrams (\code{lmrd}, etc.) currently
+do not support trimmed \eqn{L}-moments.
+
+}
 \section{Parameters of cumulative distribution functions and quantile functions}{
 The functions \code{cdf...} (cumulative distribution functions)
 and \code{qua...} (quantile functions) expect the distribution
@@ -149,6 +179,9 @@ LMOMENTS package.
 %\seealso{
 %}
 \references{
+  Elamir, E. A. H., and Seheult, A. H. (2003).  Trimmed L-moments.
+  \emph{Computational Statistics and Data Analysis}, \bold{43}, 299-314.
+
   Hosking, J. R. M. (1990).
   \eqn{L}-moments: analysis and estimation of distributions
   using linear combinations of order statistics.

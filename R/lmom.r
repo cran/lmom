@@ -8,11 +8,15 @@
 #*  YORKTOWN HEIGHTS                                                   *
 #*  NEW YORK 10598, U.S.A.                                             *
 #*                                                                     *
-#*  (c) IBM Corporation, 2008.                                         *
+#*  (c) IBM Corporation, 2008-2013.                                    *
 #*                                                                     *
-#*  Version 1.0    July 2008                                           *
+#*  Version 2.0    March 2013                                          *
 #*                                                                     *
 #***********************************************************************
+
+#-------------------------------------------------------------------------------
+#  Specifications for distributions, used by cdf...(), qua...(), lmr...(), pel...()
+#-------------------------------------------------------------------------------
 
 lmom.routines<-list(
   lmrexp="lmrexp",
@@ -38,8 +42,7 @@ lmom.routines<-list(
   pelpe3="pelpe3",
   pelwak="pelwak",
   pelwa0="pelwa0",
-  cdfwak="cdfwak",
-  samlmu="samlmu")
+  cdfwak="cdfwak")
 
 # lmom.dist contains specifications for each distribution that the "lmom" package knows about
 #
@@ -68,6 +71,10 @@ lmom.dist<-list(
   wa0=list(name="wa0",npara=5,parnames=c("xi","alpha","beta","gamma","delta"),pardefaults=c(0,1,0,0,0),himom=4,maxmom=20,lmrroutine=lmom.routines$lmrwak,pelroutine=lmom.routines$pelwa0),
   wei=list(name="wei",npara=3,parnames=c("zeta","beta","delta"),              pardefaults=c(0,1,0),    himom=3,maxmom=20,lmrroutine=NULL,                pelroutine=NULL)
 )
+
+#-------------------------------------------------------------------------------
+#  Distributions: cdf...(), qua...(), lmr...(), pel...()
+#-------------------------------------------------------------------------------
 
 cdfexp<-function(x,para=c(0,1)){
   if (length(para)!=2) stop("parameter vector has wrong length")
@@ -428,7 +435,7 @@ pelxxx<-function(xxx,lmom){
   return(list(para=para,ifail=fort$ifail))
 }
 
-cdfln3<-function(x, para=c(0,0,1)) {
+cdfln3<-function(x,para=c(0,0,1)) {
   if (length(para)!=3) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[3]<=0) stop("distribution parameters invalid")
@@ -521,74 +528,192 @@ pelwei<-function(lmom,bound=NULL) {
   return(out)
 }
 
-samlmu<-function(x,nmom=4,sort.data=TRUE){
-  if (!is.numeric(x)) stop("'x' must be numeric")
-  xok<-x[!is.na(x)]
-  nxok<-length(xok)
-  nnmom<-as.integer(nmom)
-  if (nnmom<=0) return(numeric(0))
-  if (nnmom<=2) rnames <- paste("l",1:nnmom,sep="_")
-  else rnames <- c("l_1","l_2",paste("t",3:nnmom,sep="_"))
-  result <- rep(as.numeric(NA),nnmom)
-  names(result) <- rnames
-  if (nxok==0) return(result)
-  if (sort.data==TRUE) xok<-sort(xok)
-  nmom.actual<-min(nnmom,nxok)
-  fort<-.Fortran(lmom.routines$samlmu,PACKAGE="lmom",
-        as.double(xok),
-        as.integer(nxok),
-        xmom=double(nmom.actual),
-        as.integer(nmom.actual),
-        ifail=integer(1))
-  result[1:nmom.actual]<-fort$xmom
-  if (fort$ifail==7010) {
-    warning("all data values equal")
-    result[3:nnmom]<-NA
-  }
-  return(result)
-}
+#-------------------------------------------------------------------------------
+#  Sample L-moments
+#-------------------------------------------------------------------------------
 
-samlmu.s<-function(x,nmom=4,sort.data=TRUE){
+samlmu<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
   if (!is.numeric(x)) stop("'x' must be numeric")
   xok<-x[!is.na(x)]
   n<-length(xok)
   if (nmom<=0) return(numeric(0))
-  if (nmom<=2) rnames <- paste("l",1:nmom,sep="_")
-  else rnames <- c("l_1","l_2",paste("t",3:nmom,sep="_"))
-  lmom <- rep(as.numeric(NA),nmom)
-  names(lmom) <- rnames
-  if (n==0) return(lmom)
-  if (sort.data) xok<-sort(xok)
-  nmom.actual<-min(nmom,n)
-  lmom[1] <- mean(xok)
-  if (nmom.actual==1) return(lmom)
-  temp<-seq(1-n,n-1,by=2)
-  p1<-rep(1,n)
-  p<-temp/(n-1)
-  lmom[2]<-mean(xok*p)
-  if (nmom.actual==2) return(lmom)
-  if (xok[1]==xok[n]) {
-    warning("all data values equal")
-    return(lmom)
+  t1<-trim[1]
+  t2<-if (length(trim)==1) t1 else trim[2]
+  maxmom<-min(nmom+t1+t2,n)
+  nmom.actual<-maxmom-t1-t2
+  if (nmom.actual<=0) {
+    # return(rep(as.numeric(NA),nmom)) # but should have names
+    # Next line is a device to get the right names for the return value
+    out<-samlmu(seq_len(nmom+t1+t2),nmom=nmom,trim=trim,ratios=ratios)
+    is.na(out)<-TRUE
+    return(out)
   }
-  for(j in 3:nmom.actual) {
-    p2<-p1
-    p1<-p
-    p<-((2*j-3)*temp*p1-(j-2)*(n+j-2)*p2)/((j-1)*(n-j+1))
-    lmom[j]<-mean(xok*p)/lmom[2]
+  fort<-.Fortran("samlm",PACKAGE="lmom",
+        as.double(xok),
+        as.integer(n),
+        xmom=double(maxmom),
+        as.integer(maxmom),
+        isort=as.integer(sort.data),
+        iratio=0L)
+  lmom<-fort$xmom
+  #
+  if (any(trim>0)) {
+    # Matrix 'wmat' will contain coefficients for transforming from untrimmed to trimmed L-moments.
+    # Its rth row will successively contain coefficients for lambda_r(t1,t2) as a sum of lambda's of lower
+    # orders of trimming, and will ultimately contain coefficients for lambda_r(t1,t2)
+    # as a sum of lambda_1,...,lambda_{nmom+t1+t2}.
+    wmat<-diag(1,nmom.actual,maxmom) # Initial coefficients for order (t1,t2)
+    rr<-seq_len(maxmom)
+    # Express (t1,t2) moments in terms of moments of successively reduced order (t1-1,t2), ..., (0,t2)
+    # At each step 'mm' contains the coefficients expressing one order in terms of the next lower order
+    for (tt in rev(seq_len(t1))) {
+      aa<-(rr+tt+t2)/(2*rr+tt+t2-1)          # 'aa' and 'bb' are from Hosking (2007), eq.(13)
+      bb<-(rr+1)/rr*(rr+t2)/(2*rr+tt+t2-1)
+      mm<-diag(aa)                                       # 'aa' coeffts go on leading diagonal
+      mm[cbind(1:(maxmom-1),2:maxmom)]<-bb[1:(maxmom-1)] # 'bb' coeffts go on next-to-leading diagonal
+      wmat<-wmat %*% mm
+    }
+    for (tt in rev(seq_len(t2))) {   # Successive order reduction (0,t2), (0,t2-1), ..., (0,0)
+      aa<-(rr+tt)/(2*rr+tt-1)        # 'aa' and 'bb' are from Hosking (2007), eq.(12) with s=0
+      bb<- -(rr+1)/(2*rr+tt-1)
+      mm<-diag(aa)
+      mm[cbind(1:(maxmom-1),2:maxmom)]<-bb[1:(maxmom-1)]
+      wmat<-wmat %*% mm
+    }
+    lmom<-c(wmat %*% lmom)    # Get each trimmed L-moment lambda_r(t1,t2) as a sum of lambda's
+    # If all values equal after trimming, all trimmed L-moments execpt the first must be zero
+    if (nmom.actual>1 && all(xok[(t1+1):(n-t2)]==xok[t1+1])) lmom[-1]<-0
   }
+  length(lmom)<-nmom
+  if (ratios && nmom.actual>2) {
+    if (all(xok[(1+t1):(n-t2)]==xok[(1+t1)])) {
+      warning("all data values equal", if (any(trim>0)) " (after trimming)")
+      lmom[-1]<-0    # R code doesn't guarantee this
+    }
+    lmom[3:nmom]<-lmom[3:nmom]/lmom[2]
+    names(lmom)<-c("l_1","l_2",paste("t",3:nmom,sep="_"))
+  }  else names(lmom)<-paste("l",1:nmom,sep="_")
+  if (!missing(trim)) names(lmom)<-sub("_", paste("(",t1,",",t2,")_",sep=""),names(lmom))
   return(lmom)
 }
+
+
+samlmu.s<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
+  #
+  # Preliminaries
+  #
+  if (!is.numeric(x)) stop("'x' must be numeric")
+  xok<-x[!is.na(x)]           # Remove missing values
+  n<-length(xok)
+  if (nmom<=0) return(numeric(0))
+  t1<-trim[1]
+  t2<-if (length(trim)==1) t1 else trim[2]
+  maxmom<-min(nmom+t1+t2,n)   # Number of untrimmed L-moments to compute
+  nmom.actual<-maxmom-t1-t2
+  if (nmom.actual<=0) {
+    # return(rep(as.numeric(NA),nmom)) # but should have names
+    # Next line is a device to get the right names for the return value
+    out<-samlmu.s(seq_len(nmom+t1+t2),nmom=nmom,trim=trim,ratios=ratios)
+    is.na(out)<-TRUE
+    return(out)
+  }
+  #
+  # Sort the data if needed
+  #
+  if (sort.data) xok<-sort(xok)
+  #
+  # Compute (untrimmed) sample L-moments.  The (j in 3:maxmom) loop computes
+  # discrete Legendre polynomials recursively and uses them as weights for
+  # the ordered observations.
+  #
+  lmom<-numeric(maxmom)
+  lmom[1]<-sum(xok)
+  if (maxmom>1) {
+    temp<-seq(1-n,n-1,by=2)
+    p1<-rep(1,n)
+    p<-temp/(n-1)
+    lmom[2]<-sum(xok*p)
+    if (maxmom>2) {
+      for (j in 3:maxmom) {
+        p2<-p1
+        p1<-p
+        p<-((2*j-3)*temp*p1-(j-2)*(n+j-2)*p2)/((j-1)*(n-j+1))
+        lmom[j]<-sum(xok*p)
+      }
+    }
+  }
+  lmom<-lmom/n   # Faster than mean(xok*p) within loop (R 2.15.3 on Windows 64-bit)
+  #
+  # If trimmed L-moments are needed, obtain them as linear combinations
+  # of untrimmed L-moments using the recursions in Hosking (2007,
+  # J.Statist.Plann.Inf.), eqs. (12)-(13).
+  #
+  if (any(trim>0)) {
+    # Matrix 'wmat' will contain coefficients for transforming from untrimmed to trimmed L-moments.
+    # Its rth row will successively contain coefficients for lambda_r(t1,t2) as a sum of lambda's of lower
+    # orders of trimming, and will ultimately contain coefficients for lambda_r(t1,t2)
+    # as a sum of lambda_1,...,lambda_{nmom+t1+t2}.
+    wmat<-diag(1,nmom.actual,maxmom) # Initial coefficients for order (t1,t2)
+    rr<-seq_len(maxmom)
+    # Express (t1,t2) moments in terms of moments of successively reduced order (t1-1,t2), ..., (0,t2)
+    # At each step 'mm' contains the coefficients expressing one order in terms of the next lower order
+    for (tt in rev(seq_len(t1))) {
+      aa<-(rr+tt+t2)/(2*rr+tt+t2-1)          # 'aa' and 'bb' are from Hosking (2007), eq.(13)
+      bb<-(rr+1)/rr*(rr+t2)/(2*rr+tt+t2-1)
+      mm<-diag(aa)                                       # 'aa' coeffts go on leading diagonal
+      mm[cbind(1:(maxmom-1),2:maxmom)]<-bb[1:(maxmom-1)] # 'bb' coeffts go on next-to-leading diagonal
+      wmat<-wmat %*% mm
+    }
+    for (tt in rev(seq_len(t2))) {   # Successive order reduction (0,t2), (0,t2-1), ..., (0,0)
+      aa<-(rr+tt)/(2*rr+tt-1)        # 'aa' and 'bb' are from Hosking (2007), eq.(12) with s=0
+      bb<- -(rr+1)/(2*rr+tt-1)
+      mm<-diag(aa)
+      mm[cbind(1:(maxmom-1),2:maxmom)]<-bb[1:(maxmom-1)]
+      wmat<-wmat %*% mm
+    }
+    lmom<-c(wmat %*% lmom)    # Get each trimmed L-moment lambda_r(t1,t2) as a sum of lambda's
+  }
+  #
+  # Attach names to result
+  #
+  length(lmom)<-nmom
+  if (ratios && nmom>2) {
+    if (all(xok[(1+t1):(n-t2)]==xok[(1+t1)])) {
+      warning("all data values equal", if (any(trim>0)) " (after trimming)")
+      lmom[-1]<-0  # R code doesn't guarantee this
+    }
+    lmom[3:nmom]<-lmom[3:nmom]/lmom[2]
+    names(lmom)<-c("l_1","l_2",paste("t",3:nmom,sep="_"))
+  }  else names(lmom)<-paste("l",1:nmom,sep="_")
+  if (!missing(trim)) names(lmom)<-sub("_", paste("(",t1,",",t2,")_",sep=""),names(lmom))
+  #
+  # Finished
+  #
+  return(lmom)
+}
+
+# Fast computation of L-moment ratios
+# - No 'sort.data' or 'ratios'
+# - NAs in 'x' will cause error
+# - No warning if all data values equal
+# - Return value has no names
+.samlmu<-function(x, nmom=4)
+  .Fortran("samlm",PACKAGE="lmom",
+    as.double(x),length(x),double(nmom),as.integer(nmom),1L,1L)[[3]]
+
+#-------------------------------------------------------------------------------
+#  Utility routines called by lmrp() and lmrq()
+#-------------------------------------------------------------------------------
 
 uniroot.f<-function(f, lower, upper, ftol, maxiter=1000, ...)
 ##
 ##  Univariate root finding via interval bisection.  Similar to
-##  R function 'uniroot', except that the tolerance (argument 'ftol')
+##  R function uniroot(), except that the tolerance (argument 'ftol')
 ##  is specified in terms of the function value, not the x value.
 ##  Function 'f' is expected to be monotonic over the specified interval.
-##  Return value is as for 'uniroot': a list with elements "root",
+##  Return value is as for uniroot(): a list with elements "root",
 ##  "f.root", "iter", and "estim.prec", each of which has the same
-##  meaning as in the return value of 'uniroot'.
+##  meaning as in the return value of uniroot().
 ##
 {
   if (!is.numeric(lower) || !is.numeric(upper))
@@ -609,6 +734,77 @@ uniroot.f<-function(f, lower, upper, ftol, maxiter=1000, ...)
 }
 
 
+
+#--------------------------------------------------------------------------------
+
+# Shifted Jacobi polynomials
+sjp<-function(u,m=0,a=0,b=0) {
+  if (a==0 && b==0) return(slp(u,m))
+  if (a==1 && b==1) return(sjp11(u,m))
+  px<-rep(1,length(u))
+  if (m==0) return(px)
+  p<-(a+b+2)*u-(1+b)
+  if (m==1) return(p)
+  for (r in 1:(m-1)) {
+    pxx<-px
+    px<-p
+    rrab<-r+r+a+b
+    AA<-(rrab+1)*(rrab+2)
+    BB<-(-1)*(rrab+1)*(2*r*(r+1)+(r+r+b+1)*(a+b))/rrab
+    CC<-(r+a)*(r+b)*(rrab+2)/rrab
+    p<-((AA*u+BB)*px-CC*pxx)/((r+1)*(r+a+b+1))
+  }
+  return(p)
+}
+
+# slp(u,m): Shifted Legendre polynomial of order m, evaluated at u
+# Used in the integrals computed by lmrq() in the case of no trimming
+slp<-function(u,m) {
+  if (m==0) return(rep(1,length(u)))
+  if (m==1) return(2*u-1)
+  if (m==2) return(1-6*u*(1-u))
+  if (m==3) return((1-10*u*(1-u))*(2*u-1))
+  z<-u*(1-u)
+  if (m==4) return(1-z*(20-70*z))
+  if (m==5) return((1-z*(28-126*z))*(2*u-1))
+  if (m==6) return(1-z*(42-z*(378-924*z)))
+  x<-2*u-1
+  px<-(1-z*(28-126*z))*x
+  p<-1-z*(42-z*(378-924*z))
+  for (r in 7:m) {
+     pxx<-px
+     px<-p
+     p<-((2*r-1)*x*px-(r-1)*pxx)/r
+  }
+  return(p)
+}
+
+# sjp11(u,m): Shifted Jacobi(1,1) polynomial of order m, evaluated at u
+# Used in the integrals computed by lmrp() in the case of no trimming
+sjp11<-function(u,m) {
+  if (m==0) return(1)
+  if (m==1) return(2*(2*u-1))
+  if (m==2) return(3*(1-5*u*(1-u)))
+  if (m==3) return(4*((1-7*u*(1-u))*(2*u-1)))
+  z<-u*(1-u)
+  if (m==4) return(5*(1-z*(14-42*z)))
+  if (m==5) return(6*((1-z*(18-66*z))*(2*u-1)))
+  if (m==6) return(7*(1-z*(27-z*(198-429*z))))
+  x<-2*u-1
+  px<-(1-z*(18-66*z))*x
+  p<-1-z*(27-z*(198-429*z))
+  for (r in 7:m) {
+    pxx<-px
+    px<-p
+    p<-((2*r+1)*x*px-(r-1)*pxx)/(r+2)
+  }
+  return(p*(m+1))
+}
+
+#-------------------------------------------------------------------------------
+#  L-moment computations for general distribution by numerical integration
+#-------------------------------------------------------------------------------
+
 #  lmrp - Computes L-moments of a general distribution, specified by its
 #         cumulative distribution function.  L-moments are computed by
 #         numerical integration of F(u)*(1-F(u))*Z_r(F(u)) where F is the
@@ -616,8 +812,9 @@ uniroot.f<-function(f, lower, upper, ftol, maxiter=1000, ...)
 #         polynomial.
 #
 lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
-               acc=1e-6, subdiv=100, verbose=FALSE) {
-#    cat(c(...))
+               ratios=TRUE, trim=0, acc=1e-6, subdiv=100, verbose=FALSE) {
+  t1<-trim[1]
+  t2<-if (length(trim)==1) t1 else trim[2]
   maxord<-max(order)
   out.val<-rep(0,maxord)
   out.err<-rep(0,maxord)
@@ -640,6 +837,7 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   ubound<-bounds[2]
   if (isTRUE(symm)) med<-0
   if (is.numeric(symm)) {med<-symm; symm<-TRUE}
+  allsymm<-(symm & (t1==t2))
 #
   # Sanity checks: for bounds ...
   sanity.tol<-1e-4
@@ -648,10 +846,14 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   if (is.finite(ubound) && isTRUE(abs(1-pfunc(ubound,...))>sanity.tol))
     warning("The value of the distribution function at the upper bound of the distribution is not 1")
   # .. and for centre of symmetry
-  if (symm) {
+  if (allsymm) {
     if (isTRUE(abs(pfunc(med,...)-0.5)>sanity.tol))
       warning("The supplied value of 'symm' appears not to be the median of the distribution")
   }
+#
+  # Multipliers for the integrals (Hosking, 2007, eq. (7))
+  ord<-seq.int(2,max(2,maxord))
+  mult<-c(1,exp(lgamma(ord-1)+lgamma(ord+t1+t2+1)-lgamma(ord+t1)-lgamma(ord+t2))/ord)
 #
   # Integral for lambda_2
 #
@@ -664,14 +866,14 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   # with a rescaled version -- see below.
   lam2.integrand<-function(x) {
     f<-pfunc.local(x,...)
-    out<-f*(1-f)
-    if(!isTRUE(all(out>=0))) {
-      bad<-which(out<0|is.na(out))[1]
+    if(!isTRUE(all(f>=0 & f<=1))) {
+      bad<-which(f<0 | f>1 | is.na(f))[1]
       parstring<-if (length(c(...))==0) character(0)
-        else paste(c(', parameter(s)',...),collapse=" ")
-      stop('Value of distribution function is not in the range [0,1] for argument ',
-        x[bad],parstring,': function value ',f[bad])
+        else paste(c(", parameter(s)",...),collapse=" ")
+      stop("Value of distribution function is not in the range [0,1] for argument ",
+        x[bad],parstring,": function value ",f[bad])
     }
+    out<-f^(1+t1)*(1-f)^(1+t2)
     return(out)
   }
   # Initial setting of pfunc.local
@@ -680,14 +882,14 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   # For a symmetric distribution, we use its symmetry to speed up the
   # computation. The range of integration is from the centre of
   # symmetry to ubound rather than from lbound to ubound.
-  if (symm) lbound<-med
+  if (allsymm) lbound<-med
 #
   # Compute the integral
   int<-integrate(lam2.integrand,
     lbound,ubound,rel.tol=acc/2,subdivisions=subdiv,stop.on.error=FALSE)
 #
-  denom   <- int$value
-  errdenom<- int$abs.error
+  denom   <- int$value*mult[2]
+  errdenom<- int$abs.error*mult[2]
   if (denom<0 && denom>(-errdenom)) denom<-0
   out.val[2]<-denom
   out.err[2]<-errdenom
@@ -700,7 +902,7 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   # and integrate ignoring any user-supplied bounds.  This should ensure
   # that integrate() will not deem the function to be constant everywhere.
   if ( int$message!='OK' || int$abs.error<=0 || int$value <= 2*int$abs.error ) {
-    if (symm) {
+    if (allsymm) {
       p1<-pfunc(x1<-(+1),...)
       while (p1<=0.75 & is.finite(x1)) p1<-pfunc(x1<-2*x1, ...)
       if (!is.finite(x1)) stop("Distribution function does not approach 1 for large positive values of its argument")
@@ -727,15 +929,15 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
       lbound<- -Inf
       ubound<- +Inf
     }
-    # If 'scale' is zero (or negative, if this can happen), the rescaling
-    # failed: perhaps the upper and lower quartiles of the distribution
-    # are equal.  We'll set scale equal to 1 and hope for the best.
+    # If 'scale' is zero (or negative, if this can happen), the rescaling failed:
+    # perhaps the upper and lower quartiles of the distribution are equal.
+    # We'll set scale equal to 1 and hope for the best.
     if (scale<=0) scale<-1
     #
     int<-integrate(lam2.integrand,lbound,ubound,
       rel.tol=acc/2,subdivisions=subdiv,stop.on.error=FALSE)
-    denom   <- int$value
-    errdenom<- int$abs.error
+    denom   <- int$value*mult[2]
+    errdenom<- int$abs.error*mult[2]
     if (denom<0 && denom>(-errdenom)) denom<-0
     out.val[2]<-denom*scale
     out.err[2]<-errdenom*scale
@@ -752,9 +954,9 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
 #
   } else {
 #
-    # For a symmetric distribution, lambda_2 is twice the integral
+    # For a symmetric distribution and symmetric trimming, lambda_2 is twice the integral
     # and lambda_1 (when it exists) is the centre of symmetry
-    if (symm) {
+    if (allsymm) {
       out.val[2]<-2*out.val[2]
       out.err[2]<-2*out.err[2]
       if (out.msg[2]=="OK") out.val[1]<-med
@@ -767,30 +969,40 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
 #
     # For a general distribution, compute lambda_1 if required. Use the
     # value of lambda_2 as a guide to the accuracy that can be achieved.
-    if (!symm && is.element(1,order)) {
+    if (!allsymm && is.element(1,order)) {
       abstol<-max(denom*acc/2,errdenom)
       if (abstol==0) abstol<-sqrt(.Machine$double.eps)
       if (is.finite(lbound)) {
-        int<-integrate( function(x) {1-pfunc(x,...)},lbound,ubound,
+        int<-integrate( function(x) pbeta(pfunc(x,...),1+t1,1+t2,lower.tail=FALSE),lbound,ubound,
              rel.tol=0,abs.tol=abstol,subdivisions=subdiv,stop.on.error=FALSE)
         out.val[1]<-int$value+lbound
         out.err[1]<-int$abs.error
         out.msg[1]<-int$message
       }
       else if (is.finite(ubound)) {
-        int<-integrate( function(x) pfunc(x,...),lbound,ubound,
+        int<-integrate( function(x) pbeta(pfunc(x,...),1+t1,1+t2),lbound,ubound,
              rel.tol=0,abs.tol=abstol,subdivisions=subdiv,stop.on.error=FALSE)
         out.val[1]<-ubound-int$value
         out.err[1]<-int$abs.error
         out.msg[1]<-int$message
       } else {
-        int1<-integrate( function(x) pfunc.local(x,...),-Inf, 0,
-              rel.tol=0,abs.tol=abstol/2,subdivisions=subdiv,stop.on.error=FALSE)
-        int2<-integrate( function(x) 1-pfunc.local(x,...), 0, +Inf,
-              rel.tol=0,abs.tol=abstol/2,subdivisions=subdiv,stop.on.error=FALSE)
-        out.val[1]<-(int2$value-int1$value)*scale+offset
-        out.err[1]<-(int1$abs.error+int2$abs.error)*scale
-        out.msg[1]<-if (int1$message=="OK") int2$message else int1$message
+#       int1<-integrate( function(x) pbeta(pfunc.local(x,...),1+t1,1+t2),
+#            -Inf, 0,  rel.tol=0,abs.tol=abstol/2,subdivisions=subdiv,stop.on.error=FALSE)
+#       int2<-integrate( function(x) pbeta(pfunc.local(x,...),1+t1,1+t2,lower.tail=FALSE),
+#             0, +Inf, rel.tol=0,abs.tol=abstol/2,subdivisions=subdiv,stop.on.error=FALSE)
+#       out.val[1]<-(int2$value-int1$value)*scale+offset
+#       out.err[1]<-(int1$abs.error+int2$abs.error)*scale
+#       out.msg[1]<-if (int1$message=="OK") int2$message else int1$message
+
+        # mean = integral_0^Inf { 1 - F(x) - F(-x) } dx, generalized to include trimming
+        integrand<- function(x) pbeta(pfunc.local(x,...),1+t1,1+t2,lower.tail=FALSE) -
+                                pbeta(pfunc.local(-x,...),1+t1,1+t2)
+        int<-integrate( integrand, 0, Inf,
+          rel.tol=0,abs.tol=abstol,subdivisions=subdiv,stop.on.error=FALSE)
+
+        out.val[1]<-int$value*scale+offset
+        out.err[1]<-int$abs.error*scale
+        out.msg[1]<-int$message
       }
     }
 #
@@ -798,39 +1010,50 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
     if (out.msg[2]=="OK" && abs(out.val[2])<=out.err[2]) {
 #
       out.msg[2]<-"lambda_2 is effectively zero"
-      out.val[3:maxord]<-NaN
-      out.err[3:maxord]<-NA
-      out.msg[3:maxord]<-"L-moment ratios not defined when lambda_2 is zero"
+      if (maxord>2) {
+        if (ratios) {
+          out.val[3:maxord]<-NaN
+          out.err[3:maxord]<-NA
+          out.msg[3:maxord]<-"L-moment ratios not defined when lambda_2 is zero"
+        } else {
+          out.val[3:maxord]<-0
+          out.err[3:maxord]<-NA
+          out.msg[3:maxord]<-"Higher-order L-moments not computed when lambda_2 is zero"
+        }
+      }
 #
     } else {
 #
-      # "ratios" contains the orders of the L-moment ratios that we compute
-      # via numerical integration: all orders greater than 2 in the general
-      # case, only the even orders greater than 2 for a symmetric distribution
-      ratios<-order[order>2 & { if (symm) order%%2==0 else TRUE } ]
+      # 'higher' contains the orders of the L-moments that we compute via
+      # numerical integration: all orders greater than 2 in the general case,
+      # only the even orders greater than 2 for a symmetric distribution
+      higher<-order[order>2 & { if (allsymm) order%%2==0 else TRUE } ]
 #
       # Integrals for higher-order L-moments
-      for (r in ratios) {
+      for (r in higher) {
         int<-integrate(
-          function(x) {pf<-pfunc.local(x,...); pf*(1-pf)*zpoly(pf,r-2)},
+          function(x)
+            {pf<-pfunc.local(x,...); pf^(1+t1)*(1-pf)^(1+t2)*sjp(pf,r-2,1+t2,1+t1)},
           lbound, ubound, rel.tol=0, abs.tol=denom*acc/2,
           subdivisions=subdiv, stop.on.error=FALSE)
-        out.val[r]<-int$value
-        out.err[r]<-int$abs.error
+        out.val[r]<-int$value*mult[r]
+        out.err[r]<-int$abs.error*mult[r]
         out.msg[r]<-int$message
       }
 #
       # L-moment ratios and their accuracies
-      out.val[ratios]<-out.val[ratios]/denom
-      out.err[ratios]<-(out.err[ratios]+abs(out.val[ratios])*errdenom)/denom
+      if (ratios) {
+        out.val[higher]<-out.val[higher]/denom
+        out.err[higher]<-(out.err[higher]+abs(out.val[higher])*errdenom)/denom
+      }
     }
   }
-#     cat(':',as.numeric(offset==0 && scale==1),":",out.val[order],'\n')
 #
   # Prepare and return the output
-  rnames<-
-    if (maxord<=2) paste("lambda", 1:maxord, sep="_")
-    else c("lambda_1", "lambda_2", paste("tau", 3:maxord, sep="_"))
+  rnames<-rep("lambda",maxord)
+  if (ratios && maxord>2) rnames[-(1:2)]<-"tau"
+  if (any(trim!=0)) rnames<-paste(rnames,"(",t1,",",t2,")",sep="")
+  rnames<-paste(rnames,1:maxord, sep="_")
   if (verbose) {
     dframe<-data.frame(row.names=rnames,value=out.val,abs.error=out.err,message=out.msg)
     return(dframe[order,])
@@ -845,33 +1068,179 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   }
 }
 
-# zpoly(u,m): The rescaled shifted Jacobi polynomial
-# {1/(m+1)} P^{(1,1)}_m(2u-1) --- it is also the polynomial
-# Z_m(u)/{u(1-u)} from Hosking 2007 ("Distributions with maximum
-# entropy ...", J.Statist.Plann.Inf., 137, 2870-2891), eq. (3.5).
-zpoly<-function(u,m) {
-  if (m==0) return(1)
-  if (m==1) return(2*u-1)
-  if (m==2) return(1-5*u*(1-u))
-  if (m==3) return((1-7*u*(1-u))*(2*u-1))
-  z<-u*(1-u)
-  if (m==4) return(1-z*(14-42*z))
-  if (m==5) return((1-z*(18-66*z))*(2*u-1))
-  if (m==6) return(1-z*(27-z*(198-429*z)))
-  x<-2*u-1
-  px<-(1-z*(18-66*z))*x
-  p<-1-z*(27-z*(198-429*z))
-  for (r in 7:m) {
-    pxx<-px
-    px<-p
-    p<-((2*r+1)*x*px-(r-1)*pxx)/(r+2)
+#  lmrq - Computes L-moments of a general distribution, specified by its quantile function.
+#         L-moments are computed by numerical integration of Q(u)*Pstar[m](u) where
+#         Q is the quantile function and Pstar[m] is a shifted Legendre polynomial.
+#
+lmrq<-function(qfunc, ..., symm=FALSE, order=1:4, ratios=TRUE, trim=0, acc=1e-6,
+               subdiv=100, verbose=FALSE) {
+  t1<-trim[1]
+  t2<-if (length(trim)==1) t1 else trim[2]
+  maxord<-max(order)
+  out.val<-rep(0,maxord)
+  out.err<-rep(0,maxord)
+  out.msg<-rep("OK",maxord)
+  allsymm<- (symm & (t1==t2))
+
+  # For symmetric trimming and a symmetric distribution, we use the symmetry to
+  # speed up the computation. The integrals involve Q(u)-Q(0.5) rather than Q(u),
+  # and the range of integration is 0 to 0.5 rather than 0 to 1.
+  #   'upper' contains the upper limit of integration.
+  #   'qfunc.local' is the version of the quantile function that we use.
+  if (allsymm) {
+    upper<-0.5
+    qfunc.local<- { function(u,...) qfunc(u,...)-med }
+    # (Symmetric distribution) Compute the median
+    out.val[1]<-med<-qfunc(0.5,...)
+  } else {
+    upper<-1
+    qfunc.local<-qfunc
   }
-  return(p)
+
+  # Multipliers for the integrals (Hosking, 2007, eq. (5))
+  ord<-seq_len(maxord)
+  mult<-exp(lgamma(ord)+lgamma(ord+t1+t2+1)-lgamma(ord+t1)-lgamma(ord+t2))/ord
+
+  # Integral for lambda_2
+  lam2.integrand<-function(u) {
+    qval<-qfunc.local(u,...)
+    if (any(is.na(qval))) {
+      bad<-which(is.na(qval))[1]
+      parstring<-if (length(c(...))==0) character(0)
+        else paste(c(", parameter(s)",...),collapse=" ")
+      stop("Quantile function returned ",qval[bad]," for argument ",u[bad],parstring)
+    }
+    if (!identical(order(qval[order(u)]),seq(along=qval))) {
+      ou<-order(u)
+      uu<-u[ou]
+      qq<-qval[ou]
+      bad<-which(diff(qq)<0)[1]
+      parstring<-if (length(c(...))==0) character(0)
+        else paste(c(" for parameter(s)",...),collapse=" ")
+      stop("Quantile function is not increasing on the interval ",
+        uu[bad]," to ",uu[bad+1],parstring)
+    }
+    # if (notrim) return(qval*(2*u-1)) else   # no speed advantage
+    return(qval*u^t1*(1-u)^t2*((1+t2)*u-(1+t1)*(1-u)))
+  }
+
+  int<-integrate( lam2.integrand,0,upper,
+         rel.tol=acc/2,subdivisions=subdiv,stop.on.error=FALSE)
+  denom    <- int$value*mult[2]
+  errdenom <- int$abs.error*mult[2]
+  if (denom<0 && denom>(-errdenom)) denom<-0
+  out.val[2]<-denom
+  out.err[2]<-errdenom
+  out.msg[2]<-int$message
+
+  # For a symmetric distribution, lambda_2 is twice the integral
+  if (allsymm) {out.val[2]<-2*denom; out.err[2]<-2*errdenom}
+
+  # If lambda_2 is negative, the integration must have failed
+  if (denom<0) {
+    out.val[]<-NA
+    out.err[]<-NA
+    out.msg[]<-"computed value of lambda_2 is negative"
+    if (int$message!="OK")
+      out.msg[2]<-paste(int$message,"; ",out.msg[2],sep="")
+#
+  } else {
+#
+
+    # For a general distribution, compute lambda_1 if required. Use the
+    # value of lambda_2 as a guide to the accuracy that can be achieved.
+    if (!allsymm && is.element(1,order)) {
+      int<-integrate( function(u) qfunc.local(u,...)*u^t1*(1-u)^t2,0,1,
+        rel.tol=0, abs.tol=max(denom*acc/2,errdenom),
+        subdivisions=subdiv, stop.on.error=FALSE)
+      out.val[1]<-int$value*mult[1]
+      out.err[1]<-int$abs.error*mult[1]
+      out.msg[1]<-int$message
+    }
+
+    # Test whether lambda_2 is zero to within the reported absolute error
+    if (out.msg[2]=="OK" && abs(denom)<=out.err[2]) {
+
+      if (maxord>2) {
+        if (ratios) {
+          out.val[3:maxord]<-NaN
+          out.err[3:maxord]<-NA
+          out.msg[3:maxord]<-"L-moment ratios not defined when lambda_2 is zero"
+        } else {
+          out.val[3:maxord]<-0
+          out.err[3:maxord]<-NA
+          out.msg[3:maxord]<-"Higher-order L-moments not computed when lambda_2 is zero"
+        }
+      }
+
+    } else {
+
+      # 'higher' contains the orders of the L-moments that we compute via
+      # numerical integration: all orders greater than 2 in the general case,
+      # only the even orders greater than 2 for a symmetric distribution
+      higher<-order[order>2 & { if (allsymm) order%%2==0 else TRUE } ]
+
+      # Integrals for higher-order L-moments
+      for (r in higher) {
+        int<-integrate( function(u) qfunc.local(u,...)*u^t1*(1-u)^t2*sjp(u,r-1,t2,t1),
+          0,upper,rel.tol=0,abs.tol=denom*acc/2,subdivisions=subdiv,stop.on.error=FALSE)
+        out.val[r]<-int$value*mult[r]
+        out.err[r]<-int$abs.error*mult[r]
+        out.msg[r]<-int$message
+      }
+
+      # L-moment ratios and their accuracies
+      if (ratios) {
+        out.val[higher]<-out.val[higher]/denom
+        out.err[higher]<-(out.err[higher]+abs(out.val[higher])*errdenom)/denom
+      }
+    }
+  }
+
+  # Prepare and return the output
+  rnames<-rep("lambda",maxord)
+  if (ratios && maxord>2) rnames[-(1:2)]<-"tau"
+  if (any(trim!=0)) rnames<-paste(rnames,"(",t1,",",t2,")",sep="")
+  rnames<-paste(rnames,1:maxord, sep="_")
+  if (verbose) {
+    dframe<-data.frame(row.names=rnames,value=out.val,abs.error=out.err,message=out.msg)
+    return(dframe[order,])
+  } else {
+    for (r in intersect(c(2,order),which(out.msg!="OK")))
+      # 'if (...)' suppresses secondary warnings (when problems computing
+      # lambda_2 meant that we couldn't compute L-moments of other orders)
+      if (!(r!=2 && regexpr("lambda_2",out.msg[r])>0))
+        warning("in computation of L-moment of order ",r,": ",out.msg[r])
+    names(out.val)<-rnames
+    return(out.val[order])
+  }
 }
 
-pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
-               type=c("n","s","ls","lss"), method="nlm", acc=1e-5, ...) {
+#-------------------------------------------------------------------------------
+#  Parameter estimation for a general distribution
+#-------------------------------------------------------------------------------
+
+pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf), type=c("n","s","ls","lss"),
+               ratios=NULL, trim=NULL, method="nlm", acc=1e-5, ...) {
+##
   type<-match.arg(type)
+
+  infer<-infer_trim(names(lmom))
+  if (is.null(infer)) {
+    if (is.null(ratios)) stop("unable to infer 'ratios' from names of 'lmom'")
+    if (is.null(trim)) stop("unable to infer trim orders from names of 'lmom'")
+  } else if (identical(infer,list())) {
+    if (is.null(ratios)) ratios<-TRUE
+    if (is.null(trim)) trim<-0
+  } else {
+    if (is.null(ratios)) ratios<-infer$ratios
+    else if (length(lmom)>2 && !identical(as.logical(ratios),infer$ratios))
+      warning("value of argument 'ratios' is incompatible with names of 'lmom'")
+    if (is.null(trim)) trim<-infer$trim
+    else if (!all(c(trim,trim)[1:2]==infer$trim))
+      warning("value of argument 'trim' is incompatible with names of 'lmom'")
+  }
+
   method<-try(match.arg(method,c("nlm", "uniroot", eval(formals(optim)$method))),
     silent=TRUE)
   if (class(method)=="try-error") stop(sub(".*'arg'","'method'",method))
@@ -918,11 +1287,11 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
       fullpara<-switch(type,n=para,s=c(1,para),ls=c(0,1,para),lss=c(0,1,para))
 
       # 'paralist' contains all parameters, as a list suitable for passing
-      # to 'do.call(pfunc,...)': i.e. if pfunc expects a single vector
-      # of parameters, then paralist is a list with a single element which
-      # is the vector of parameters; if pfunc expects separate arguments,
-      # then paralist is a list with as many elements as there are
-      # parameters and  one parameter in each element.
+      # to 'do.call(pfunc,...)': i.e. if pfunc() expects a single vector
+      # of parameters, then 'paralist' is a list with a single element which
+      # is the vector of parameters; if pfunc() expects separate arguments,
+      # then 'paralist' is a list with as many elements as there are
+      # parameters and one parameter in each element.
       paralist<- if (parvec) list(fullpara) else as.list(fullpara)
 
       # Compute L-moments
@@ -930,13 +1299,13 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
 
         # For type "n", compute L-moments (so that all elements of zmom
         # have approx. the same magnitude)
-        zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=order.shape,acc=acc/10),paralist))
+        zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=order.shape,ratios=ratios,trim=trim,acc=acc/10),paralist))
         if (nlmom>2) zmom[-(1:2)]<-zmom[-(1:2)]*zmom[2]
 
       } else if (type=="s") {
 
         # For type "s", scale the L-moments by lambda_1, not lambda_2
-        zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=1:npara,acc=acc/10),paralist))
+        zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=1:npara,ratios=ratios,trim=trim,acc=acc/10),paralist))
         if (nlmom>2) zmom[-(1:2)]<-zmom[-(1:2)]*zmom[2]
         zmom<-zmom[-1]/zmom[1]
 
@@ -945,7 +1314,7 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
         # For type "ls", compute L-moment ratios
         # For type "lss", compute L-moment ratios via lmrp(...,symm=TRUE)
         symm<-if (type=="lss") 0 else FALSE
-        zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=order.shape,acc=acc/10,symm=symm),paralist))
+        zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=order.shape,ratios=ratios,trim=trim,acc=acc/10,symm=symm),paralist))
 
       }
 
@@ -1016,180 +1385,47 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf),
 
   # Estimate the location and scale parameters
 
-  if (nlocscale>0) {
-    if (is.element(type,c("ls","lss"))) outpar[1:2]<-c(0,1)
-    else if (type=="s") outpar[1]<-1
+  if (is.element(type,c("ls","lss"))) {
 
+    outpar[1:2]<-c(0,1)
     paralist<- if (parvec) list(outpar) else as.list(outpar)
-    zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=1:2,acc=acc/10),paralist))
+    zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=1:2,ratios=ratios,trim=trim,acc=acc/10),paralist))
+    outpar[2]<-lmom[2]/zmom[2]
+    outpar[1]<-lmom[1]-outpar[2]*zmom[1]
 
-    if (is.element(type,c("ls","lss"))) {
-      outpar[2]<-lmom[2]/zmom[2]
-      outpar[1]<-lmom[1]-outpar[2]*zmom[1]
-    } else if (type=="s") outpar[1]<-lmom[1]/zmom[1]
+  } else if (type=="s") {
+
+    outpar[1]<-1
+    paralist<- if (parvec) list(outpar) else as.list(outpar)
+    zmom<-do.call("lmrp",c(list(pfunc,bounds=bounds,order=1,ratios=ratios,trim=trim,acc=acc/10),paralist))
+    outpar[1]<-lmom[1]/zmom[1]
+
   }
 
   if (!parvec) names(outpar)<-names(formals(pfunc))[2:(npara+1)]
   return(list(para=outpar,code=code))
 }
 
-
-#  lmrq - Computes L-moments of a general distribution, specified by its
-#         quantile function.  L-moments are computed by numerical integration
-#         of Q(u)*Pstar[m](u) where Q is the quantile function and Pstar[m]
-#         is a shifted Legendre polynomial.
-#
-lmrq<-function(qfunc, ..., symm=FALSE, order=1:4, acc=1e-6, subdiv=100,
-              verbose=FALSE) {
-  maxord<-max(order)
-  out.val<-rep(0,maxord)
-  out.err<-rep(0,maxord)
-  out.msg<-rep("OK",maxord)
-
-  # For a symmetric distribution, we use its symmetry to speed up the
-  # computation. The integrals involve Q(u)-Q(0.5) rather than Q(u),
-  # and the range of integration is 0 to 0.5 rather than 0 to 1.
-  #   "upper" contains the upper limit of integration.
-  #   "qfunc.local" is the version of the quantile function that we use.
-  if (symm) {
-    upper<-0.5
-    qfunc.local<- { function(u,...) qfunc(u,...)-med }
-    # (Symmetric distribution) Compute the median
-    out.val[1]<-med<-qfunc(0.5,...)
-  } else {
-    upper<-1
-    qfunc.local<-qfunc
-  }
-
-  # Integral for lambda_2
-  lam2.integrand<-function(u) {
-    qval<-qfunc.local(u,...)
-    if (any(is.na(qval))) {
-      bad<-which(is.na(qval))[1]
-      parstring<-if (length(c(...))==0) character(0)
-        else paste(c(', parameter(s)',...),collapse=" ")
-      stop('Quantile function returned ',qval[bad],' for argument ',
-        u[bad],parstring)
-    }
-    if (!identical(order(qval[order(u)]),seq(along=qval))) {
-      ou<-order(u)
-      uu<-u[ou]
-      qq<-qval[ou]
-      bad<-which(diff(qq)<0)[1]
-      parstring<-if (length(c(...))==0) character(0)
-        else paste(c(' for parameter(s)',...),collapse=" ")
-      stop('Quantile function is not increasing on the interval ',
-      uu[bad],' to ',uu[bad+1],parstring)
-    }
-    return(qval*(2*u-1))
-  }
-
-  int<-integrate( lam2.integrand,0,upper,
-         rel.tol=acc/2,subdivisions=subdiv,stop.on.error=FALSE)
-  denom    <- int$value
-  errdenom <- int$abs.error
-  if (denom<0 && denom>(-errdenom)) denom<-0
-  out.val[2]<-denom
-  out.err[2]<-errdenom
-  out.msg[2]<-int$message
-
-  # For a symmetric distribution, lambda_2 is twice the integral
-  if (symm) {out.val[2]<-2*denom; out.err[2]<-2*errdenom}
-
-  # If lambda_2 is negative, the integration must have failed
-  if (denom<0) {
-    out.val[]<-NA
-    out.err[]<-NA
-    out.msg[]<-"computed value of lambda_2 is negative"
-    if (int$message!="OK")
-      out.msg[2]<-paste(int$message,"; ",out.msg[2],sep="")
-#
-  } else {
-#
-
-    # For a general distribution, compute lambda_1 if required. Use the
-    # value of lambda_2 as a guide to the accuracy that can be achieved.
-    if (!symm && is.element(1,order)) {
-      int<-integrate( function(u) qfunc.local(u,...),0,1,
-        rel.tol=0, abs.tol=max(denom*acc/2,errdenom),
-        subdivisions=subdiv, stop.on.error=FALSE)
-      out.val[1]<-int$value
-      out.err[1]<-int$abs.error
-      out.msg[1]<-int$message
-    }
-
-    # Test whether lambda_2 is zero to within the reported absolute error
-    if (out.msg[2]=="OK" && abs(denom)<=out.err[2]) {
-
-      out.msg[2]<-"lambda_2 is effectively zero"
-      out.val[3:maxord]<-NaN
-      out.err[3:maxord]<-NA
-      out.msg[3:maxord]<-"L-moment ratios not defined when lambda_2 is zero"
-
-    } else {
-
-      # "ratios" contains the orders of the L-moment ratios that we compute
-      # via numerical integration: all orders greater than 2 in the general
-      # case, only the even orders greater than 2 for a symmetric distribution
-      ratios<-order[order>2 & { if (symm) order%%2==0 else TRUE } ]
-
-      # Integrals for higher-order L-moments
-      for (r in ratios) {
-        int<-integrate( function(u) qfunc.local(u,...)*slp(u,r-1), 0,upper,
-               rel.tol=0,abs.tol=denom*acc/2,subdivisions=subdiv,stop.on.error=FALSE)
-        out.val[r]<-int$value
-        out.err[r]<-int$abs.error
-        out.msg[r]<-int$message
-      }
-
-      # L-moment ratios and their accuracies
-      out.val[ratios]<-out.val[ratios]/denom
-      out.err[ratios]<-(out.err[ratios]+abs(out.val[ratios])*errdenom)/denom
-    }
-  }
-
-  # Prepare and return the output
-  rnames<-
-    if (maxord<=2) paste("lambda", 1:maxord, sep="_")
-    else c("lambda_1", "lambda_2", paste("tau", 3:maxord, sep="_"))
-  if (verbose) {
-    dframe<-data.frame(row.names=rnames,value=out.val,abs.error=out.err,message=out.msg)
-    return(dframe[order,])
-  } else {
-    for (r in intersect(c(2,order),which(out.msg!="OK")))
-      # 'if (...)' suppresses secondary warnings (when problems computing
-      # lambda_2 meant that we couldn't compute L-moments of other orders)
-      if (!(r!=2 && regexpr("lambda_2",out.msg[r])>0))
-        warning("in computation of L-moment of order ",r,": ",out.msg[r])
-    names(out.val)<-rnames
-    return(out.val[order])
-  }
-}
-
-# slp(u,m): Shifted Legendre polynomial of order m, evaluated at u
-slp<-function(u,m) {
-  if (m==0) return(1)
-  if (m==1) return(2*u-1)
-  if (m==2) return(1-6*u*(1-u))
-  if (m==3) return((1-10*u*(1-u))*(2*u-1))
-  z<-u*(1-u)
-  if (m==4) return(1-z*(20-70*z))
-  if (m==5) return((1-z*(28-126*z))*(2*u-1))
-  if (m==6) return(1-z*(42-z*(378-924*z)))
-  x<-2*u-1
-  px<-(1-z*(28-126*z))*x
-  p<-1-z*(42-z*(378-924*z))
-  for (r in 7:m) {
-     pxx<-px
-     px<-p
-     p<-((2*r-1)*x*px-(r-1)*pxx)/r
-  }
-  return(p)
-}
-
 pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
-               method="nlm", acc=1e-5, ...) {
+                ratios=NULL, trim=NULL, method="nlm", acc=1e-5, ...) {
   type<-match.arg(type)
+
+  infer<-infer_trim(names(lmom))
+  if (is.null(infer)) {
+    if (is.null(ratios)) stop("unable to infer 'ratios' from names of 'lmom'")
+    if (is.null(trim)) stop("unable to infer trim orders from names of 'lmom'")
+  } else if (identical(infer,list())) {
+    if (is.null(ratios)) ratios<-TRUE
+    if (is.null(trim)) trim<-0
+  } else {
+    if (is.null(ratios)) ratios<-infer$ratios
+    else if (length(lmom)>2 && !identical(as.logical(ratios),infer$ratios))
+      warning("value of argument 'ratios' is incompatible with names of 'lmom'")
+    if (is.null(trim)) trim<-infer$trim
+    else if (!all(c(trim,trim)[1:2]==infer$trim))
+      warning("value of argument 'trim' is incompatible with names of 'lmom'")
+  }
+
   method<-try(match.arg(method,c("nlm", "uniroot", eval(formals(optim)$method))),
     silent=TRUE)
   if (class(method)=="try-error") stop(sub(".*'arg'","'method'",method))
@@ -1223,27 +1459,38 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
     # order.shape - orders of L-moments that are used to estimate the shape parameters
     order.shape<-switch(type,n=1:nshape,s=2:(nshape+1),ls=3:(nshape+2),lss=seq(4,by=2,len=nshape))
 
-    # "critfn" is the criterion function for optimization.  For function
+    # 'critfn' is the criterion function for optimization.  For function
     # minimization, via nlm() or optim(), it is the sum of squared
     # differences between the sample and population L-moments or L-moment
     # ratios.  For root-finding, via uniroot(), it is the difference between
     # the sample and population versions of the L-moment or L-moment ratio.
-    #   critfn() makes calls to lmrq().  If parvec==TRUE these can be made
-    # directly, otherwise we must use do.call(lmrq,...).
+    #   critfn() makes calls to lmrp().  If parvec==TRUE these can be made
+    # directly, otherwise we must use do.call(lmrp,...).
     critfn<-function(para) {
+
+      # 'fullpara' contains all parameters, including location and scale
+      fullpara<-switch(type,n=para,s=c(1,para),ls=c(0,1,para),lss=c(0,1,para))
+
+      # 'paralist' contains all parameters, as a list suitable for passing
+      # to 'do.call(pfunc,...)': i.e. if pfunc() expects a single vector
+      # of parameters, then 'paralist' is a list with a single element which
+      # is the vector of parameters; if pfunc() expects separate arguments,
+      # then 'paralist' is a list with as many elements as there are
+      # parameters and one parameter in each element.
+      paralist<- if (parvec) list(fullpara) else as.list(fullpara)
+
+      # Compute L-moments
       if (type=="n") {
 
         # For type "n", compute L-moments (so that all elements of zmom
         # have approx. the same magnitude)
-        zmom<- if (parvec) lmrq(qfunc,order=order.shape,acc=acc/10,para)
-               else do.call("lmrq",c(list(qfunc,order=order.shape,acc=acc/10),para))
+        zmom<-do.call("lmrq",c(list(qfunc,order=order.shape,trim=trim,acc=acc/10),paralist))
         if (nlmom>2) zmom[-(1:2)]<-zmom[-(1:2)]*zmom[2]
 
       } else if (type=="s") {
 
         # For type "s", scale the L-moments by lambda_1, not lambda_2
-        zmom<- if (parvec) lmrq(qfunc,order=1:npara,acc=acc/10,c(1,para))
-               else do.call("lmrq",c(list(qfunc,order=1:npara,acc=acc/10),1,para))
+        zmom<-do.call("lmrq",c(list(qfunc,order=1:npara,trim=trim,acc=acc/10),paralist))
         if (nlmom>2) zmom[-(1:2)]<-zmom[-(1:2)]*zmom[2]
         zmom<-zmom[-1]/zmom[1]
 
@@ -1251,12 +1498,14 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
 
         # For type "ls", compute L-moment ratios
         # For type "lss", compute L-moment ratios via lmrq(...,symm=TRUE)
-        zmom<- if (parvec) lmrq(qfunc,order=order.shape,acc=acc/10,symm=(type=="lss"),c(0,1,para))
-               else do.call("lmrq",c(list(qfunc,order=order.shape,acc=acc/10,symm=(type=="lss")),0,1,para))
+        zmom<-do.call("lmrq",c(list(qfunc,order=order.shape,trim=trim,acc=acc/10,symm=(type=="lss")),paralist))
 
       }
+
+      # Construct the criterion function value
       retval<-if (method=="uniroot") zmom-lmom[order.shape]
               else sum((zmom-lmom[order.shape])^2)
+
       return(retval)
     }
 
@@ -1316,25 +1565,194 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
   }
 
   # Estimate the location and scale parameters
+
   if (is.element(type,c("ls","lss"))) {
 
     outpar[1:2]<-c(0,1)
-    zmom<-if (parvec) lmrq(qfunc,outpar,order=1:2,acc=acc/10)
-          else do.call("lmrq",c(list(qfunc,order=1:2,acc=acc/10),outpar))
+    paralist<- if (parvec) list(outpar) else as.list(outpar)
+    zmom<-do.call("lmrq",c(list(qfunc,order=1:2,trim=trim,acc=acc/10),paralist))
     outpar[2]<-lmom[2]/zmom[2]
     outpar[1]<-lmom[1]-outpar[2]*zmom[1]
 
   } else if (type=="s") {
 
     outpar[1]<-1
-    zmom<-if (parvec) lmrq(qfunc,outpar,order=1,acc=acc/10)
-          else do.call("lmrq",c(list(qfunc,order=1,acc=acc/10),outpar))
+    paralist<- if (parvec) list(outpar) else as.list(outpar)
+    zmom<-do.call("lmrq",c(list(qfunc,order=1,trim=trim,acc=acc/10),paralist))
     outpar[1]<-lmom[1]/zmom[1]
 
   }
 
   if (!parvec) names(outpar)<-names(formals(qfunc))[2:(npara+1)]
   return(list(para=outpar,code=code))
+}
+
+infer_trim<-function(nam) {
+##
+## Infers, from the names of a vector of L-moments or L-moment ratios
+## returned by lmrp(), lmrq(), or samlmu(), whether the vector contains
+## L-moments or L-moment ratios and the order of trimming of the
+## L-moments or L-moment ratios.
+##
+## The return value is a list with components "ratios" and "trim".
+##
+## Such vectors of names can have the form
+##
+##   l(s,t)_1  l(s,t)_2  l(s,t)_3 ...
+##
+## or
+##
+##   l(s,t)_1  l(s,t)_2  t(s,t)_3 ...
+##
+## with 's' and 't' positive integers, the orders of trimming;
+## in this case the return value's "trim" component is 'c(s,t)'.
+## Vectors can also have the form
+##
+##   l_1  l_2  l_3 ...
+##
+## or
+##
+##   l_1  l_2  t_3 ...
+##
+## with no trim specification, indicating no trimming; in this case
+## the return value's "trim" component is c(0,0).
+##
+## If the input vector has no names, the return value is an empty list.
+##
+## In other cses when the orders of trimming cannot be unequivocally
+## identified, the return value is NULL.
+##
+  ratios<-TRUE
+  if (is.null(nam)) return(list())
+  if (length(nam)==0) return(NULL)
+  opt<-options(warn=-1)
+  on.exit(options(opt))
+  if (all(substr(nam,1,1)=="l")) ratios<-FALSE
+  else {
+    if (any(substr(c(nam,"l","l")[1:2],1,1)!="l")) return(NULL)     # First character of first two elements must be "l"
+    if (any(substr(nam[-(1:2)],1,1)!="t")) return(NULL)             # First character of all other elements must be "t"
+    ratios<-TRUE
+  }
+  orders<-sub(".*_","",nam)                                         # Everything after "_" is the order of the L-moment (or ratio)
+  if (!identical(as.integer(orders),seq_along(nam))) return(NULL)   # Orders must be the sequence 1,2,...
+  super<-sub("^.(.*)_.*$","\\1",nam)                                # Everything between 1st character and "_" is the trim specification
+  if (all(nchar(super)==0)) return(list(ratios=ratios,trim=c(0,0))) # A blank trim specification is valid and indicates no trimming
+  if (!all(grepl("^\\(.*\\)$",super))) return(NULL)                 # A nonblank trim specification must begin with "(" and end with ")"
+  trim1<-substr(super,2,nchar(super)-1)                             # Everything in between ...
+  trim2<-strsplit(paste(trim1,",",sep=""),",")                      # ... is treated as a sequence of items separated by ","
+  if (!all(sapply(trim2,length)==2)) return(NULL)                   # There must be exactly 2 items
+  if (!all(sapply(trim2,identical,trim2[[1]]))) return(NULL)        # They must be the same in each element of the names vector
+  trim3<-as.numeric(trim2[[1]])                                     # When converted to numbers ...
+  if (!(all(is.finite(trim3)) && all(trim3>=0) && all(trim3 %%1==0))) return(NULL) # ... they must be positive integers, returned as the trim orders
+  return(list(ratios=ratios,trim=trim3))
+}
+
+#-------------------------------------------------------------------------------
+#  Functions and data for L-moment ratio diagram
+#-------------------------------------------------------------------------------
+
+lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
+               xlim, ylim, pch=3, cex, col, lty, lwd=1,
+               legend.lmrd = TRUE, xlegend, ylegend,
+               xlab = expression(italic(L) * "-skewness"),
+               ylab = expression(italic(L) * "-kurtosis"), ...) {
+## Function lmrd -- draws an L-moment ratio diagram
+# check arguments
+#
+  x.missing<-missing(x)
+  if (x.missing) { x<-y<-numeric(0) }
+  else if (missing(y)) {
+    y<-NULL
+    if (inherits(x,"regdata")) {
+      y<-x[[6]]; x<-x[[5]]
+    } else if (length(dim(x))==2) {
+      dn2<-dimnames(x)[[2]]
+      mm<-match(c("t_3","t_4"),dn2)
+      if (any(is.na(mm))) mm<-match(c("tau_3","tau_4"),dn2)
+      if (!any(is.na(mm))) { y<-x[,mm[2] ]; x<-x[,mm[1] ] }
+    } else if (is.numeric(x)) {
+      nx<-names(x)
+      mm<-match(c("t_3","t_4"),nx)
+      if (any(is.na(mm))) mm<-match(c("tau_3","tau_4"),nx)
+      if (!any(is.na(mm))) { y<-x[mm[2] ]; x<-x[mm[1] ] }
+    }
+    if (is.null(y))
+      stop("could not find L-skewness and L-kurtosis values in 'x'")
+  }
+  if (identical(as.logical(distributions),FALSE)) distributions<-""
+  if (length(distributions)==1) distributions<-make.words(distributions)
+  matchdist<-match(toupper(distributions),lmrd.3par$distributions)
+  if (any(is.na(matchdist))) stop("unknown distribution(s) ",
+    paste(distributions[is.na(matchdist)],collapse=" "))
+  if (missing(twopar)) twopar<-lmrd.3par$twopar[matchdist]
+  else if (twopar==FALSE) twopar<-""
+  twopar<-unique(make.words(twopar))
+  match2<-pmatch(toupper(twopar),lmrd.2par$distributions)
+  if (any(is.na(match2))) stop("unknown 2-parameter distribution(s)",
+    paste(distributions[is.na(match2)],collapse=" "))
+#
+# three-parameter distributions
+#
+  if (missing(xlim)) xlim<-range(0,0.6,x,na.rm=TRUE)
+  if (missing(ylim)) ylim<-range(0,0.4,y,na.rm=TRUE)
+  if (length(distributions)==0) {
+    matplot(0,0,type="n",xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,frame.plot=FALSE,...)
+    legend.lmrd<-FALSE
+  } else {
+   col.lines <- if (!missing(col) && (x.missing || length(col)>1)) col else lmrd.3par$col[matchdist]
+   if (missing(lty)) lty<-lmrd.3par$lty[matchdist]
+   matplot(round(lmrd.data[,1],2), lmrd.data[,toupper(distributions)], type="l",
+     xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, col=col.lines, lty=lty, lwd=lwd,
+     frame.plot=FALSE, ...)
+  }
+#
+# framing elements of plot (box, lines at x=0 and y=0)
+#
+  fg<-list(...)$fg
+  if (is.null(fg)) fg<-par("fg")
+  box(col=fg)
+  abline(h=0,v=0,col=fg)
+#
+# two-parameter distributions
+#
+  if (length(twopar)>0) {
+    # Restrict to points that lie within the plotting area
+    pu<-par("usr")
+    match2<- match2 * (
+      lmrd.2par$tau3[match2]>=pu[1] & lmrd.2par$tau3[match2]<=pu[2] &
+      lmrd.2par$tau4[match2]>=pu[3] & lmrd.2par$tau4[match2]<=pu[4] )
+    # Plot the points, don't clip at axis box
+    points(lmrd.2par$tau3[match2],lmrd.2par$tau4[match2],pch=15,col="black",xpd=TRUE)
+    text(lmrd.2par$tau3[match2],lmrd.2par$tau4[match2],
+         lmrd.2par$text[match2],adj=c(-0.5,-0.25),xpd=TRUE)
+  }
+#
+# legend
+#
+  if (isTRUE(legend.lmrd)) legend.lmrd<-list()
+  if (is.list(legend.lmrd)) {
+    parusr<-par("usr")
+    if (missing(xlegend)) xlegend<-parusr[1]+0.01*(parusr[2]-parusr[1])
+    if (missing(ylegend)) ylegend<-parusr[4]-0.01*(parusr[4]-parusr[3])*par("pin")[1]/par("pin")[2]
+    legend.args<-list(x=xlegend,y=ylegend,legend=toupper(distributions),
+      bty="n",col=col.lines,lty=lty,lwd=lwd)
+    legend.args[names(legend.lmrd)]<-legend.lmrd
+    do.call(legend,legend.args)
+  }
+#
+# data points
+#
+  if (!x.missing) {
+    if (missing(cex)) cex<-NULL
+    if (!missing(col) && length(col)==1) points(x,y,pch=pch,cex=cex,col=col)
+    else points(x,y,pch=pch,cex=cex)
+  }
+}
+
+make.words<-function(astring)
+{
+  zz<-unlist(strsplit(as.character(astring)," "))
+  zz[zz!=""]
 }
 
 lmrd.data <- matrix(ncol=8, byrow=TRUE, data=c(
@@ -1555,109 +1973,6 @@ lmrd.2par<-list(
   text=c("E","G","L","N","U")
 )
 
-
-#----------------------------------------------------------------------
-# Function lmrd -- draws an L-moment ratio diagram
-#----------------------------------------------------------------------
-
-lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
-               xlim, ylim, pch=3, cex, col, lty, lwd=1,
-               legend.lmrd = TRUE, xlegend, ylegend,
-               xlab = expression(italic(L) * "-skewness"),
-               ylab = expression(italic(L) * "-kurtosis"), ...) {
-#
-# check arguments
-#
-  x.missing<-missing(x)
-  if (x.missing) { x<-y<-numeric(0) }
-  else if (missing(y)) {
-    y<-NULL
-    if (inherits(x,"regdata")) {
-      y<-x[[6]]; x<-x[[5]]
-    } else if (length(dim(x))==2) {
-      dn2<-dimnames(x)[[2]]
-      mm<-match(c("t_3","t_4"),dn2)
-      if (any(is.na(mm))) mm<-match(c("tau_3","tau_4"),dn2)
-      if (!any(is.na(mm))) { y<-x[,mm[2] ]; x<-x[,mm[1] ] }
-    } else if (is.numeric(x)) {
-      nx<-names(x)
-      mm<-match(c("t_3","t_4"),nx)
-      if (any(is.na(mm))) mm<-match(c("tau_3","tau_4"),nx)
-      if (!any(is.na(mm))) { y<-x[mm[2] ]; x<-x[mm[1] ] }
-    }
-    if (is.null(y))
-      stop("could not find L-skewness and L-kurtosis values in 'x'")
-  }
-  if (identical(as.logical(distributions),FALSE)) distributions<-""
-  if (length(distributions)==1) distributions<-make.words(distributions)
-  matchdist<-match(toupper(distributions),lmrd.3par$distributions)
-  if (any(is.na(matchdist))) stop("unknown distribution(s) ",
-    paste(distributions[is.na(matchdist)],collapse=" "))
-  if (missing(twopar)) twopar<-lmrd.3par$twopar[matchdist]
-  else if (twopar==FALSE) twopar<-""
-  twopar<-unique(make.words(twopar))
-  match2<-pmatch(toupper(twopar),lmrd.2par$distributions)
-  if (any(is.na(match2))) stop("unknown 2-parameter distribution(s)",
-    paste(distributions[is.na(match2)],collapse=" "))
-#
-# three-parameter distributions
-#
-  if (missing(xlim)) xlim<-range(0,0.6,x,na.rm=TRUE)
-  if (missing(ylim)) ylim<-range(0,0.4,y,na.rm=TRUE)
-  if (length(distributions)==0) {
-    matplot(0,0,type="n",xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,frame.plot=FALSE,...)
-    legend.lmrd<-FALSE
-  } else {
-   col.lines <- if (!missing(col) && (x.missing || length(col)>1)) col else lmrd.3par$col[matchdist]
-   if (missing(lty)) lty<-lmrd.3par$lty[matchdist]
-   matplot(round(lmrd.data[,1],2), lmrd.data[,toupper(distributions)], type="l",
-     xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, col=col.lines, lty=lty, lwd=lwd,
-     frame.plot=FALSE, ...)
-  }
-#
-# framing elements of plot (box, lines at x=0 and y=0)
-#
-  fg<-list(...)$fg
-  if (is.null(fg)) fg<-par("fg")
-  box(col=fg)
-  abline(h=0,v=0,col=fg)
-#
-# two-parameter distributions
-#
-  if (length(twopar)>0) {
-    # Restrict to points that lie within the plotting area
-    pu<-par("usr")
-    match2<- match2 * (
-      lmrd.2par$tau3[match2]>=pu[1] & lmrd.2par$tau3[match2]<=pu[2] &
-      lmrd.2par$tau4[match2]>=pu[3] & lmrd.2par$tau4[match2]<=pu[4] )
-    # Plot the points, don't clip at axis box
-    points(lmrd.2par$tau3[match2],lmrd.2par$tau4[match2],pch=15,col="black",xpd=TRUE)
-    text(lmrd.2par$tau3[match2],lmrd.2par$tau4[match2],
-         lmrd.2par$text[match2],adj=c(-0.5,-0.25),xpd=TRUE)
-  }
-#
-# legend
-#
-  if (isTRUE(legend.lmrd)) legend.lmrd<-list()
-  if (is.list(legend.lmrd)) {
-    parusr<-par("usr")
-    if (missing(xlegend)) xlegend<-parusr[1]+0.01*(parusr[2]-parusr[1])
-    if (missing(ylegend)) ylegend<-parusr[4]-0.01*(parusr[4]-parusr[3])*par("pin")[1]/par("pin")[2]
-    legend.args<-list(x=xlegend,y=ylegend,legend=toupper(distributions),
-      bty="n",col=col.lines,lty=lty,lwd=lwd)
-    legend.args[names(legend.lmrd)]<-legend.lmrd
-    do.call(legend,legend.args)
-  }
-#
-# data points
-#
-  if (!x.missing) {
-    if (missing(cex)) cex<-NULL
-    if (!missing(col) && length(col)==1) points(x,y,pch=pch,cex=cex,col=col)
-    else points(x,y,pch=pch,cex=cex)
-  }
-}
-
 lmrdpoints<-function(x, y=NULL, type="p", ...) {
 ## Add points to an L-moment ratio diagram
   if (is.null(y)) {
@@ -1681,6 +1996,10 @@ lmrdpoints<-function(x, y=NULL, type="p", ...) {
 }
 
 lmrdlines<-function(x, y=NULL, type="l", ...) lmrdpoints(x=x, y=y, type=type, ...)
+
+#-------------------------------------------------------------------------------
+#  Functions for extreme-value plot
+#-------------------------------------------------------------------------------
 
 evplot<-function(y,...)
 UseMethod("evplot")
@@ -1761,10 +2080,66 @@ evdistp<-function(pfunc,para,npoints=101,...) {
   lines(xval,yval,...)
 }
 
-make.words<-function(astring)
+#-------------------------------------------------------------------------------
+#  lmom package's own version of integrate()
+#-------------------------------------------------------------------------------
+
+integrate<- function(f, lower, upper, ..., subdivisions=100,
+  rel.tol, abs.tol, stop.on.error = TRUE)
 {
-  zz<-unlist(strsplit(as.character(astring)," "))  ## R
-# zz<-unlist(unpaste(astring," "))                 ## S
-  zz[zz!=""]
+  f <- match.fun(f)
+
+  if (is.na(lower) || is.na(upper)) stop("a limit is missing")
+  if (lower>upper) stop("limits incorrectly ordered")
+  if (subdivisions<1) stop("'subdivisions' must be at least 1")
+  if (missing(rel.tol) && missing(abs.tol)) abs.tol<-rel.tol<-.Machine$double.eps^0.25
+  else if (missing(rel.tol)) rel.tol<-0
+  else if (missing(abs.tol)) abs.tol<-0
+  if (abs.tol<=0 && rel.tol<max(50*.Machine$double.eps, 0.5e-28))
+    stop("invalid tolerance values")
+
+  env<-new.env(parent=environment())
+  assign("expr", quote(f(x, ...)), envir=env)
+
+  a<-as.double(lower)
+  b<-as.double(upper)
+  limit<-as.integer(subdivisions)
+  epsabs<-as.double(abs.tol)
+  epsrel<-as.double(rel.tol)
+
+  result<-numeric(1)
+  abserr<-numeric(1)
+  neval<-integer(1)
+  ier<-integer(1)
+  last<-integer(1)
+
+  if (is.finite(lower) && is.finite(upper)) {
+
+    cout <- .Call("cdqagse", PACKAGE="lmom",
+      a, b, epsabs, epsrel, limit, result, abserr, neval, ier, last, env)
+
+  } else {
+
+    if (is.finite(lower)) {inf<-1L; bound<-a }        # upper bound (only) infinite
+    else if (is.finite(upper)) {inf<- -1L; bound<-b } # lower bound (only) infinite
+    else {inf<-2L; bound<-0 }                         # both bounds infinite
+
+    cout <- .Call("cdqagie", PACKAGE="lmom",
+      bound, inf, epsabs, epsrel, limit, result, abserr, neval, ier, last, env)
+  }
+
+  res<-list(value=result, abs.error=abserr, subdivisions=last)
+  res$message <- switch(ier + 1,
+    "OK",
+    "maximum number of subdivisions reached",
+    "roundoff error was detected",
+    "extremely bad integrand behaviour",
+    "roundoff error is detected in the extrapolation table",
+    "the integral is probably divergent",
+    "the input is invalid")
+  if(ier==6 || (ier>0 && stop.on.error)) stop(res$message)
+  res$call<-match.call()
+  class(res)<-"integrate"
+  res
 }
 

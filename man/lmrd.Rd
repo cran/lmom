@@ -27,16 +27,16 @@ lmrd(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
       whose \eqn{L}-skewness--\eqn{L}-kurtosis relations
       are to be plotted as lines on the diagram.
       The following distribution identifiers are recognized, in upper or lower case:
-      \tabular{ll}{
-      \code{GLO} \tab generalized logistic \cr
-      \code{GEV} \tab generalized extreme-value \cr
-      \code{GPA} \tab generalized Pareto \cr
-      \code{GNO} \tab generalized normal \cr
-      \code{PE3} \tab Pearson type III \cr
-      \code{WAK.LB} \tab lower bound of \eqn{L}-kurtosis for given \eqn{L}-skewness, \cr
-                    \tab for the Wakeby distribution. \cr
-      \code{ALL.LB} \tab lower bound of \eqn{L}-kurtosis for given \eqn{L}-skewness, \cr
-                    \tab for all distributions.
+      \tabular{rll}{
+      \tab \code{GLO}    \tab generalized logistic \cr
+      \tab \code{GEV}    \tab generalized extreme-value \cr
+      \tab \code{GPA}    \tab generalized Pareto \cr
+      \tab \code{GNO}    \tab generalized normal \cr
+      \tab \code{PE3}    \tab Pearson type III \cr
+      \tab \code{WAK.LB} \tab lower bound of \eqn{L}-kurtosis for given \eqn{L}-skewness, \cr
+      \tab               \tab for the Wakeby distribution. \cr
+      \tab \code{ALL.LB} \tab lower bound of \eqn{L}-kurtosis for given \eqn{L}-skewness, \cr
+      \tab               \tab for all distributions.
       }
 
       % Alternative to a table:
@@ -63,12 +63,12 @@ lmrd(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
       Two-parameter distributions whose (\eqn{L}-skewness, \eqn{L}-kurtosis) values
       are to be plotted as points on the diagram.
       The following distribution identifiers are recognized, in upper or lower case:
-      \tabular{ll}{
-      \code{E} or \code{EXP} \tab exponential \cr
-      \code{G} or \code{GUM} \tab Gumbel \cr
-      \code{L} or \code{LOG} \tab logistic \cr
-      \code{N} or \code{NOR} \tab normal \cr
-      \code{U} or \code{UNI} \tab uniform
+      \tabular{rll}{
+      \tab \code{E} or \code{EXP} \tab exponential \cr
+      \tab \code{G} or \code{GUM} \tab Gumbel \cr
+      \tab \code{L} or \code{LOG} \tab logistic \cr
+      \tab \code{N} or \code{NOR} \tab normal \cr
+      \tab \code{U} or \code{UNI} \tab uniform
       }
 
       The argument should be either a character vector each of whose elements
@@ -109,7 +109,7 @@ lmrd(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
 
       By default, colors and line types are matched to the distributions given
       in the \code{distributions} parameter, as follows:
-      \tabular{ll}{
+      \tabular{rll}{
       % S-plus colors
       %GLO \tab color  6, line type 1 (blue, solid) \cr
       %GEV \tab color  4, line type 1 (green, solid) \cr
@@ -119,13 +119,13 @@ lmrd(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
       %WAK.LB \tab color 15, line type 4 (red, dashed) \cr
       %ALL.LB \tab color  1, line type 4 (black, dashed)
       % R colors
-      \code{GLO}    \tab blue,  solid line \cr
-      \code{GEV}    \tab green, solid line \cr
-      \code{GPA}    \tab red,   solid line \cr
-      \code{GNO}    \tab black, solid line \cr
-      \code{PE3}    \tab cyan,  solid line \cr
-      \code{WAK.LB} \tab red,   dashed line\cr
-      \code{ALL.LB} \tab black, dashed line
+      \tab \code{GLO}    \tab blue,  solid line \cr
+      \tab \code{GEV}    \tab green, solid line \cr
+      \tab \code{GPA}    \tab red,   solid line \cr
+      \tab \code{GNO}    \tab black, solid line \cr
+      \tab \code{PE3}    \tab cyan,  solid line \cr
+      \tab \code{WAK.LB} \tab red,   dashed line\cr
+      \tab \code{ALL.LB} \tab black, dashed line
       }
       The green and cyan colors are less bright than the standard
       \code{"green"} and \code{"cyan"}; they are defined to be

@@ -17,20 +17,20 @@
 \description{Computes the \eqn{L}-moments of a probability distribution
 given its parameters.
 The following distributions are recognized:
-\tabular{ll}{
-\code{lmrexp} \tab exponential \cr
-\code{lmrgam} \tab gamma \cr
-\code{lmrgev} \tab generalized extreme-value \cr
-\code{lmrglo} \tab generalized logistic \cr
-\code{lmrgpa} \tab generalized Pareto \cr
-\code{lmrgno} \tab generalized normal \cr
-\code{lmrgum} \tab Gumbel (extreme-value type I) \cr
-\code{lmrkap} \tab kappa \cr
-\code{lmrln3} \tab three-parameter lognormal \cr
-\code{lmrnor} \tab normal \cr
-\code{lmrpe3} \tab Pearson type III \cr
-\code{lmrwak} \tab Wakeby \cr
-\code{lmrwei} \tab Weibull \cr
+\tabular{rll}{
+\tab \code{lmrexp} \tab exponential \cr
+\tab \code{lmrgam} \tab gamma \cr
+\tab \code{lmrgev} \tab generalized extreme-value \cr
+\tab \code{lmrglo} \tab generalized logistic \cr
+\tab \code{lmrgpa} \tab generalized Pareto \cr
+\tab \code{lmrgno} \tab generalized normal \cr
+\tab \code{lmrgum} \tab Gumbel (extreme-value type I) \cr
+\tab \code{lmrkap} \tab kappa \cr
+\tab \code{lmrln3} \tab three-parameter lognormal \cr
+\tab \code{lmrnor} \tab normal \cr
+\tab \code{lmrpe3} \tab Pearson type III \cr
+\tab \code{lmrwak} \tab Wakeby \cr
+\tab \code{lmrwei} \tab Weibull \cr
 }
 }
 \usage{
@@ -78,20 +78,20 @@ specified by its cumulative distribution function or quantile function.
 of a distribution given its \eqn{L}-moments.
 
 For individual distributions, see their cumulative distribution functions:
-\tabular{ll}{
-\code{\link{cdfexp}} \tab exponential \cr
-\code{\link{cdfgam}} \tab gamma \cr
-\code{\link{cdfgev}} \tab generalized extreme-value \cr
-\code{\link{cdfglo}} \tab generalized logistic \cr
-\code{\link{cdfgpa}} \tab generalized Pareto \cr
-\code{\link{cdfgno}} \tab generalized normal \cr
-\code{\link{cdfgum}} \tab Gumbel (extreme-value type I) \cr
-\code{\link{cdfkap}} \tab kappa \cr
-\code{\link{cdfln3}} \tab three-parameter lognormal \cr
-\code{\link{cdfnor}} \tab normal \cr
-\code{\link{cdfpe3}} \tab Pearson type III \cr
-\code{\link{cdfwak}} \tab Wakeby \cr
-\code{\link{cdfwei}} \tab Weibull \cr
+\tabular{rll}{
+\tab \code{\link{cdfexp}} \tab exponential \cr
+\tab \code{\link{cdfgam}} \tab gamma \cr
+\tab \code{\link{cdfgev}} \tab generalized extreme-value \cr
+\tab \code{\link{cdfglo}} \tab generalized logistic \cr
+\tab \code{\link{cdfgpa}} \tab generalized Pareto \cr
+\tab \code{\link{cdfgno}} \tab generalized normal \cr
+\tab \code{\link{cdfgum}} \tab Gumbel (extreme-value type I) \cr
+\tab \code{\link{cdfkap}} \tab kappa \cr
+\tab \code{\link{cdfln3}} \tab three-parameter lognormal \cr
+\tab \code{\link{cdfnor}} \tab normal \cr
+\tab \code{\link{cdfpe3}} \tab Pearson type III \cr
+\tab \code{\link{cdfwak}} \tab Wakeby \cr
+\tab \code{\link{cdfwei}} \tab Weibull \cr
 }
 }
 
