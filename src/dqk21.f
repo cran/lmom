@@ -32,9 +32,9 @@ C                                  vector of dimension n
 C                                  input values (function arguments)
 C                         - n    - integer
 C                                  number of input values
-C                         - ienv - Type (C_PTR)
-C                                  Passed to/from C code, not used in
-C                                  Fortran statements.
+C                         - ienv - integer
+C                                  array, length 2.  Passed to/from C
+C                                  code, not used in Fortran statements.
 C                       F should be declared EXTERNAL in the calling
 C                       program.
 c
@@ -62,21 +62,20 @@ c              resasc - double precision
 c                       approximation to the integral of abs(f-i/(b-a))
 c                       over (a,b)
 C
-C              ienv   - Type (C_PTR)
-C                       array, assumed length. Passed to/from C code,
+C              ienv   - integer
+C                       array, length 2. Passed to/from C code,
 C                       not used in Fortran statements.
 c
 c***references  (none)
 c***routines called  d1mach
 c***end prologue  dqk21
 c
-      Use ISO_C_BINDING
       double precision a,absc,abserr,b,centr,dabs,dhlgth,dmax1,dmin1,
      *  d1mach,epmach,fc,fsum,fval1,fval2,fv1,fv2,hlgth,resabs,resasc,
      *  resg,resk,reskh,result,uflow,wg,wgk,xgk
       Double Precision fin(21),fout(21)
       integer j,jtw,jtwm1
-      Type (C_PTR) ienv
+      Integer ienv(2)
       external f
 c
       dimension fv1(10),fv2(10),wg(5),wgk(11),xgk(11)

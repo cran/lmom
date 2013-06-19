@@ -1,6 +1,6 @@
-6ac131e21640067c37c4e8a1e654f056 *DESCRIPTION
+5b319978af9ae9b93c7c9671ac92d4af *DESCRIPTION
 ccd621f203fcb023ef5829357098b39e *NAMESPACE
-cbecadb42e6af54ecc3abf4788bd06c8 *NEWS
+1aef1afad003117c7a336c82b90ef373 *NEWS
 8be050bccb2d5860c49ce10ffdf9ba71 *R/lmom.r
 5b6c4d8510c10167ea07967c0e71513a *inst/CITATION
 b842fdca9b0cb28a77aebf90e3400935 *man/cdfexp.Rd
@@ -26,11 +26,11 @@ ad95033f7a9da161e8e665d416eabaf4 *man/lmrdpoints.Rd
 9d7fa3b82e810eda3d3d4d2024970645 *man/pelp.Rd
 259e2d37cb69d81f5579adb9cf48e191 *man/samlmu.Rd
 576255f02bcfc26f9461edb3ec6f335b *src/d1mach.f
-c951ff811f8851bf226958a5f7b6932d *src/dqagie.f
-3cdf6f7c54b9c1ef03dc519a7f2ffd73 *src/dqagse.f
+ccf77abdaa9e30c1aae7c770e6af8053 *src/dqagie.f
+2803e07925241f6b153ca93cdd3ca724 *src/dqagse.f
 8904c1f19555e723a0a0621bacf1ca17 *src/dqelg.f
-e4d661102854c49334c7791d580f4a87 *src/dqk15i.f
-9b8c82d6ca2963fd58a8a46a8355fd43 *src/dqk21.f
+9841ee0199bd1ca139395d30fe5420de *src/dqk15i.f
+5aa238ab96394e19ff7f0322563585a7 *src/dqk21.f
 e5439c145a80972ca625bfe4e1421877 *src/dqpsrt.f
 2c314957a4e7d8ba3cf5c4420b15cbc7 *src/lmomc.c
 373a96fcdc5a003baebe184020687cd5 *src/lmoments.f

@@ -5,6 +5,12 @@
        **************************************************
 
 
+Version 2.1     2013 Jun 19
+
+   o   Removed Fortran 2003 features from the Forrtan code used by lmrp() and
+       lmrq(), to enable compilation by CRAN for Macintosh OS.
+
+
 Version 2.0     2013 Jun 17
 
    o   Some support added for trimmed L-moments: samlmu(), samlmu.s(), lmrp(),

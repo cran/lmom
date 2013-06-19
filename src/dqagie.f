@@ -145,14 +145,13 @@ c            last   - integer
 c                     number of subintervals actually produced
 c                     in the subdivision process
 C
-C            ienv   - Type (C_PTR)
-C                     array, assumed length. Passed to/from C code,
+C            ienv   - integer
+C                     array, length 2. Passed to/from C code,
 C                     not used in Fortran statements.
 c
 c***references  (none)
 c***routines called  d1mach,dqelg,dqk15i,dqpsrt
 c***end prologue  dqagie
-      Use ISO_C_BINDING
       double precision abseps,abserr,alist,area,area1,area12,area2,a1,
      *  a2,blist,boun,bound,b1,b2,correc,dabs,defabs,defab1,defab2,
      *  dmax1,dres,d1mach,elist,epmach,epsabs,epsrel,erlarg,erlast,
@@ -160,7 +159,7 @@ c***end prologue  dqagie
      *  reseps,result,res3la,rlist,rlist2,small,uflow
       integer id,ier,ierro,inf,iord,iroff1,iroff2,iroff3,jupbnd,k,ksgn,
      *  ktmin,last,limit,maxerr,neval,nres,nrmax,numrl2
-      Type (C_PTR) ienv
+      Integer ienv(2)
       logical extrap,noext
 c
       dimension alist(limit),blist(limit),elist(limit),iord(limit),
