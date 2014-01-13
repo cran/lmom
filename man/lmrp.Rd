@@ -57,12 +57,16 @@ eq. (7) for \code{lmrp}, eq. (5) for \code{lmrq}.
 Integrals in those expressions are computed by numerical integration.
 }
 
-\value{If \code{verbose=FALSE}, a numeric vector containing the \eqn{L}-moments
-(of orders 1 and 2) and \eqn{L}-moment ratios (of orders 3 and higher).
+\value{If \code{verbose=FALSE} and \code{ratios=FALSE},
+a numeric vector containing the \eqn{L}-moments.
+
+If \code{verbose=FALSE} and \code{ratios=TRUE},
+a numeric vector containing the \eqn{L}-moments (of orders 1 and 2)
+and \eqn{L}-moment ratios (of orders 3 and higher).
 
 If \code{verbose=TRUE}, a data frame with columns as follows:
-\item{value}{\eqn{L}-moments (for orders 1 and 2) and \eqn{L}-moment ratios
-(for orders 3 and higher).}
+\item{value}{\eqn{L}-moments (if \code{ratios=FALSE}),
+or \eqn{L}-moments and \eqn{L}-moment ratios (if \code{ratios=TRUE}).}
 \item{abs.error}{Estimate of the absolute error in the computed value.}
 \item{message}{\code{"OK"} or a character string giving the error message
 resulting from the numerical integration.}
@@ -93,10 +97,10 @@ As of version 2.0, numerical integration uses an internal function
 that directly calls (slightly modified versions of)
 the Fortran routines in QUADPACK (Piessens et al. 1983).
 \R{}'s own \code{integrate} function uses C code \dQuote{based on} the
-QUADPACK routines but since \R{} version 2.12.0 through at least
-\R{} version 3.0.1 does not in every case reproduce the results that
-would have been obtained with the Fortran code.
-(This is \R{} bug PR#15219, reported 2013 Feb 24 but not acted on as of 2013 Jun 1).
+QUADPACK routines, but in \R{} versions 2.12.0 through 3.0.1
+did not in every case reproduce the results that
+would have been obtained with the Fortran code
+(this is \R{} bug PR#15219).
 }
 
 \references{

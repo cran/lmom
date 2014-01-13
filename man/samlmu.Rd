@@ -50,7 +50,7 @@ using the recursions of Hosking (2007), eqs. (12)-(13).
   the \eqn{L}-moments and \eqn{L}-moment ratios,
   in the order \eqn{\ell_1}{l_1}, \eqn{\ell_2}{l_2}, \eqn{t_3}{t_3}, \eqn{t_4}{t_4}, etc.
   If \code{ratios} is \code{FALSE}, a numeric vector containing the \eqn{L}-moments
-  in the order \eqn{\ell_1}{l_1}, \eqn{\ell_2}{l_2}, \eqn{l_3}{l_3}, \eqn{l_4}{l_4}, etc.
+  in the order \eqn{\ell_1}{l_1}, \eqn{\ell_2}{l_2}, \eqn{\ell_3}{l_3}, \eqn{\ell_4}{l_4}, etc.
 }
 
 \note{The term \dQuote{trimmed} is used in a different sense from

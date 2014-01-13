@@ -2,7 +2,7 @@ C
 C  Fortran code for R package "lmom", version 2.0.
 C  Based on the LMOMENTS Fortran package, version 3.04.
 C
-C  (c) IBM Corporation, 2008-2013.
+C  (c) IBM Corporation, 2008-2014.
 C
 C  The following routines are called from R functions:
 C

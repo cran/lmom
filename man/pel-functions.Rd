@@ -59,7 +59,13 @@ or of a data sample.}
 }
 
 \details{Numerical methods and accuracy are as described in
-Hosking (1996, pp. 8--9).}
+Hosking (1996, pp. 10--11).
+Exception:
+if \code{pelwak} is unable to fit a Wakeby distribution using all 5 \eqn{L}-moments,
+it instead fits a generalized Pareto distribution to the first 3 \eqn{L}-moments.
+(The corresponding routine in the LMOMENTS Fortran package
+would attempt to fit a Wakeby distribution with lower bound zero.)
+}
 
 \value{A numeric vector containing the parameters of the distribution.}
 

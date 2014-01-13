@@ -5,9 +5,41 @@
        **************************************************
 
 
+Version 2.2     2014 Jan 13
+
+   o   Now explicitly imports standard packages "stats" and "graphics".
+
+   o   pelp() and pelq() gain an argument 'subdiv'.
+
+   o   In samlmu() and samlmu.s(), computation of trimmed L-moments is faster
+       for small degrees of trimming.
+
+   o   Help file for pelwak() now notes the difference between its behaviour
+       and that of the corresponding routine in the LMOMENTS Fortran package.
+
+   o   Fixed: lmrp() could, in rare cases, attempt to evaluate 'pfunc' with an
+       argument outside the user-supplied bounds.
+
+   o   Fixed: lmrp(...,order=1,verbose=TRUE) would fail with error
+       "in data.frame( ... : 'row.names' should specify one of the variables".
+
+       In versions 1.6 and earlier, lmrq(...,order=1,verbose=TRUE) would fail
+       with the same error.  In versions 2.0 and later this was masked by the
+       following bug ...
+
+   o   Fixed: since version 2.0, lmrq(...,order=1) would fail with error
+       "if (denom>0 ... : missing value where TRUE/FALSE needed".
+
+       pelq(...,type="s"), which calls lmrq(...,order=1) internally, would fail
+       with the same error.
+
+   o   Fixed: since version 2.0, samlmu() could give an error in some cases
+       when 'nmom' exceeded the number of non-missing values in 'x'.
+
+
 Version 2.1     2013 Jun 19
 
-   o   Removed Fortran 2003 features from the Forrtan code used by lmrp() and
+   o   Removed Fortran 2003 features from the Fortran code used by lmrp() and
        lmrq(), to enable compilation by CRAN for Macintosh OS.
 
 
@@ -24,8 +56,8 @@ Version 2.0     2013 Jun 17
        ratios.
 
    o   lmrp() and lmrq() use an internal function for numerical integration,
-       to avoid the bugs introduced into R's own integrate() function in R
-       version 2.12.0.
+       to avoid the bugs present in R's own integrate() function in R versions
+       2.12.0 through 3.0.1.
 
    o   In lmrp(), modified the computation method for lambda_1: should make
        computations a little faster.
@@ -128,7 +160,7 @@ Version 1.1     2008 Dec 23
 
    o   New functions, for the 3-parameter lognormal distribution: cdfln3(),
        lmrln3(), pelln3(), qualn3().  pelln3() also permits parameter
-       estimation for the 2-parameter lognormal distributon.
+       estimation for the 2-parameter lognormal distribution.
 
    o   Fixed: pelp() and pelq() would fail when the name of the
        optimization routine (argument 'method') was also the name

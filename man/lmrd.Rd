@@ -181,6 +181,7 @@ e.g. follow \code{lmrd(t3, t4)} by \code{points(t3, t4, col=c("red", "green"))}.
 \examples{
 data(airquality)
 lmrd(samlmu(airquality$Ozone))
+
 # Tweaking a few graphics parameters makes the graph look better
 # (in the author's opinion)
 lmrd(samlmu(airquality$Ozone), xaxs="i", yaxs="i", las=1)

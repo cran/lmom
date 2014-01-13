@@ -8,10 +8,12 @@ as a function of the \eqn{L}-moments or trimmed \eqn{L}-moments.
 \usage{
 pelp(lmom, pfunc, start, bounds = c(-Inf, Inf),
      type = c("n", "s", "ls", "lss"),
-     ratios = NULL, trim = NULL, method = "nlm", acc = 1e-5, ...)
+     ratios = NULL, trim = NULL, method = "nlm", acc = 1e-5,
+     subdiv = 100, ...)
 
 pelq(lmom, qfunc, start, type = c("n", "s", "ls", "lss"),
-     ratios = NULL, trim = NULL, method = "nlm", acc = 1e-5, ...)
+     ratios = NULL, trim = NULL, method = "nlm", acc = 1e-5,
+     subdiv = 100, ...)
 }
 
 \arguments{
@@ -62,6 +64,9 @@ pelq(lmom, qfunc, start, type = c("n", "s", "ls", "lss"),
     relative accuracy for a scale parameter, and
     absolute accuracy of the location parameter divided by the scale parameter
     for a location parameter.}
+  \item{subdiv}{Maximum number of subintervals used in the numerical integration
+    that computes \eqn{L}-moments of the distribution.  Passed to functions
+    \code{lmrp} or \code{lmrq}, which perform this integration.}
   \item{\dots}{Further arguments will be passed to the optimization function
     (\code{nlm}, \code{uniroot}, or \code{optim}).}
 }
@@ -214,7 +219,7 @@ If in this case \code{lmom} has no names, default values
 \code{ratios=TRUE} and \code{trim=0} will be used.
 
 This inference is made in order to reduce the need to specify the
-orders of trimming repetitivelty.
+orders of trimming repetitively.
 For example, a distribution with quantile function \code{qfunc} can be
 fitted to (1,1)-trimmed \eqn{L}-moments of data in \code{x} by
 \preformatted{

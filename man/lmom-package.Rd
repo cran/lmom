@@ -145,7 +145,7 @@ parameters to be specified as a single vector.
 This differs from the standard \R convention, in which
 each parameter is a separate argument.
 There are two reasons for this.
-First, the single-vector parameterization is consistent with
+First, the single-vector parametrization is consistent with
 the Fortran routines on which these \R functions are based.
 Second, the single-vector parametrization is often easier to use.
 For example, consider computing the 80th and 90th percentiles
