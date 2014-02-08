@@ -139,28 +139,24 @@ lmrq(quagev, c(2,3,-0.2))
 lmrgev(c(2,3,-0.2), nmom=4)
 
 ## GEV bounds specified as a vector
-##
 lmrp(cdfgev, c(2,3,-0.2), bounds=c(-13,Inf))
-##
+
 ## GEV bounds specified as a function -- single vector of parameters
-##
 gevbounds <- function(para) {
   k <- para[3]
   b <- para[1]+para[2]/k
-  c(ifelse(k<0, b,- Inf), ifelse(k>0, b, Inf))
+  c(ifelse(k<0, b, -Inf), ifelse(k>0, b, Inf))
 }
 lmrp(cdfgev, c(2,3,-0.2), bounds=gevbounds)
-##
+
 ## GEV bounds specified as a function -- separate parameters
-##
-pgev <- function(x, xi, alpha ,k)
+pgev <- function(x, xi, alpha, k)
   pmin(1, pmax(0, exp(-((1-k*(x-xi)/alpha)^(1/k)))))
 pgevbounds <- function(xi,alpha,k) {
   b <- xi+alpha/k
   c(ifelse(k<0, b, -Inf), ifelse(k>0, b, Inf))
 }
 lmrp(pgev, xi=2, alpha=3, k=-0.2, bounds=pgevbounds)
-
 
 ## Normal distribution
 lmrp(pnorm)

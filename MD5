@@ -1,7 +1,7 @@
-5ba896e286886b019a6cc72b06b622a3 *DESCRIPTION
-0abc2c7e2d56dc1c0f4f6d551c200837 *NAMESPACE
-0948f25b955a61269518364bae2df597 *NEWS
-6991ce8e96a437a1be1895dfda531842 *R/lmom.r
+e8d3e27083462c27da72b5284da4ab41 *DESCRIPTION
+5208953441a5d45a5d58d5d46079ab78 *NAMESPACE
+1ed552e4b6b26e051eb6277b52294f33 *NEWS
+354ae9248349cb91dbbb2ca7eb0ad001 *R/lmom.r
 5b6c4d8510c10167ea07967c0e71513a *inst/CITATION
 b842fdca9b0cb28a77aebf90e3400935 *man/cdfexp.Rd
 6c8ce575e2590ccc8980c19886bcc251 *man/cdfgam.Rd
@@ -21,7 +21,7 @@ e81f2d827c6171daec4241ecef393457 *man/cdfwei.Rd
 13a76813bfbd92f426947cec19df458b *man/lmr-functions.Rd
 a8f0533650e6742b435c070a55e2018e *man/lmrd.Rd
 99307aa054aa9c15fa758d61bda814fc *man/lmrdpoints.Rd
-0ecc0dcf09599d682a1b6740046403a8 *man/lmrp.Rd
+dce7661eafb895e296b13d85b2dfc370 *man/lmrp.Rd
 ff808da00ef918eb529c9a1780a52dc3 *man/pel-functions.Rd
 92d4ecd084f681996b104cb7e3769ea6 *man/pelp.Rd
 21da4052a5fa2541d224b96142112780 *man/samlmu.Rd
@@ -33,5 +33,5 @@ ccf77abdaa9e30c1aae7c770e6af8053 *src/dqagie.f
 5aa238ab96394e19ff7f0322563585a7 *src/dqk21.f
 e5439c145a80972ca625bfe4e1421877 *src/dqpsrt.f
 2c314957a4e7d8ba3cf5c4420b15cbc7 *src/lmomc.c
-e81106772f931382bf4b0b96b1ef1275 *src/lmoments.f
+6da9a32b0619dc0170f7a23c6262cc7b *src/lmoments.f
 9bf068df0e510df7127dd44701758880 *src/samlm.f

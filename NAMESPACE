@@ -1,7 +1,6 @@
 import(stats)
 import(graphics)
 useDynLib(lmom)
-exportPattern("^x")
 export(cdfexp)
 export(cdfgam)
 export(cdfgev)

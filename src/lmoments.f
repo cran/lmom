@@ -1,5 +1,5 @@
 C
-C  Fortran code for R package "lmom", version 2.0.
+C  Fortran code for R package "lmom", version 2.3.
 C  Based on the LMOMENTS Fortran package, version 3.04.
 C
 C  (c) IBM Corporation, 2008-2014.
@@ -848,6 +848,9 @@ C*  NEW YORK 10598, U.S.A.                                             *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
 C*                                                                     *
+C*  Version 2.3    February 2014                                       *
+C*  * PARA now has dimension 3 (was 5)                                 *
+C*                                                                     *
 C***********************************************************************
 C
 C  L-MOMENT RATIOS FOR THE GENERALIZED PARETO DISTRIBUTION
@@ -861,7 +864,7 @@ C                  LAMBDA-1, LAMBDA-2, TAU-3, TAU-4, ... .
 C  NMOM   * INPUT* NUMBER OF L-MOMENTS TO BE FOUND. AT MOST 20.
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      DOUBLE PRECISION PARA(5),XMOM(NMOM)
+      DOUBLE PRECISION PARA(3),XMOM(NMOM)
       DATA ZERO/0D0/,ONE/1D0/,TWO/2D0/
 C
       IFAIL=0

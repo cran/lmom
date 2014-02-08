@@ -1,3 +1,4 @@
+
 #***********************************************************************
 #*                                                                     *
 #*  R code for R package "lmom"                                        *
@@ -10,39 +11,13 @@
 #*                                                                     *
 #*  (c) IBM Corporation, 2008-2014.                                    *
 #*                                                                     *
-#*  Version 2.2    January 2014                                        *
+#*  Version 2.3    February 2014                                       *
 #*                                                                     *
 #***********************************************************************
 
 #-------------------------------------------------------------------------------
 #  Specifications for distributions, used by cdf...(), qua...(), lmr...(), pel...()
 #-------------------------------------------------------------------------------
-
-lmom.routines<-list(
-  lmrexp="lmrexp",
-  lmrgam="lmrgam",
-  lmrgev="lmrgev",
-  lmrglo="lmrglo",
-  lmrgno="lmrgno",
-  lmrgpa="lmrgpa",
-  lmrgum="lmrgum",
-  lmrkap="lmrkap",
-  lmrnor="lmrnor",
-  lmrpe3="lmrpe3",
-  lmrwak="lmrwak",
-  pelexp="pelexp",
-  pelgam="pelgam",
-  pelgev="pelgev",
-  pelglo="pelglo",
-  pelgno="pelgno",
-  pelgpa="pelgpa",
-  pelgum="pelgum",
-  pelkap="pelkap",
-  pelnor="pelnor",
-  pelpe3="pelpe3",
-  pelwak="pelwak",
-  pelwa0="pelwa0",
-  cdfwak="cdfwak")
 
 # 'lmom.dist' contains specifications for each distribution that the "lmom" package knows about
 #
@@ -52,24 +27,22 @@ lmom.routines<-list(
 # pardefaults - default values of parameters
 # himom       - highest order L-moment needed for parameter estimation
 # maxmom      - highest order L-moment that can be computed by the LMR... Fortran routine
-# lmrroutine  - name of the Fortran routine that computes L-moments for this distribution
-# pelroutine  - name of the Fortran routine that estimates parameters of this distribution
 #
 lmom.dist<-list(
-  exp=list(name="exp",npara=2,parnames=c("xi","alpha"),                       pardefaults=c(0,1),      himom=2,maxmom=20,lmrroutine=lmom.routines$lmrexp,pelroutine=lmom.routines$pelexp),
-  gam=list(name="gam",npara=2,parnames=c("alpha","beta"),                     pardefaults=c(1,1),      himom=2,maxmom= 4,lmrroutine=lmom.routines$lmrgam,pelroutine=lmom.routines$pelgam),
-  gev=list(name="gev",npara=3,parnames=c("xi","alpha","k"),                   pardefaults=c(0,1,0),    himom=3,maxmom=20,lmrroutine=lmom.routines$lmrgev,pelroutine=lmom.routines$pelgev),
-  glo=list(name="glo",npara=3,parnames=c("xi","alpha","k"),                   pardefaults=c(0,1,0),    himom=3,maxmom=20,lmrroutine=lmom.routines$lmrglo,pelroutine=lmom.routines$pelglo),
-  gno=list(name="gno",npara=3,parnames=c("xi","alpha","k"),                   pardefaults=c(0,1,0),    himom=3,maxmom=20,lmrroutine=lmom.routines$lmrgno,pelroutine=lmom.routines$pelgno),
-  gpa=list(name="gpa",npara=3,parnames=c("xi","alpha","k"),                   pardefaults=c(0,1,0),    himom=3,maxmom=20,lmrroutine=lmom.routines$lmrgpa,pelroutine=lmom.routines$pelgpa),
-  gum=list(name="gum",npara=2,parnames=c("xi","alpha"),                       pardefaults=c(0,1),      himom=2,maxmom=20,lmrroutine=lmom.routines$lmrgum,pelroutine=lmom.routines$pelgum),
-  kap=list(name="kap",npara=4,parnames=c("xi","alpha","k","h"),               pardefaults=c(0,1,0,0),  himom=4,maxmom=20,lmrroutine=lmom.routines$lmrkap,pelroutine=lmom.routines$pelkap),
-  ln3=list(name="ln3",npara=3,parnames=c("zeta","mu","sigma"),                pardefaults=c(0,0,1),    himom=3,maxmom=20,lmrroutine=NULL,                pelroutine=NULL),
-  nor=list(name="nor",npara=2,parnames=c("mu","sigma"),                       pardefaults=c(0,1),      himom=2,maxmom=20,lmrroutine=lmom.routines$lmrnor,pelroutine=lmom.routines$pelnor),
-  pe3=list(name="pe3",npara=3,parnames=c("mu","sigma","gamma"),               pardefaults=c(0,1,0),    himom=3,maxmom= 4,lmrroutine=lmom.routines$lmrpe3,pelroutine=lmom.routines$pelpe3),
-  wak=list(name="wak",npara=5,parnames=c("xi","alpha","beta","gamma","delta"),pardefaults=c(0,1,0,0,0),himom=5,maxmom=20,lmrroutine=lmom.routines$lmrwak,pelroutine=lmom.routines$pelwak),
-  wa0=list(name="wa0",npara=5,parnames=c("xi","alpha","beta","gamma","delta"),pardefaults=c(0,1,0,0,0),himom=4,maxmom=20,lmrroutine=lmom.routines$lmrwak,pelroutine=lmom.routines$pelwa0),
-  wei=list(name="wei",npara=3,parnames=c("zeta","beta","delta"),              pardefaults=c(0,1,0),    himom=3,maxmom=20,lmrroutine=NULL,                pelroutine=NULL)
+  exp=list(name="exp", npara=2L, parnames=c("xi","alpha"),                        pardefaults=c(0,1),       himom=2L, maxmom=20L),
+  gam=list(name="gam", npara=2L, parnames=c("alpha","beta"),                      pardefaults=c(1,1),       himom=2L, maxmom= 4L),
+  gev=list(name="gev", npara=3L, parnames=c("xi","alpha","k"),                    pardefaults=c(0,1,0),     himom=3L, maxmom=20L),
+  glo=list(name="glo", npara=3L, parnames=c("xi","alpha","k"),                    pardefaults=c(0,1,0),     himom=3L, maxmom=20L),
+  gno=list(name="gno", npara=3L, parnames=c("xi","alpha","k"),                    pardefaults=c(0,1,0),     himom=3L, maxmom=20L),
+  gpa=list(name="gpa", npara=3L, parnames=c("xi","alpha","k"),                    pardefaults=c(0,1,0),     himom=3L, maxmom=20L),
+  gum=list(name="gum", npara=2L, parnames=c("xi","alpha"),                        pardefaults=c(0,1),       himom=2L, maxmom=20L),
+  kap=list(name="kap", npara=4L, parnames=c("xi","alpha","k","h"),                pardefaults=c(0,1,0,0),   himom=4L, maxmom=20L),
+  ln3=list(name="ln3", npara=3L, parnames=c("zeta","mu","sigma"),                 pardefaults=c(0,0,1),     himom=3L, maxmom=20L),
+  nor=list(name="nor", npara=2L, parnames=c("mu","sigma"),                        pardefaults=c(0,1),       himom=2L, maxmom=20L),
+  pe3=list(name="pe3", npara=3L, parnames=c("mu","sigma","gamma"),                pardefaults=c(0,1,0),     himom=3L, maxmom= 4L),
+  wak=list(name="wak", npara=5L, parnames=c("xi","alpha","beta","gamma","delta"), pardefaults=c(0,1,0,0,0), himom=5L, maxmom=20L),
+  wa0=list(name="wa0", npara=5L, parnames=c("xi","alpha","beta","gamma","delta"), pardefaults=c(0,1,0,0,0), himom=4L, maxmom=20L),
+  wei=list(name="wei", npara=3L, parnames=c("zeta","beta","delta"),               pardefaults=c(0,1,0),     himom=3L, maxmom=20L)
 )
 
 #-------------------------------------------------------------------------------
@@ -177,14 +150,12 @@ cdfwak<-function(x,para=c(0,1,0,0,0)){
   ok<-is.finite(x)
   xok<-x[ok]
   nxok<-length(xok)
-
-  fort<-.Fortran(lmom.routines$cdfwak,PACKAGE="lmom",
+  fort<-.Fortran("cdfwak",PACKAGE="lmom",
         as.double(xok),
         as.integer(nxok),
         as.double(para),
         cdf=double(nxok),
         ifail=integer(nxok))
-
   if (fort$ifail[1]==7000) stop("distribution parameters invalid")
   if (any(fort$ifail==7010)) warning("iteration did not converge - some cdf values not computed")
   result<-rep(as.numeric(NA),length(x))
@@ -349,8 +320,8 @@ lmrxxx<-function(xxx,para,nmom){
   if (length(para)!=ddata$npara) stop("lmr",ddata$name,": parameter vector has wrong length - should be ",ddata$npara)
   if (any(is.na(para))) stop("lmr",ddata$name,": missing values in parameter vector")
   nnmom<-as.integer(nmom)
-  if (nnmom<=0) return(numeric(0))
-  if (nnmom<=2) rnames <- paste("lambda",1:nnmom,sep="_")
+  if (nnmom<=0L) return(numeric(0))
+  if (nnmom<=2L) rnames <- paste("lambda",1:nnmom,sep="_")
   else rnames <- c("lambda_1","lambda_2",paste("tau",3:nnmom,sep="_"))
   result <- rep(as.numeric(NA),nnmom)
   names(result) <- rnames
@@ -358,11 +329,23 @@ lmrxxx<-function(xxx,para,nmom){
     warning("lmr",ddata$name,": too many L-moments requested - max. is ",ddata$maxmom)
     nnmom<-min(nnmom,ddata$maxmom)
   }
-  fort<-.Fortran(ddata$lmrroutine,PACKAGE="lmom",
-        as.double(para),
-        xmom=double(nnmom),
-        as.integer(nnmom),
-        ifail=integer(1))
+  para<-as.double(para)
+  xmom<-double(nnmom)
+  nnmom<-as.integer(nnmom)
+  ifail<-integer(1)
+  fort<-switch(xxx,
+    exp=.Fortran("lmrexp", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    gam=.Fortran("lmrgam", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    gev=.Fortran("lmrgev", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    glo=.Fortran("lmrglo", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    gno=.Fortran("lmrgno", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    gpa=.Fortran("lmrgpa", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    gum=.Fortran("lmrgum", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    kap=.Fortran("lmrkap", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    nor=.Fortran("lmrnor", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    pe3=.Fortran("lmrpe3", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    wak=.Fortran("lmrwak", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail)
+  )
   if (fort$ifail==7000) stop("lmr",ddata$name,": distribution parameters invalid")
   if (fort$ifail==7020) stop("lmr",ddata$name,": calculations of L-moments have broken down")
   if (fort$ifail>=7100) {
@@ -424,11 +407,23 @@ pelxxx<-function(xxx,lmom){
   ddata<-lmom.dist[[xxx]]
   himom<-ddata$himom
   if (length(lmom)<himom) stop("pel",ddata$name,": need at least ",himom," L-moments")
-  if (any(is.na(lmom[1:himom]))) stop("pel",ddata$name,": missing values in L-moment vector")
-  fort<-.Fortran(ddata$pelroutine,PACKAGE="lmom",
-        as.double(lmom[1:himom]),
-        para=double(ddata$npara),
-        ifail=integer(1))
+  lmom<-as.double(lmom[1:himom])
+  if (any(is.na(lmom))) stop("pel",ddata$name,": missing values in L-moment vector")
+  para<-double(ddata$npara)
+  ifail<-integer(1)
+  fort<-switch(xxx,
+    exp=.Fortran("pelexp", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    gam=.Fortran("pelgam", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    gev=.Fortran("pelgev", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    glo=.Fortran("pelglo", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    gno=.Fortran("pelgno", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    gpa=.Fortran("pelgpa", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    gum=.Fortran("pelgum", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    kap=.Fortran("pelkap", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    nor=.Fortran("pelnor", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    pe3=.Fortran("pelpe3", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    wak=.Fortran("pelwak", PACKAGE="lmom", lmom, para=para, ifail=ifail)
+  )
   if (fort$ifail==7000) stop("pel",ddata$name,": L-moments invalid")
   para<-fort$para
   names(para)<-ddata$parnames
@@ -1062,8 +1057,6 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   }
 }
 
-
-
 #  lmrq - Computes L-moments of a general distribution, specified by its quantile function.
 #         L-moments are computed by numerical integration of Q(u)*Pstar[m](u) where
 #         Q is the quantile function and Pstar[m] is a shifted Legendre polynomial.
@@ -1602,20 +1595,24 @@ infer_trim<-function(nam) {
 ## Such vectors of names can have the form
 ##
 ##   l(s,t)_1  l(s,t)_2  l(s,t)_3 ...
+##   lambda(s,t)_1  lambda(s,t)_2  lambda(s,t)_3 ...
 ##
 ## or
 ##
 ##   l(s,t)_1  l(s,t)_2  t(s,t)_3 ...
+##   lambda(s,t)_1  lambda(s,t)_2  tau(s,t)_3 ...
 ##
 ## with 's' and 't' positive integers, the orders of trimming;
 ## in this case the return value's "trim" component is 'c(s,t)'.
 ## Vectors can also have the form
 ##
 ##   l_1  l_2  l_3 ...
+##   lambda_1  lambda_2  lambda_3 ...
 ##
 ## or
 ##
 ##   l_1  l_2  t_3 ...
+##   lambda_1  lambda_2  tau_3 ...
 ##
 ## with no trim specification, indicating no trimming; in this case
 ## the return value's "trim" component is 'c(0,0)'.
@@ -1636,6 +1633,8 @@ infer_trim<-function(nam) {
     if (any(substr(nam[-(1:2)],1,1)!="t")) return(NULL)             # First character of all other elements must be "t"
     ratios<-TRUE
   }
+  nam<-sub("^lambda","l",nam)                                       # Treat initial "lambda" as "l"
+  nam<-sub("^tau","t",nam)                                          # ... and initial "tau" as "t"
   orders<-sub(".*_","",nam)                                         # Everything after "_" is the order of the L-moment (or ratio)
   if (!identical(as.integer(orders),seq_along(nam))) return(NULL)   # Orders must be the sequence 1,2,...
   super<-sub("^.(.*)_.*$","\\1",nam)                                # Everything between 1st character and "_" is the trim specification
@@ -2086,6 +2085,18 @@ evdistp<-function(pfunc,para,npoints=101,...) {
 #-------------------------------------------------------------------------------
 #  lmom package's own version of integrate()
 #-------------------------------------------------------------------------------
+
+#  Differences from R's own integrate():
+#
+#  o Does not have the bug that affected R's own integrate() between versions
+#    2.12.0 and 3.0.1 (R bug PR#15219).
+#
+#  o Different treatment of 'abs.tol' and 'rel.tol'.  If only one is supplied,
+#    the other is set to 0. (In R, setting just 'abs.tol' leaves 'rel.tol' at
+#    its default, which if 'abs.tol' is small often means that 'rel.tol' will
+#    still control the test for convergence.)
+#
+#  o Does not have the R version's unused arguments ('keep.xy' and 'aux').
 
 integrate<- function(f, lower, upper, ..., subdivisions=100,
   rel.tol, abs.tol, stop.on.error = TRUE)
