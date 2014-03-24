@@ -422,7 +422,8 @@ pelxxx<-function(xxx,lmom){
     kap=.Fortran("pelkap", PACKAGE="lmom", lmom, para=para, ifail=ifail),
     nor=.Fortran("pelnor", PACKAGE="lmom", lmom, para=para, ifail=ifail),
     pe3=.Fortran("pelpe3", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    wak=.Fortran("pelwak", PACKAGE="lmom", lmom, para=para, ifail=ifail)
+    wak=.Fortran("pelwak", PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    wa0=.Fortran("pelwa0", PACKAGE="lmom", lmom, para=para, ifail=ifail)
   )
   if (fort$ifail==7000) stop("pel",ddata$name,": L-moments invalid")
   para<-fort$para

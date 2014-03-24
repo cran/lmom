@@ -5,18 +5,24 @@
        **************************************************
 
 
+Version 2.4     2014 Mar 24
+
+   o   Fixed: pelwak() would fail when 'bound' was not NULL.  (Bug introduced
+       at version 2.3.)
+
+
 Version 2.3     2014 Feb  8
 
    o   Fixed: pelp() and pelq() required their arguments 'ratios' and 'trim'
        to be set explicitly in some cases when the values of these arguments
-       could have been inferred from the names of 'lmom' -- for example, when
-       'lmom' was a numeric vector returned by lmrp() or lmrq().
+       were documented as being inferred from the names of 'lmom' -- for
+       example, when 'lmom' was a numeric vector returned by lmrp() or lmrq().
 
    o   [Invisible to users] Some internal calls to .Fortran() altered, to avoid
        a NOTE when building the package for CRAN under R version 3.1.0.
-       (Internal function lmrxxx() now uses switch() to ensure that '.NAME'
-       argument of .Fortran() is always a character string, and recognizable
-       as such to CRAN's code checks.)
+       (Internal functions lmrxxx() and pelxxx() now use switch() to ensure
+       that, in calls to .Fortran(), argument '.NAME' is always a character
+       string and is recognizable as such to CRAN's code checks.)
 
    o   [Invisible to users] Minor changes to internal Fortran code (routine
        LMRGPA).
