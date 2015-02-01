@@ -93,14 +93,11 @@ either a single vector, or a separate argument for each parameter.
 In package \pkg{lmom} versions 1.6 and earlier, the \dQuote{Details} section stated that
 \dQuote{Integrals in those expressions are computed by numerical integration,
 using the \R function \code{integrate}}.
-As of version 2.0, numerical integration uses an internal function
-that directly calls (slightly modified versions of)
-the Fortran routines in QUADPACK (Piessens et al. 1983).
-\R{}'s own \code{integrate} function uses C code \dQuote{based on} the
-QUADPACK routines, but in \R{} versions 2.12.0 through 3.0.1
-did not in every case reproduce the results that
-would have been obtained with the Fortran code
-(this is \R{} bug PR#15219).
+As of version 2.0, numerical integration uses an internal function that directly calls
+(slightly modified versions of) Fortran routines in QUADPACK (Piessens et al. 1983).
+\R{}'s own \code{integrate} function uses C code \dQuote{based on} the QUADPACK routines,
+but in \R{} versions 2.12.0 through 3.0.1 did not in every case reproduce the results
+that would have been obtained with the Fortran code (this is \R{} bug PR#15219).
 }
 
 \references{
@@ -114,7 +111,7 @@ would have been obtained with the Fortran code
   \emph{Quadpack: a Subroutine Package for Automatic Integration}.
   Springer Verlag.
 }
-\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
+\author{J. R. M. Hosking \email{jrmhosking@gmail.com}}
 
 \section{Warning}{Arguments \code{bounds}, \code{symm}, \code{order},
 \code{ratios}, \code{trim}, \code{acc}, \code{subdiv}, and \code{verbose}

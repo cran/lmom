@@ -75,7 +75,7 @@ Hosking, J. R. M. (2007).  Some theory and practical uses of trimmed L-moments.
 \emph{Journal of Statistical Planning and Inference}, \bold{137}, 3024-3039.
 }
 
-\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
+\author{J. R. M. Hosking \email{jrmhosking@gmail.com}}
 
 \examples{
 data(airquality)

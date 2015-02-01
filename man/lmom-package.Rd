@@ -191,5 +191,5 @@ LMOMENTS package.
   \emph{Regional frequency analysis: an approach based on L-moments}.
   Cambridge University Press.
 }
-\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
+\author{J. R. M. Hosking \email{jrmhosking@gmail.com}}
 \keyword{package}

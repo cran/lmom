@@ -3,15 +3,9 @@
 #*                                                                     *
 #*  R code for R package "lmom"                                        *
 #*                                                                     *
-#*  J. R. M. HOSKING                                                   *
-#*  IBM RESEARCH DIVISION                                              *
-#*  T. J. WATSON RESEARCH CENTER                                       *
-#*  YORKTOWN HEIGHTS                                                   *
-#*  NEW YORK 10598, U.S.A.                                             *
+#*  J. R. M. HOSKING <jrmhosking@gmail.com>                                                  *
 #*                                                                     *
-#*  (c) IBM Corporation, 2008-2014.                                    *
-#*                                                                     *
-#*  Version 2.3    February 2014                                       *
+#*  Version 2.5    February 2015                                       *
 #*                                                                     *
 #***********************************************************************
 
@@ -149,6 +143,7 @@ cdfwak<-function(x,para=c(0,1,0,0,0)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   ok<-is.finite(x)
   xok<-x[ok]
+  if (length(xok)==0) xok<-para[1]
   nxok<-length(xok)
   fort<-.Fortran("cdfwak",PACKAGE="lmom",
         as.double(xok),
@@ -366,7 +361,7 @@ pelgev<-function(lmom) {
 pelglo<-function(lmom) pelxxx("glo",lmom)$para
 pelgno<-function(lmom) {
   pel<-pelxxx("gno",lmom)
-  if (pel$ifail==7010) stop("tau_3 too small -- must be greater than -0.95")
+  if (pel$ifail==7010) stop("|tau_3| too large -- must be less than 0.95")
   return(pel$para)
 }
 pelgpa<-function(lmom, bound=NULL) {
@@ -639,15 +634,15 @@ samlmu.s<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
     r<-1:maxmom
     lmom<-(lmom[r]*(r+j+t2)+lmom[r+1]*(r+1)*(r+t2)/r)/(2*r+j+t2-1)
   }
+  length(lmom)<-nmom
+  if (all(xok[(1+t1):(n-t2)]==xok[(1+t1)])) {
+    lmom[-1]<-0    # R code doesn't guarantee this
+    if (ratios && nmom>2) warning("all data values equal", if (any(trim>0)) " (after trimming)")
+  }
   #
   # Attach names to result
   #
-  length(lmom)<-nmom
   if (ratios && nmom>2) {
-    if (all(xok[(1+t1):(n-t2)]==xok[(1+t1)])) {
-      warning("all data values equal", if (any(trim>0)) " (after trimming)")
-      lmom[-1]<-0  # R code doesn't guarantee this
-    }
     lmom[3:nmom]<-lmom[3:nmom]/lmom[2]
     names(lmom)<-c("l_1","l_2",paste("t",3:nmom,sep="_"))
   }  else names(lmom)<-paste("l",1:nmom,sep="_")
@@ -804,8 +799,10 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   }
   lbound<-bounds[1]
   ubound<-bounds[2]
-  if (isTRUE(symm)) med<-0
-  if (is.numeric(symm)) {med<-symm; symm<-TRUE}
+  if (is.numeric(symm)) {
+    med<-symm
+    symm<-TRUE
+  } else if (!identical(symm,FALSE)) stop("'symm' must be FALSE or numeric")
   allsymm<-(symm & (t1==t2))
 #
   # Sanity checks: for bounds ...
@@ -1024,11 +1021,15 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
         out.err[r]<-int$abs.error*mult[r]
         out.msg[r]<-int$message
       }
-#
-      # L-moment ratios and their accuracies
+      if (allsymm) {
+        out.val[higher]<-2*out.val[higher]
+        out.err[higher]<-2*out.err[higher]
+      }
+
+#     # L-moment ratios and their accuracies
       if (ratios) {
-        out.val[higher]<-out.val[higher]/denom
-        out.err[higher]<-(out.err[higher]+abs(out.val[higher])*errdenom)/denom
+        out.val[higher]<-out.val[higher]/out.val[2]
+        out.err[higher]<-(out.err[higher]+abs(out.val[higher])*out.err[2])/out.val[2]
       }
     }
   }
@@ -1181,12 +1182,18 @@ lmrq<-function(qfunc, ..., symm=FALSE, order=1:4, ratios=TRUE, trim=0, acc=1e-6,
         out.err[r]<-int$abs.error*mult[r]
         out.msg[r]<-int$message
       }
-
-      # L-moment ratios and their accuracies
-      if (ratios) {
-        out.val[higher]<-out.val[higher]/denom
-        out.err[higher]<-(out.err[higher]+abs(out.val[higher])*errdenom)/denom
+      if (allsymm) {
+        out.val[higher]<-2*out.val[higher]
+        out.err[higher]<-2*out.err[higher]
       }
+
+#     # L-moment ratios and their accuracies
+      if (ratios) {
+        out.val[higher]<-out.val[higher]/out.val[2]
+        out.err[higher]<-(out.err[higher]+abs(out.val[higher])*out.err[2])/out.val[2]
+      }
+
+
     }
   }
 

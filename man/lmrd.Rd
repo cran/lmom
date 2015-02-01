@@ -78,8 +78,8 @@ lmrd(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
       and given one-character labels.
 
       The default is to plot the two-parameter distributions that are special
-      cases of the three-parameter distributions specified in the
-      \code{distributions} parameter.  Thus for example if
+      cases of the three-parameter distributions specified in
+      argument \code{distributions}.  Thus for example if
       \code{distributions="GPA PE3"}, the default for \code{twopar}
       is \code{"EXP NOR UNI"}: NOR is a special case of PE3, UNI of GPA,
       EXP of both GPA and PE3.
@@ -108,7 +108,7 @@ lmrd(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
 \item{lty}{Vector specifying the line types to be used for the lines on the plot.
 
       By default, colors and line types are matched to the distributions given
-      in the \code{distributions} parameter, as follows:
+      in argument \code{distributions}, as follows:
       \tabular{rll}{
       % S-plus colors
       %GLO \tab color  6, line type 1 (blue, solid) \cr
@@ -176,7 +176,7 @@ e.g. follow \code{lmrd(t3, t4)} by \code{points(t3, t4, col=c("red", "green"))}.
 
 %\value{ }
 
-\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
+\author{J. R. M. Hosking \email{jrmhosking@gmail.com}}
 
 \examples{
 data(airquality)

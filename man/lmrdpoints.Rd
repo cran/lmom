@@ -34,7 +34,7 @@ or an object of class \code{"regdata"} (as defined in package \pkg{lmomRFA}).
 }
 %\value{}
 %\references{}
-\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
+\author{J. R. M. Hosking \email{jrmhosking@gmail.com}}
 %\note{}
 \seealso{\code{\link{lmrd}}, \code{\link{points}}, \code{\link{lines}}.}
 \examples{

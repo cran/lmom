@@ -3,11 +3,7 @@ C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING                                                   *
-C*  IBM RESEARCH DIVISION                                              *
-C*  T. J. WATSON RESEARCH CENTER                                       *
-C*  YORKTOWN HEIGHTS                                                   *
-C*  NEW YORK 10598, U.S.A.                                             *
+C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 2.0    April 2013                                          *
 C*                                                                     *
@@ -84,9 +80,15 @@ C
    50 CONTINUE
    60 CONTINUE
 C
+C         Sanity check: higher-order L-moments cannot exceed l_2
+C
+      DO 70 J=3,NMOM
+        IF (ABS(XMOM(J)).GT.XMOM(2)) XMOM(J)=SIGN(XMOM(2),XMOM(J))
+   70 CONTINUE
+C
 C         L-moments or L-moment ratios
 C
-      AMULT=ONE/DN
+      RN=ONE/DN
       IF (IRATIO.GT.0) THEN
         IF (XMOM(2).EQ.ZERO) THEN
           AMULT=ZERO
@@ -94,12 +96,12 @@ C
           AMULT=ONE/XMOM(2)
         END IF
       ELSE
-        AMULT=ONE/DN
+        AMULT=RN
       END IF
-      DO 70 J=3,NMOM
-   70 XMOM(J)=XMOM(J)*AMULT
-      XMOM(1)=XMOM(1)/DN
-      XMOM(2)=XMOM(2)/DN
+      DO 80 J=3,NMOM
+   80 XMOM(J)=XMOM(J)*AMULT
+      XMOM(1)=XMOM(1)*RN
+      XMOM(2)=XMOM(2)*RN
       RETURN
 C
 C         At most two L-moments
@@ -116,6 +118,12 @@ C
       XMOM(1)=SUM1/DN
       IF(NMOM.EQ.1)RETURN
       XMOM(2)=SUM2/(DN*(DN-ONE))
+C
+C         Sanity check for positive data: l_2 cannot exceed l_1
+C
+      IF (ISORT.GT.0.AND.X(1).GE.ZERO.AND.XMOM(2).GT.XMOM(1))
+     *  XMOM(2)=XMOM(1)
+C
       RETURN
 C
       END

@@ -58,15 +58,14 @@ evpoints(y, ...)
   nonexceedance probability.
   Not used if \code{plim} is specified.}
 \item{ylim}{Y axis limits.}
-\item{type}{Plot type.  Determines how the data values in the
-  \code{y} parameter are plotted.  Interpreted in the same way as
-  the \code{type} plotting parameter, i.e. \code{"p"} for points,
-  \code{"b"} for points connected by lines, etc.}
+\item{type}{Plot type.  Determines how the data values in \code{y} are plotted.
+  Interpreted in the same way as argument \code{type} of function \code{plot},
+  i.e. \code{"p"} for points, \code{"b"} for points connected by lines, etc.}
 \item{xlab}{X axis label.}
 \item{ylab}{Y axis label.}
 \item{rp.axis}{Logical. Whether to draw the \dQuote{Return period} axis,
   a secondary horizontal axis.}
-\item{\dots}{Additional parameters are passed to the plotting routine.}
+\item{\dots}{Additional arguments are passed to the plotting routine.}
 }
 %\details{ }
 %\value{ }
@@ -88,9 +87,7 @@ are the parameters of the distribution) or the \code{cdf\dots} or
 and the second argument is a vector containing the parameter values).
 }
 
-\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
-
-
+\author{J. R. M. Hosking \email{jrmhosking@gmail.com}}
 
 \examples{
 # Extreme-value plot of Ozone from the airquality data

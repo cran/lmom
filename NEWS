@@ -5,6 +5,27 @@
        **************************************************
 
 
+Version 2.5     2015 Feb  1
+
+   o   lmrp() no longer allows the argument value 'symm=TRUE' (it was treated
+       as 'symm=0', though this was undocumented).
+
+   o   Fixed: cdfwak() would give an error if 'x' contained no finite values.
+
+   o   Fixed: lmrp(...,symm=,ratios=FALSE) and lmrq(..,symm=TRUE,ratios=FALSE)
+       gave incorrect values, by a factor of 2, for higher-order (even, >=4)
+       L-moments.
+
+   o   Fixed: pelgno() would give an incorrect error message if the supplied
+       value of 'lmom[3]' was greater than 0.95.
+
+   o   Fixed: samlmu() could, in rare cases, return (untrimmed) L-moment ratios
+       greater than 1 in absolute value.
+
+   o   Fixed: samlmu.s(ratios=FALSE), when all 'x' values were equal, could
+       return not-exactly-zero values for L-moments.
+
+
 Version 2.4     2014 Mar 24
 
    o   Fixed: pelwak() would fail when 'bound' was not NULL.  (Bug introduced

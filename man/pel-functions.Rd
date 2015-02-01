@@ -75,7 +75,7 @@ would attempt to fit a Wakeby distribution with lower bound zero.)
   Research Report RC20525, IBM Research Division, Yorktown Heights, N.Y.
 }
 
-\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
+\author{J. R. M. Hosking \email{jrmhosking@gmail.com}}
 
 \seealso{
 \code{\link{pelp}} for parameter estimation of a general distribution

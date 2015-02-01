@@ -230,7 +230,7 @@ There is no need to specify \code{trim} both in the call to \code{samlmu}
 and the call to \code{pelq}.
 }
 
-\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
+\author{J. R. M. Hosking \email{jrmhosking@gmail.com}}
 
 \seealso{
 \code{\link{pelexp}} for parameter estimation of specific distributions.

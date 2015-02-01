@@ -65,8 +65,7 @@ Hosking (1996, pp. 8--9).}
   Research Report RC20525, IBM Research Division, Yorktown Heights, N.Y.
 }
 
-\author{J. R. M. Hosking \email{hosking@us.ibm.com}}
-
+\author{J. R. M. Hosking \email{jrmhosking@gmail.com}}
 
 \seealso{
 \code{\link{lmrp}} to compute \eqn{L}-moments of a general distribution
