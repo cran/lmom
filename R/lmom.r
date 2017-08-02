@@ -145,7 +145,7 @@ cdfwak<-function(x,para=c(0,1,0,0,0)){
   xok<-x[ok]
   if (length(xok)==0) xok<-para[1]
   nxok<-length(xok)
-  fort<-.Fortran("cdfwak",PACKAGE="lmom",
+  fort<-.Fortran(RegSym_cdfwak,PACKAGE="lmom",
         as.double(xok),
         as.integer(nxok),
         as.double(para),
@@ -329,17 +329,17 @@ lmrxxx<-function(xxx,para,nmom){
   nnmom<-as.integer(nnmom)
   ifail<-integer(1)
   fort<-switch(xxx,
-    exp=.Fortran("lmrexp", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
-    gam=.Fortran("lmrgam", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
-    gev=.Fortran("lmrgev", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
-    glo=.Fortran("lmrglo", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
-    gno=.Fortran("lmrgno", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
-    gpa=.Fortran("lmrgpa", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
-    gum=.Fortran("lmrgum", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
-    kap=.Fortran("lmrkap", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
-    nor=.Fortran("lmrnor", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
-    pe3=.Fortran("lmrpe3", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
-    wak=.Fortran("lmrwak", PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail)
+    exp=.Fortran(RegSym_lmrexp, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    gam=.Fortran(RegSym_lmrgam, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    gev=.Fortran(RegSym_lmrgev, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    glo=.Fortran(RegSym_lmrglo, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    gno=.Fortran(RegSym_lmrgno, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    gpa=.Fortran(RegSym_lmrgpa, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    gum=.Fortran(RegSym_lmrgum, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    kap=.Fortran(RegSym_lmrkap, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    nor=.Fortran(RegSym_lmrnor, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    pe3=.Fortran(RegSym_lmrpe3, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail),
+    wak=.Fortran(RegSym_lmrwak, PACKAGE="lmom", para, xmom=xmom, nnmom, ifail=ifail)
   )
   if (fort$ifail==7000) stop("lmr",ddata$name,": distribution parameters invalid")
   if (fort$ifail==7020) stop("lmr",ddata$name,": calculations of L-moments have broken down")
@@ -407,18 +407,18 @@ pelxxx<-function(xxx,lmom){
   para<-double(ddata$npara)
   ifail<-integer(1)
   fort<-switch(xxx,
-    exp=.Fortran("pelexp", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    gam=.Fortran("pelgam", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    gev=.Fortran("pelgev", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    glo=.Fortran("pelglo", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    gno=.Fortran("pelgno", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    gpa=.Fortran("pelgpa", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    gum=.Fortran("pelgum", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    kap=.Fortran("pelkap", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    nor=.Fortran("pelnor", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    pe3=.Fortran("pelpe3", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    wak=.Fortran("pelwak", PACKAGE="lmom", lmom, para=para, ifail=ifail),
-    wa0=.Fortran("pelwa0", PACKAGE="lmom", lmom, para=para, ifail=ifail)
+    exp=.Fortran(RegSym_pelexp, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    gam=.Fortran(RegSym_pelgam, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    gev=.Fortran(RegSym_pelgev, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    glo=.Fortran(RegSym_pelglo, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    gno=.Fortran(RegSym_pelgno, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    gpa=.Fortran(RegSym_pelgpa, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    gum=.Fortran(RegSym_pelgum, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    kap=.Fortran(RegSym_pelkap, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    nor=.Fortran(RegSym_pelnor, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    pe3=.Fortran(RegSym_pelpe3, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    wak=.Fortran(RegSym_pelwak, PACKAGE="lmom", lmom, para=para, ifail=ifail),
+    wa0=.Fortran(RegSym_pelwa0, PACKAGE="lmom", lmom, para=para, ifail=ifail)
   )
   if (fort$ifail==7000) stop("pel",ddata$name,": L-moments invalid")
   para<-fort$para
@@ -534,7 +534,7 @@ samlmu<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
   nmom.actual<-maxmom-t1-t2
   if (nmom.actual<=0) lmom<-rep(NA_real_,nmom)
     else {
-    fort<-.Fortran("samlm",PACKAGE="lmom",
+    fort<-.Fortran(RegSym_samlm, PACKAGE="lmom",
           as.double(xok),
           as.integer(n),
           xmom=double(maxmom),
@@ -659,7 +659,7 @@ samlmu.s<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
 # - No warning if all data values equal
 # - Return value has no names
 .samlmu<-function(x, nmom=4)
-  .Fortran("samlm",PACKAGE="lmom",
+  .Fortran(RegSym_samlm, PACKAGE="lmom",
     as.double(x),length(x),double(nmom),as.integer(nmom),1L,1L)[[3]]
 
 #-------------------------------------------------------------------------------
@@ -1633,6 +1633,7 @@ infer_trim<-function(nam) {
   ratios<-TRUE
   if (is.null(nam)) return(list())
   if (length(nam)==0) return(NULL)
+  if (any(is.na(nam))) return(NULL)
   opt<-options(warn=-1)
   on.exit(options(opt))
   if (all(substr(nam,1,1)=="l")) ratios<-FALSE
@@ -1699,7 +1700,7 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
   twopar<-unique(make.words(twopar))
   match2<-pmatch(toupper(twopar),lmrd.2par$distributions)
   if (any(is.na(match2))) stop("unknown 2-parameter distribution(s)",
-    paste(distributions[is.na(match2)],collapse=" "))
+    paste(twopar[is.na(match2)],collapse=" "))
 #
 # Three-parameter distributions
 #
@@ -1711,6 +1712,7 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
   } else {
    col.lines <- if (!missing(col) && (x.missing || length(col)>1)) col else lmrd.3par$col[matchdist]
    if (missing(lty)) lty<-lmrd.3par$lty[matchdist]
+   lwd<-rep_len(lwd,length(distributions))
    matplot(round(lmrd.data[,1],2), lmrd.data[,toupper(distributions)], type="l",
      xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, col=col.lines, lty=lty, lwd=lwd,
      frame.plot=FALSE, ...)
@@ -1754,9 +1756,16 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
 #
   if (!x.missing) {
     if (missing(cex)) cex<-NULL
-    if (!missing(col) && length(col)==1) points(x,y,pch=pch,cex=cex,col=col)
-    else points(x,y,pch=pch,cex=cex)
+    col.pts <- if (!missing(col) && length(col)==1) col else par("col")
+    points(x,y,pch=pch,cex=cex,col=col.pts)
   }
+#
+  out<-list(lines=NULL,twopar=NULL,points=NULL)
+  if (length(distributions)>0) out$lines<-list(
+    distributions=toupper(distributions),col.lines=col.lines, lty=lty, lwd=lwd)
+  if (length(twopar)>0) out$twopar<-twopar
+  if (!x.missing) out$points<-list(col.pts=col.pts,pch=pch,cex=cex)
+  return(invisible(out))
 }
 
 make.words<-function(astring)
@@ -2137,7 +2146,7 @@ integrate<- function(f, lower, upper, ..., subdivisions=100,
 
   if (is.finite(lower) && is.finite(upper)) {
 
-    cout <- .Call("cdqagse", PACKAGE="lmom",
+    cout <- .Call(RegSym_cdqagse, PACKAGE="lmom",
       a, b, epsabs, epsrel, limit, result, abserr, neval, ier, last, env)
 
   } else {
@@ -2146,7 +2155,7 @@ integrate<- function(f, lower, upper, ..., subdivisions=100,
     else if (is.finite(upper)) {inf<- -1L; bound<-b } # lower bound (only) infinite
     else {inf<-2L; bound<-0 }                         # both bounds infinite
 
-    cout <- .Call("cdqagie", PACKAGE="lmom",
+    cout <- .Call(RegSym_cdqagie, PACKAGE="lmom",
       bound, inf, epsabs, epsrel, limit, result, abserr, neval, ier, last, env)
   }
 

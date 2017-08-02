@@ -174,10 +174,21 @@ different points, follow \code{lmrd} by an additional call to \code{points},
 e.g. follow \code{lmrd(t3, t4)} by \code{points(t3, t4, col=c("red", "green"))}.
 }
 
-%\value{ }
+\value{A list, returned invisibly, describing what was plotted.
+Useful for customization of the legend, as in one of the examples below.
+List elements:
+\item{lines}{List containing elements describing the plotted distribution curves (if any).
+Each element is a vector with the same length as \code{distributions}.
+List elements \code{distributions}, \code{col.lines}, \code{lty}, \code{lwd}.}
+\item{twopar}{Character vector containing the 1-character symbols for the
+two-parameter distributions that were plotted.}
+\item{points}{List containing elements describing the plot (if any) of the data points.
+List elements \code{col.pts}, \code{pch}, \code{cex}.}
+If any of the above items was not plotted, the corresponding list element is \code{NULL}.
+}
 
 \author{J. R. M. Hosking \email{jrmhosking@gmail.com}}
-
+\seealso{For adding to an \eqn{L}-moment ratio diagram: \code{\link{lmrdpoints}}, \code{\link{lmrdlines}}.}
 \examples{
 data(airquality)
 lmrd(samlmu(airquality$Ozone))
@@ -200,5 +211,25 @@ aa <- apply(mm, 1, samlmu)
 # diagram that also shows (only) the population L-moment ratios
 # of the Gumbel distribution
 lmrd(t(aa), dist="", twopar="G", col="red")
+
+# L-moment ratio diagram with curves for GLO, GEV, GPA, and Weibull.
+# The Weibull curve is added manually. A legend is added,
+# using information returned from lmrd().
+#
+# - Draw the diagram, with the GLO, GEV, and GPA curves
+info <- lmrd(distributions="GLO GEV GPA", xaxs="i", yaxs="i", las=1, legend=FALSE)
+#
+# - Compute L-skewness and L-kurtosis values for Weibull
+sa <- sapply(seq(0, 0.6, by=0.01),
+    function(tau3) lmrwei(pelwei(c(0,1,tau3)), nmom=4)[3:4])
+#
+# - Plot the Weibull curve
+lmrdlines(sa["tau_3",], sa["tau_4",], col="magenta", lwd=2)
+#
+# - Add a legend
+legend("topleft", bty="n",
+  legend = c(info$lines$distributions, "WEI"),
+  col = c(info$lines$col.lines, "magenta"),
+  lwd = c(info$lines$lwd, 3))
 }
 \keyword{hplot}

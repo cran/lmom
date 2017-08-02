@@ -5,6 +5,21 @@
        **************************************************
 
 
+Version 2.6     2017 Aug  1
+
+   o   "Native routines" are now "registered".
+
+   o   lmrd() now has a non-NULL return value, useful for adding a customized
+       legend to the plot.
+
+   o   Internal function infer_trim(), used by pelp() and pelq(), has defensive
+       coding to work around the possibility (new in R 3.3.0) that nchar() may
+       return NA.
+
+   o   Fixed: lmrd(), when an unrecognized distribution was supplied in
+       argument 'twopar', would give an incorrect error message.
+
+
 Version 2.5     2015 Feb  1
 
    o   lmrp() no longer allows the argument value 'symm=TRUE' (it was treated

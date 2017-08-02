@@ -1,6 +1,6 @@
 import(stats)
 import(graphics)
-useDynLib(lmom)
+useDynLib(lmom, .registration=TRUE, .fixes="RegSym_")
 export(cdfexp)
 export(cdfgam)
 export(cdfgev)
