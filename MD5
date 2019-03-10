@@ -1,8 +1,9 @@
-b53b20abb60745af7b59120b0bba32d2 *DESCRIPTION
+ed4d96a87669b88c8e947ace505998f6 *DESCRIPTION
 cfa8e00b0b6d4841d8a7340dab6630a9 *NAMESPACE
-03e697261cb60f9714555cb5a444cff7 *NEWS
-511debe7207b8f98e9cc0e993e29fa7d *R/lmom.r
+ceb6720c21ec7c96c24bd167c39f3ce9 *NEWS
+da74c81f740c08637fd525b3f7175c0a *R/lmom.r
 d428099e1e16b5b9503855b06b064195 *inst/CITATION
+f0ef16fbb3decc05c5b3741bd1774c68 *inst/lmom-manual.pdf
 b842fdca9b0cb28a77aebf90e3400935 *man/cdfexp.Rd
 6c8ce575e2590ccc8980c19886bcc251 *man/cdfgam.Rd
 de1a789f9368fc3e2452061e05cbecff *man/cdfgev.Rd
@@ -21,7 +22,7 @@ df80493cb05dc20b8401f0d291c31708 *man/lmom-package.Rd
 87948f0684a52a714b4d3eafd59aa9d6 *man/lmr-functions.Rd
 6eb5fc79040f2feccdda1e134aceb86f *man/lmrd.Rd
 97834eec2c24c7975cdc69e629eb5828 *man/lmrdpoints.Rd
-bdd53a0aa9a3a2acfbd439804763bf60 *man/lmrp.Rd
+ab51bdba8ae1a2942d6dcd91a15c5eb0 *man/lmrp.Rd
 178a1915b81d2124a4287dea36195ca1 *man/pel-functions.Rd
 7f36b9c36afc3095b995a4caf80ad8f5 *man/pelp.Rd
 b8ac61ec7d258a0ea3bf7ffc23bc13fa *man/samlmu.Rd

@@ -533,7 +533,7 @@ samlmu<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
   maxmom<-min(nmom+t1+t2,n)
   nmom.actual<-maxmom-t1-t2
   if (nmom.actual<=0) lmom<-rep(NA_real_,nmom)
-    else {
+  else {
     fort<-.Fortran(RegSym_samlm, PACKAGE="lmom",
           as.double(xok),
           as.integer(n),
@@ -799,7 +799,9 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   }
   lbound<-bounds[1]
   ubound<-bounds[2]
-  if (is.numeric(symm)) {
+  if (length(symm)!=1) stop("'symm' must have length 1")
+  if (is.na(symm)) symm<-FALSE
+  else if (is.numeric(symm)) {
     med<-symm
     symm<-TRUE
   } else if (!identical(symm,FALSE)) stop("'symm' must be FALSE or numeric")

@@ -26,7 +26,7 @@ lmrq(qfunc, ..., symm=FALSE, order=1:4, ratios=TRUE, trim=0,
     For \code{lmrq}, a logical value indicating whether
     the distribution is symmetric about its median.
 
-    For \code{lmrp}, either the logical value \code{FALSE}
+    For \code{lmrp}, either the logical value \code{FALSE} or \code{NA}
     to indicate that the distribution is not symmetric,
     or a numeric value to indicate that the distribution is symmetric
     and that the specified value is the center of symmetry.
