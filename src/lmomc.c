@@ -42,14 +42,15 @@ SEXP cdqagse(SEXP a, SEXP b, SEXP epsabs, SEXP epsrel, SEXP limit,
 
 void F77_SUB(f)(double *fout, double *fin, int *n, SEXP env) {
   int i;
-  SEXP rin, rout;
+  SEXP rin, rout, var;
 
   PROTECT(rin=allocVector(REALSXP,*n));
   for (i=0; i<*n; i++) REAL(rin)[i]=fin[i];
 
   defineVar(install("x"),rin,env);
 
-  PROTECT(rout = eval(findVarInFrame(env, install("expr")), env)) ;
+  PROTECT(var = findVarInFrame(env, install("expr"))) ;
+  PROTECT(rout = eval(var, env)) ;
 
   if (length(rout)!=*n) error("evaluation of integrand gave result of wrong length");
   rout=coerceVector(rout,REALSXP);
@@ -58,7 +59,7 @@ void F77_SUB(f)(double *fout, double *fin, int *n, SEXP env) {
     if (!R_FINITE(fout[i])) error("non-finite integrand at argument %f",fin[i]) ;
   }
 
-  UNPROTECT(2);
+  UNPROTECT(3);
   return;
 }
 

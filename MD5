@@ -1,9 +1,9 @@
-ed4d96a87669b88c8e947ace505998f6 *DESCRIPTION
+8300f94b6992c524183bd8def9d4089b *DESCRIPTION
 cfa8e00b0b6d4841d8a7340dab6630a9 *NAMESPACE
-ceb6720c21ec7c96c24bd167c39f3ce9 *NEWS
-da74c81f740c08637fd525b3f7175c0a *R/lmom.r
+4b39fa3a90e97fbeeb6acd4c13f3418a *NEWS
+0b3e2474e96bdf6404b703d49e2eba30 *R/lmom.r
 d428099e1e16b5b9503855b06b064195 *inst/CITATION
-f0ef16fbb3decc05c5b3741bd1774c68 *inst/lmom-manual.pdf
+c247f4f5923bdd6d0ed5810d2db58a84 *inst/lmom-manual.pdf
 b842fdca9b0cb28a77aebf90e3400935 *man/cdfexp.Rd
 6c8ce575e2590ccc8980c19886bcc251 *man/cdfgam.Rd
 de1a789f9368fc3e2452061e05cbecff *man/cdfgev.Rd
@@ -34,6 +34,6 @@ ccf77abdaa9e30c1aae7c770e6af8053 *src/dqagie.f
 5aa238ab96394e19ff7f0322563585a7 *src/dqk21.f
 e5439c145a80972ca625bfe4e1421877 *src/dqpsrt.f
 75e2fc4b4b2c02a891510074cb1d1a97 *src/init.c
-2c314957a4e7d8ba3cf5c4420b15cbc7 *src/lmomc.c
+fc99dd5fb631ea16abe3e48b2f1a2228 *src/lmomc.c
 771a5e2d86b70aca2aebc5e8f2f9c666 *src/lmoments.f
 2ae8bb71df604b0a2e321f7431317a55 *src/samlm.f

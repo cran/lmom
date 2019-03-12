@@ -3,9 +3,9 @@
 #*                                                                     *
 #*  R code for R package "lmom"                                        *
 #*                                                                     *
-#*  J. R. M. HOSKING <jrmhosking@gmail.com>                                                  *
+#*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
 #*                                                                     *
-#*  Version 2.5    February 2015                                       *
+#*  Version 2.7    March 2019                                          *
 #*                                                                     *
 #***********************************************************************
 
@@ -804,7 +804,7 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
   else if (is.numeric(symm)) {
     med<-symm
     symm<-TRUE
-  } else if (!identical(symm,FALSE)) stop("'symm' must be FALSE or numeric")
+  } else if (!identical(symm,FALSE)) stop("'symm' must be FALSE or NA or numeric")
   allsymm<-(symm & (t1==t2))
 #
   # Sanity checks: for bounds ...
