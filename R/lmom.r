@@ -47,6 +47,7 @@ cdfexp<-function(x,para=c(0,1)){
   if (length(para)!=2) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
+  para<-unname(para)  # to suppress naming of output when 'para' has names and 'x' has length 1
   return(1-exp(-(pmax(0,x-para[1]))/para[2]))
 }
 
@@ -54,6 +55,7 @@ cdfgam<-function(x,para=c(1,1)){
   if (length(para)!=2) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (any(para<=0)) stop("distribution parameters invalid")
+  para<-unname(para)
   result<-pgamma(x/para[2],para[1])
   return(result)
 }
@@ -62,6 +64,7 @@ cdfgev<-function(x,para=c(0,1,0)){
   if (length(para)!=3) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
+  para<-unname(para)
   if (para[3]==0) y<-(x-para[1])/para[2]
 #                        pmax so that values outside the range
 #                             generate 0s or 1s rather than NAs
@@ -73,6 +76,7 @@ cdfglo<-function(x,para=c(0,1,0)){
   if (length(para)!=3) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
+  para<-unname(para)
   if (para[3]==0) y<-(x-para[1])/para[2]
 #                        pmax so that values outside the range
 #                             generate 0s or 1s rather than NAs
@@ -84,6 +88,7 @@ cdfgno<-function(x,para=c(0,1,0)){
   if (length(para)!=3) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
+  para<-unname(para)
   if (para[3]==0) y<-(x-para[1])/para[2]
 #                        pmax so that values outside the range
 #                             generate 0s or 1s rather than NAs
@@ -95,6 +100,7 @@ cdfgpa<-function(x,para=c(0,1,0)){
   if (length(para)!=3) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
+  para<-unname(para)
   if (para[3]==0) y<-(x-para[1])/para[2]
   else y<--1/para[3]*log(pmax(0,1-para[3]*(x-para[1])/para[2]))
   return(1-exp(-pmax(y,0)))
@@ -104,6 +110,7 @@ cdfgum<-function(x,para=c(0,1)){
   if (length(para)!=2) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
+  para<-unname(para)
   return(exp(-exp(-(x-para[1])/para[2])))
 }
 
@@ -111,6 +118,7 @@ cdfkap<-function(x,para=c(0,1,0,0)){
   if (length(para)!=4) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
+  para<-unname(para)
   y<-(x-para[1])/para[2]
   if (para[3]!=0) y<--1/para[3]*log(pmax(0,1-para[3]*y))
   y<-exp(-y)
@@ -123,6 +131,7 @@ cdfnor<-function(x,para=c(0,1)){
   if (length(para)!=2) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
+  para<-unname(para)
   return(pnorm(x,para[1],para[2]))
 }
 
@@ -130,6 +139,7 @@ cdfpe3<-function(x,para=c(0,1,0)){
   if (length(para)!=3) stop("parameter vector has wrong length")
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
+  para<-unname(para)
   if (abs(para[3])<=1e-6) return(pnorm(x,para[1],para[2]))
   alpha<-4/para[3]^2
   z<-2*(x-para[1])/(para[2]*para[3])+alpha
@@ -141,6 +151,7 @@ cdfpe3<-function(x,para=c(0,1,0)){
 cdfwak<-function(x,para=c(0,1,0,0,0)){
   if (length(para)!=5) stop("parameter vector has wrong length - should be 5")
   if (any(is.na(para))) stop("missing values in parameter vector")
+# para<-unname(para)  # not needed here
   ok<-is.finite(x)
   xok<-x[ok]
   if (length(xok)==0) xok<-para[1]
@@ -165,6 +176,7 @@ quaexp<-function(f,para=c(0,1)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   result<-para[1]+para[2]*(-log(1-f))
   return(result)
 }
@@ -174,6 +186,7 @@ quagam<-function(f,para=c(1,1)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (any(para<=0)) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   result<-para[2]*pmax(0,qgamma(f,para[1]))
   return(result)
 }
@@ -183,6 +196,7 @@ quagev<-function(f,para=c(0,1,0)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   result<-
     if (para[3]==0) para[1]-para[2]*log(-log(f))
     else para[1]+para[2]/para[3]*(1-(-log(f))^para[3])
@@ -194,6 +208,7 @@ quaglo<-function(f,para=c(0,1,0)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   result<-
     if (para[3]==0) para[1]+para[2]*(log(f/(1-f)))
     else para[1]+para[2]/para[3]*(1-((1-f)/f)^para[3])
@@ -205,6 +220,7 @@ quagno<-function(f,para=c(0,1,0)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   result<-
     if (para[3]==0) para[1]+para[2]*qnorm(f)
     else para[1]+para[2]/para[3]*(1-exp(-qnorm(f)*para[3]))
@@ -216,6 +232,7 @@ quagpa<-function(f,para=c(0,1,0)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   result<-
     if (para[3]==0) para[1]+para[2]*(-log(1-f))
     else para[1]+para[2]/para[3]*(1-(1-f)^(para[3]))
@@ -227,6 +244,7 @@ quagum<-function(f,para=c(0,1)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   result<-para[1]-para[2]*log(log(1/f))
   return(result)
 }
@@ -236,6 +254,7 @@ quakap<-function(f,para=c(0,1,0,0)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   f <- if (para[4]==0) (-log(f)) else (1-f^para[4])/para[4]
   f <- if (para[3]==0) (-log(f)) else (1-f^para[3])/para[3]
   result<-para[1]+para[2]*f
@@ -248,6 +267,7 @@ quanor<-function(f,para=c(0,1)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   result<-qnorm(f,para[1],para[2])
   return(result)
 }
@@ -257,6 +277,7 @@ quape3<-function(f,para=c(0,1,0)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (para[2]<=0) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   if (abs(para[3])<=1e-8) return(qnorm(f,para[1],para[2]))
   alpha<-4/para[3]^2
   beta<-abs(0.5*para[2]*para[3])
@@ -271,6 +292,7 @@ quawak<-function(f,para=c(0,1,0,0,0)){
   if (any(is.na(para))) stop("missing values in parameter vector")
   if (lmom.parok.wak(para)==FALSE) stop("distribution parameters invalid")
   if (isTRUE(any(f<0 | f>1))) stop("probabilities must be between 0 and 1")
+  para<-unname(para)
   flog<- -log(1-f)
   result<-para[1]+
     (if (para[2]==0) 0 else para[2]*(if (para[3]==0) flog else  (1-exp(-para[3]*flog))/para[3]))+
@@ -526,6 +548,9 @@ pelwei<-function(lmom,bound=NULL) {
 samlmu<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
   if (!is.numeric(x)) stop("'x' must be numeric")
   xok<-x[!is.na(x)]
+  # Can't pass infinities to Fortran code, so instead use samlmu.s()
+  if (any(!is.finite(xok))) return(samlmu.s(xok,nmom,sort.data,ratios,trim))
+#
   n<-length(xok)
   if (nmom<=0) return(numeric(0))
   t1<-trim[1]
@@ -534,6 +559,21 @@ samlmu<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
   nmom.actual<-maxmom-t1-t2
   if (nmom.actual<=0) lmom<-rep(NA_real_,nmom)
   else {
+    # To reduce numerical issues, replace values that would be trimmed away with
+    # values unlikely to cause loss of significance in trimmed L-moment recursions.
+    # Because sorting via sort() or sort.int() is slow (adds ~30% to computation time),
+    # we'll do this only if the data values span a wide range - 8 orders of magnitude.
+    if (t1+t2>0) {
+      rabs<-range(abs(xok))
+      if (sort.data && rabs[2]/rabs[1]>1e+08) {
+        xok<-sort.int(xok)
+        force(ratios)
+        sort.data<-FALSE
+        xok[seq_len(t1)]<-xok[1+t1]
+        xok[n+1-seq_len(t2)]<-xok[n-t2]
+      }
+    }
+    #
     fort<-.Fortran(RegSym_samlm, PACKAGE="lmom",
           as.double(xok),
           as.integer(n),
@@ -542,13 +582,13 @@ samlmu<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
           isort=as.integer(sort.data),
           iratio=0L)
     lmom<-fort$xmom
-    # Hosking (2007), eq.(12), applied for t=1,...t2 with s=0
+    # Hosking (2007), eq.(12), applied for t=1,...,t2 with s=0
     for (j in seq_len(t2)) {
       maxmom<-maxmom-1
       r<-1:maxmom
       lmom<-(lmom[r]*(r+j)-lmom[r+1]*(r+1))/(2*r+j-1)
     }
-    # Hosking (2007), eq.(13), applied for s=1,...t1 with t=t2
+    # Hosking (2007), eq.(13), applied for s=1,...,t1 with t=t2
     for (j in seq_len(t1)) {
       maxmom<-maxmom-1
       r<-1:maxmom
@@ -557,15 +597,16 @@ samlmu<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
     #
     if (all(xok[(1+t1):(n-t2)]==xok[(1+t1)])) {
       lmom[-1]<-0    # R code doesn't guarantee this
-      if (ratios) warning("all data values equal", if (any(trim>0)) " (after trimming)")
+      if (ratios && nmom.actual>2) warning("all data values equal",
+        if (any(trim>0)) " (after trimming)", " - L-moment ratios not defined")
     }
-    if (nmom>nmom.actual) lmom<-lmom[1:nmom]
+    length(lmom)<-nmom
   }
   if (ratios && nmom>2) {
     lmom[3:nmom]<-lmom[3:nmom]/lmom[2]
-    names(lmom)<-c("l_1","l_2",paste("t",3:nmom,sep="_"))
-  }  else names(lmom)<-paste("l",1:nmom,sep="_")
-  if (!missing(trim)) names(lmom)<-sub("_", paste("(",t1,",",t2,")_",sep=""),names(lmom))
+    names(lmom)<-c("l_1", "l_2", paste("t",3:nmom,sep="_"))
+  }  else names(lmom)<-paste("l", 1:nmom, sep="_")
+  if (!missing(trim)) names(lmom)<-sub("_", paste("(",t1,",",t2,")_",sep=""), names(lmom))
   return(lmom)
 }
 
@@ -593,52 +634,82 @@ samlmu.s<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
   #
   if (sort.data) xok<-sort(xok)
   #
-  # Compute (untrimmed) sample L-moments.  The (j in 3:maxmom) loop computes
-  # discrete Legendre polynomials recursively and uses them as weights for
-  # the ordered observations.
+  # To reduce numerical issues, replace values that would be trimmed away with
+  # values unlikely to cause loss of significance in trimmed L-moment recursions
+  #
+  xok[seq_len(t1)]<-xok[1+t1]
+  xok[n+1-seq_len(t2)]<-xok[n-t2]
   #
   lmom<-numeric(maxmom)
-  lmom[1]<-sum(xok)
-  if (maxmom>1) {
-    temp<-seq(1-n,n-1,by=2)
-    p1<-rep(1,n)
-    p<-temp/(n-1)
-    lmom[2]<-sum(xok*p)
-    if (maxmom>2) {
-      for (j in 3:maxmom) {
-        p2<-p1
-        p1<-p
-        p<-((2*j-3)*temp*p1-(j-2)*(n+j-2)*p2)/((j-1)*(n-j+1))
-        lmom[j]<-sum(xok*p)
+  if (any(!is.finite(xok[(1+t1):(n-t2)]))) {
+    #
+    # Special case - infinities in trimmed data
+    #
+    # L-moments (any order of trimming) as function of number of infinities:
+    #   #(-Inf)   #(+Inf)    l_1   l_2  l_{odd,>=3} l_{even,>=4}
+    #      1         0      -Inf   Inf    -Inf          Inf
+    #      0         1       Inf   Inf     Inf          Inf
+    #      1         1      -Inf   Inf     NaN          NaN
+    #    >=2         0      -Inf   NaN     NaN          NaN
+    #      0       >=2       NaN   Inf     NaN          NaN
+    #      [all others]      NaN   NaN     NaN          NaN
+    #
+    lmom<-rep(NaN,maxmom)
+    psum<-sum(xok[(1+t1):(n-t2)]==Inf)
+    nsum<-sum(xok[(1+t1):(n-t2)]==-Inf)
+    if (psum<=1L && nsum<=1L && maxmom>=2L) lmom[seq(2L,maxmom,by=2L)]<-Inf
+    if (psum==0L) lmom[1L]<- -Inf
+    if (nsum==0L) lmom[1L]<-  Inf
+    if (psum+nsum==1L && maxmom>=3L) lmom[seq(3L,maxmom,by=2L)]<-lmom[1]
+  } else {
+    #
+    # Compute (untrimmed) sample L-moments.  The (j in 3:maxmom) loop computes
+    # discrete Legendre polynomials recursively and uses them as weights for
+    # the ordered observations.
+    #
+    lmom[1]<-sum(xok)
+    if (maxmom>1) {
+      temp<-seq(1-n,n-1,by=2)
+      p1<-rep(1,n)
+      p<-temp/(n-1)
+      lmom[2]<-sum(xok*p)
+      if (maxmom>2) {
+        for (j in 3:maxmom) {
+          p2<-p1
+          p1<-p
+          p<-((2*j-3)*temp*p1-(j-2)*(n+j-2)*p2)/((j-1)*(n-j+1))
+          lmom[j]<-sum(xok*p)
+        }
       }
     }
-  }
-  lmom<-lmom/n   # Faster than mean(xok*p) within loop (R 2.15.3 on Windows 64-bit)
-  #
-  # If trimmed L-moments are needed, obtain them as linear combinations
-  # of untrimmed L-moments using the recursions in Hosking (2007,
-  # J.Statist.Plann.Inf.), eqs. (12)-(13).
-  #
-  # - Hosking (2007), eq.(12), applied for t=1,...t2 with s=0
-  #
-  for (j in seq_len(t2)) {
-    maxmom<-maxmom-1
-    r<-1:(maxmom-j)
-    lmom<-(lmom[r]*(r+j)-lmom[r+1]*(r+1))/(2*r+j-1)
-  }
-  #
-  # - Hosking (2007), eq.(13), applied for s=1,...t1 with t=t2
-  #
-  for (j in seq_len(t1)) {
-    maxmom<-maxmom-1
-    r<-1:maxmom
-    lmom<-(lmom[r]*(r+j+t2)+lmom[r+1]*(r+1)*(r+t2)/r)/(2*r+j+t2-1)
+    lmom<-lmom/n   # Faster than mean(xok*p) within loop (R 2.15.3 on Windows 64-bit)
+    #
+    # If trimmed L-moments are needed, obtain them as linear combinations
+    # of untrimmed L-moments using the recursions in Hosking (2007,
+    # J.Statist.Plann.Inf.), eqs. (12)-(13).
+    #
+    # - Hosking (2007), eq.(12), applied for t=1,...,t2 with s=0
+    #
+    for (j in seq_len(t2)) {
+      maxmom<-maxmom-1
+      r<-1:maxmom
+      lmom<-(lmom[r]*(r+j)-lmom[r+1]*(r+1))/(2*r+j-1)
+    }
+    #
+    # - Hosking (2007), eq.(13), applied for s=1,...,t1 with t=t2
+    #
+    for (j in seq_len(t1)) {
+      maxmom<-maxmom-1
+      r<-1:maxmom
+      lmom<-(lmom[r]*(r+j+t2)+lmom[r+1]*(r+1)*(r+t2)/r)/(2*r+j+t2-1)
+    }
+    if (all(xok[(1+t1):(n-t2)]==xok[(1+t1)])) {
+      lmom[-1]<-0    # R code doesn't guarantee this
+      if (ratios && nmom.actual>2) warning("all data values equal",
+        if (any(trim>0)) " (after trimming)", " - L-moment ratios not defined")
+    }
   }
   length(lmom)<-nmom
-  if (all(xok[(1+t1):(n-t2)]==xok[(1+t1)])) {
-    lmom[-1]<-0    # R code doesn't guarantee this
-    if (ratios && nmom>2) warning("all data values equal", if (any(trim>0)) " (after trimming)")
-  }
   #
   # Attach names to result
   #
@@ -655,12 +726,12 @@ samlmu.s<-function(x, nmom=4, sort.data=TRUE, ratios=sort.data, trim=0){
 
 # Fast computation of L-moment ratios
 # - No 'sort.data' or 'ratios'
-# - NAs in 'x' will cause error
+# - NAs or infinities in 'x' will cause error
 # - No warning if all data values equal
 # - Return value has no names
 .samlmu<-function(x, nmom=4)
   .Fortran(RegSym_samlm, PACKAGE="lmom",
-    as.double(x),length(x),double(nmom),as.integer(nmom),1L,1L)[[3]]
+    as.double(x), length(x), double(nmom), as.integer(nmom), 1L, 1L)[[3L]]
 
 #-------------------------------------------------------------------------------
 #  Utility routines called by lmrp() and lmrq()
@@ -699,6 +770,7 @@ uniroot.f<-function(f, lower, upper, ftol, maxiter=1000, ...)
 #--------------------------------------------------------------------------------
 
 # Shifted Jacobi polynomials
+# Used in the integrals computed by lmrp() and lmrq()
 sjp<-function(u,m=0,a=0,b=0) {
   if (a==0 && b==0) return(slp(u,m))
   if (a==1 && b==1) return(sjp11(u,m))
@@ -719,7 +791,7 @@ sjp<-function(u,m=0,a=0,b=0) {
 }
 
 # slp(u,m): Shifted Legendre polynomial of order m, evaluated at u
-# Used in the integrals computed by lmrq() in the case of no trimming
+# Used (via call to sjp()) in the integrals computed by lmrq() in the case of no trimming
 slp<-function(u,m) {
   if (m==0) return(rep(1,length(u)))
   if (m==1) return(2*u-1)
@@ -741,7 +813,7 @@ slp<-function(u,m) {
 }
 
 # sjp11(u,m): Shifted Jacobi(1,1) polynomial of order m, evaluated at u
-# Used in the integrals computed by lmrp() in the case of no trimming
+# Used (via call to sjp()) in the integrals computed by lmrp() in the case of no trimming
 sjp11<-function(u,m) {
   if (m==0) return(1)
   if (m==1) return(2*(2*u-1))
@@ -1251,7 +1323,7 @@ pelp<-function(lmom, pfunc, start, bounds=c(-Inf,Inf), type=c("n","s","ls","lss"
 
   method<-try(match.arg(method,c("nlm", "uniroot", eval(formals(optim)$method))),
     silent=TRUE)
-  if (class(method)=="try-error") stop(sub(".*'arg'","'method'",method))
+  if (inherits(method,"try-error")) stop(sub(".*'arg'","'method'",method))
   npara<-length(start)     # Number of parameters
   outpar<-numeric(npara)   # Vector to hold the estimated parameter values
 
@@ -1435,7 +1507,7 @@ pelq<-function(lmom, qfunc, start, type=c("n","s","ls","lss"),
 
   method<-try(match.arg(method,c("nlm", "uniroot", eval(formals(optim)$method))),
     silent=TRUE)
-  if (class(method)=="try-error") stop(sub(".*'arg'","'method'",method))
+  if (inherits(method,"try-error")) stop(sub(".*'arg'","'method'",method))
   npara<-length(start)     # Number of parameters
   outpar<-numeric(npara)   # Vector to hold the estimated parameter values
 
@@ -1736,9 +1808,11 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
       lmrd.2par$tau3[match2]>=pu[1] & lmrd.2par$tau3[match2]<=pu[2] &
       lmrd.2par$tau4[match2]>=pu[3] & lmrd.2par$tau4[match2]<=pu[4] )
     # Plot the points, don't clip at axis box
-    points(lmrd.2par$tau3[match2],lmrd.2par$tau4[match2],pch=15,col="black",xpd=TRUE)
-    text(lmrd.2par$tau3[match2],lmrd.2par$tau4[match2],
-         lmrd.2par$text[match2],adj=c(-0.5,-0.25),xpd=TRUE)
+    if (any(match2>0)) {
+      points(lmrd.2par$tau3[match2],lmrd.2par$tau4[match2],pch=15,col="black",xpd=TRUE)
+      text(lmrd.2par$tau3[match2],lmrd.2par$tau4[match2],
+           lmrd.2par$text[match2],adj=c(-0.5,-0.25),xpd=TRUE)
+    }
   }
 #
 # Legend
@@ -2037,7 +2111,7 @@ evplot.default<-function(y,qfunc,para,npoints=101,plim,xlim=c(-2,5),ylim,type,
   } else {
     yy<-sort(y[!is.na(y)])
     lyy<-length(yy)
-    xx<--log(-log(((1:lyy)-0.44)/(lyy+0.12)))
+    xx<--log(-log(ppoints(lyy,0.44)))
     if (missing.ylim) ylim<-c(min(0,yy),max(yy))
     if (missing(plim)) xlim<-c(min(xlim[1],xx[1]),max(xlim[2],xx[lyy]))
     if (missing(type)) type<-"p"
@@ -2079,7 +2153,7 @@ evplot.default<-function(y,qfunc,para,npoints=101,plim,xlim=c(-2,5),ylim,type,
 evpoints<-function(y,...) {
   yval<-sort(y[!is.na(y)])
   n<-length(yval)
-  xval<--log(-log(((1:n)-0.44)/(n+0.12)))
+  xval<--log(-log(ppoints(n,0.44)))
   points(xval,yval,...)
 }
 

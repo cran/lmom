@@ -5,11 +5,59 @@
        **************************************************
 
 
+Version 2.9     2022 May 29
+
+   o   [invisible to users] In evplot.default() and evpoints(), computation of
+       plotting positions uses ppoints() rather than an explicit expression.
+
+   o   In samlmu() and .samlmu(), removed the undocumented behaviour that
+       higher-order sample L-moments were restricted to be no larger than l_2
+       (the sample L-moment of order 2) in absolute value (and concomitantly
+       that sample L-moment ratios were restricted to the range [-1,1]).
+         This restriction applied to untrimmed L-moments, and induced analogous
+       (but much more complex) restrictions on trimmed sample L-moments.
+
+   o   samlmu() and samlmu.s() try harder to compute defensible values when 'x'
+       contains Inf or -Inf. In particular, samlmu() no longer gives an error
+       when 'x' contains infinite values.
+
+   o   samlmu() and samlmu.s() now warn "all data values equal" only when
+       L-moment ratios are computed (previously, a warning was given even when
+       the sample size after trimming was 1 or 2).
+
+   o   In documentation of cdfgev() and cdfgpa(), added notes explaining that
+       some other R packages use a different convention for the sign of the
+       shape parameter.
+
+   o   Fixed: Most cdf...() and qua...() functions, if called with 'x' having
+       length 1 and 'para' a named vector, would return a named vector.
+       Affected functions: cdfexp(), cdfgam(), cdfgev(), cdfglo(), cdfgno(),
+       cdfgpa(), cdfgum(), cdfkap(), cdfln3(), cdfwei(), quaexp(), quagam(),
+       quagev(), quaglo(), quagno(), quagpa(), quagum(), quakap(), qualn3(),
+       quape3(), quawak(), quawei().
+
+   o   Fixed: lmrd() would give an error when plotting of two-parameter
+       distributions was requested but all points to be plotted were outside
+       the plot region.
+
+   o   Fixed: samlmu() and samlmu.s(), when computing trimmed L-moments, could
+       give incorrect values when extreme values were present in the 'x' values
+       that would be trimmed away. Example:
+       'samlmu(c(1,2,3,6,1e20), trim=c(0,1))'.
+
+   o   Fixed: samlmu.s(), with trimming at the upper end of the conceptual
+       sample, would compute too few L-moments, with NA values at the end of
+       the returned vector.
+
+   o   Fixed: samlmu.s() with sample size 1 (after trimming if requested) would
+       return l_2 as 0 rather than NA.
+
+
 Version 2.8     2019 Mar 11
 
    o   In lmrp(), 'symm=NA' now indicates asymmetry, similarly to 'symm=FALSE'.
 
-   o   [invisible to users] Internal C code used by lmrp() and lmrq() changed
+   o   [Invisible to users] Internal C code used by lmrp() and lmrq() changed
        to avoid a possible memory leak.
 
 

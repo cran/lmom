@@ -1,15 +1,15 @@
-8300f94b6992c524183bd8def9d4089b *DESCRIPTION
+5f0b6e165b0c8bdfb7aba686a877fe6f *DESCRIPTION
 cfa8e00b0b6d4841d8a7340dab6630a9 *NAMESPACE
-4b39fa3a90e97fbeeb6acd4c13f3418a *NEWS
-0b3e2474e96bdf6404b703d49e2eba30 *R/lmom.r
+1a0a8882b9414db285b6e20b39c9cf68 *NEWS
+b0b67c5ed13ba4d15063b0a64a3907e1 *R/lmom.r
 d428099e1e16b5b9503855b06b064195 *inst/CITATION
-c247f4f5923bdd6d0ed5810d2db58a84 *inst/lmom-manual.pdf
+f4a6871d8c96f5ed22e47fae8b41905f *inst/lmom-manual.pdf
 b842fdca9b0cb28a77aebf90e3400935 *man/cdfexp.Rd
 6c8ce575e2590ccc8980c19886bcc251 *man/cdfgam.Rd
-de1a789f9368fc3e2452061e05cbecff *man/cdfgev.Rd
+ad6db8fb1c40a2375cf2b73c826ecbf4 *man/cdfgev.Rd
 4f010ce26590d70efdd03f598aac2297 *man/cdfglo.Rd
 151e3fdad6253de70b7bea63d19c7382 *man/cdfgno.Rd
-7d4163492f199aee6f5e3d5e39f58a37 *man/cdfgpa.Rd
+63474052e6133020353dac87013b445f *man/cdfgpa.Rd
 d8ab482dbeb08ffcfcf60177945ac303 *man/cdfgum.Rd
 f68cfb5e55e550a27e6f893fe7b555f1 *man/cdfkap.Rd
 f9a91d427227f3c504f11bf362259dee *man/cdfln3.Rd
@@ -36,4 +36,4 @@ e5439c145a80972ca625bfe4e1421877 *src/dqpsrt.f
 75e2fc4b4b2c02a891510074cb1d1a97 *src/init.c
 fc99dd5fb631ea16abe3e48b2f1a2228 *src/lmomc.c
 771a5e2d86b70aca2aebc5e8f2f9c666 *src/lmoments.f
-2ae8bb71df604b0a2e321f7431317a55 *src/samlm.f
+743b97f0c469cabf46592af6db0291ad *src/samlm.f
