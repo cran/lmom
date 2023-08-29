@@ -3,13 +3,19 @@ C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 2.0    April 2013                                          *
 C*                                                                     *
 C*  Version 2.9    June 2020                                           *
 C*  * Removed the "sanity check" that restricted higher-order          *
 C*    L-moments to be no greater than l_2 in absoulte value.           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Replaced DFLOAT by DBLE.                                       *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -36,7 +42,8 @@ C                          QSORT3 is R's internal sort routine
 C
       DN=N
       DO 10 J=1,NMOM
-   10 XMOM(J)=ZERO
+      XMOM(J)=ZERO
+   10 CONTINUE
       IF(NMOM.LE.2)GOTO 100
 C
 C         Unbiased estimates of L-moments -- the 'DO 30' loop
@@ -44,9 +51,9 @@ C         recursively calculates discrete Legendre polynomials, via
 C         eq.(9) of Neuman and Schonbach (1974, Int.J.Num.Meth.Eng.)
 C
       DO 20 J=3,NMOM
-      TEMP=ONE/DFLOAT((J-1)*(N-J+1))
-      COEF(1,J)=DFLOAT(J+J-3)*TEMP
-      COEF(2,J)=DFLOAT((J-2)*(N+J-2))*TEMP
+      TEMP=ONE/DBLE((J-1)*(N-J+1))
+      COEF(1,J)=DBLE(J+J-3)*TEMP
+      COEF(2,J)=DBLE((J-2)*(N+J-2))*TEMP
    20 CONTINUE
       TEMP=-DN-ONE
       CONST=ONE/(DN-ONE)
@@ -103,7 +110,8 @@ C
         AMULT=RN
       END IF
       DO 80 J=3,NMOM
-   80 XMOM(J)=XMOM(J)*AMULT
+      XMOM(J)=XMOM(J)*AMULT
+   80 CONTINUE
       XMOM(1)=XMOM(1)*RN
       XMOM(2)=XMOM(2)*RN
       RETURN

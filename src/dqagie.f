@@ -236,7 +236,7 @@ c
       rlist(1) = 0.0d+00
       elist(1) = 0.0d+00
       iord(1) = 0
-      if(epsabs.le.0.0d+00.and.epsrel.lt.dmax1(0.5d+02*epmach,0.5d-28))
+      if(epsabs.le.0.0d+00.and.epsrel.lt.max(0.5d+02*epmach,0.5d-28))
      *  ier = 6
       if(ier.eq.6) go to 999
 c
@@ -260,8 +260,8 @@ c
       rlist(1) = result
       elist(1) = abserr
       iord(1) = 1
-      dres = dabs(result)
-      errbnd = dmax1(epsabs,epsrel*dres)
+      dres = abs(result)
+      errbnd = max(epsabs,epsrel*dres)
       if(abserr.le.1.0d+02*epmach*defabs.and.abserr.gt.errbnd) ier = 2
       if(limit.eq.1) ier = 1
       if(ier.ne.0.or.(abserr.le.errbnd.and.abserr.ne.resabs).or.
@@ -314,14 +314,14 @@ c
         errsum = errsum+erro12-errmax
         area = area+area12-rlist(maxerr)
         if(defab1.eq.error1.or.defab2.eq.error2)go to 15
-        if(dabs(rlist(maxerr)-area12).gt.0.1d-04*dabs(area12)
+        if(abs(rlist(maxerr)-area12).gt.0.1d-04*abs(area12)
      *  .or.erro12.lt.0.99d+00*errmax) go to 10
         if(extrap) iroff2 = iroff2+1
         if(.not.extrap) iroff1 = iroff1+1
    10   if(last.gt.10.and.erro12.gt.errmax) iroff3 = iroff3+1
    15   rlist(maxerr) = area1
         rlist(last) = area2
-        errbnd = dmax1(epsabs,epsrel*dabs(area))
+        errbnd = max(epsabs,epsrel*abs(area))
 c
 c           test for roundoff error and eventually set error flag.
 c
@@ -336,8 +336,8 @@ c
 c           set error flag in the case of bad integrand behaviour
 c           at some points of the integration range.
 c
-        if(dmax1(dabs(a1),dabs(b2)).le.(0.1d+01+0.1d+03*epmach)*
-     *  (dabs(a2)+0.1d+04*uflow)) ier = 4
+        if(max(abs(a1),abs(b2)).le.(0.1d+01+0.1d+03*epmach)*
+     *  (abs(a2)+0.1d+04*uflow)) ier = 4
 c
 c           append the newly-created intervals to the list.
 c
@@ -366,13 +366,13 @@ c
         if(last.eq.2) go to 80
         if(noext) go to 90
         erlarg = erlarg-erlast
-        if(dabs(b1-a1).gt.small) erlarg = erlarg+erro12
+        if(abs(b1-a1).gt.small) erlarg = erlarg+erro12
         if(extrap) go to 40
 c
 c           test whether the interval to be bisected next is the
 c           smallest interval.
 c
-        if(dabs(blist(maxerr)-alist(maxerr)).gt.small) go to 90
+        if(abs(blist(maxerr)-alist(maxerr)).gt.small) go to 90
         extrap = .true.
         nrmax = 2
    40   if(ierro.eq.3.or.erlarg.le.ertest) go to 60
@@ -387,7 +387,7 @@ c
         do 50 k = id,jupbnd
           maxerr = iord(nrmax)
           errmax = elist(maxerr)
-          if(dabs(blist(maxerr)-alist(maxerr)).gt.small) go to 90
+          if(abs(blist(maxerr)-alist(maxerr)).gt.small) go to 90
           nrmax = nrmax+1
    50   continue
 c
@@ -403,7 +403,7 @@ c
         abserr = abseps
         result = reseps
         correc = erlarg
-        ertest = dmax1(epsabs,epsrel*dabs(reseps))
+        ertest = max(epsabs,epsrel*abs(reseps))
         if(abserr.le.ertest) go to 100
 c
 c            prepare bisection of the smallest interval.
@@ -434,14 +434,14 @@ c
       if(abserr.gt.errsum)go to 115
       if(area.eq.0.0d+00) go to 130
       go to 110
-  105 if(abserr/dabs(result).gt.errsum/dabs(area))go to 115
+  105 if(abserr/abs(result).gt.errsum/abs(area))go to 115
 c
 c           test on divergence
 c
-  110 if(ksgn.eq.(-1).and.dmax1(dabs(result),dabs(area)).le.
+  110 if(ksgn.eq.(-1).and.max(abs(result),abs(area)).le.
      * defabs*0.1d-01) go to 130
       if(0.1d-01.gt.(result/area).or.(result/area).gt.0.1d+03.
-     *or.errsum.gt.dabs(area)) ier = 6
+     *or.errsum.gt.abs(area)) ier = 6
       go to 130
 c
 c           compute global integral sum.

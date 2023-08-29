@@ -49,7 +49,7 @@ and that is the form used in \R{} package \pkg{lmom}.  A slight inconvenience wi
 skewness of the distribution is a decreasing function of the shape parameter \eqn{k}.
 Perhaps for this reason, authors of some other \R{} packages prefer a form in which
 the sign of the shape parameter \eqn{k} is changed and the parameters are renamed:
-\deqn{F(x) = 1 - \lbrace 1 + \xi ( x - \mu ) / \sigma) \rbrace ^{-1/\xi}.}{F(x) = 1 - { 1 - xi ( x - mu ) / sigma) } ^ (-1/xi) .}
+\deqn{F(x) = 1 - \lbrace 1 + \xi ( x - \mu ) / \sigma) \rbrace ^{-1/\xi}.}{F(x) = 1 - { 1 + xi ( x - mu ) / sigma) } ^ (-1/xi) .}
 Users should be able to mix functions from packages that use either form; just be aware that
 the sign of the shape parameter will need to be changed when converting from one form to the other
 (and that \eqn{\xi}{xi} is a location parameter in one form and a shape parameter in the other).

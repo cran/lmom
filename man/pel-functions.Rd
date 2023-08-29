@@ -65,6 +65,18 @@ if \code{pelwak} is unable to fit a Wakeby distribution using all 5 \eqn{L}-mome
 it instead fits a generalized Pareto distribution to the first 3 \eqn{L}-moments.
 (The corresponding routine in the LMOMENTS Fortran package
 would attempt to fit a Wakeby distribution with lower bound zero.)
+
+The kappa and Wakeby distributions have 4 and 5 parameters respectively
+but cannot attain all possible values of the first 4 or 5 \eqn{L}-moments.
+Function \code{pelkap} can fit only kappa distributions with
+\eqn{\tau_4 <= (1 + 5 \tau_3^2) / 6}{tau_4 <= (1 + 5 * tau_3^2) / 6}
+(the limit is the \eqn{(\tau_3, \tau_4)} relation satisfied by the generalized logistic distribution),
+and will give an error if \code{lmom} does not satisfy this constraint.
+Function \code{pelwak} can fit a Wakeby distribution only if
+the \eqn{(\tau_3,\tau_4)} values lie above a line plotted by \code{lmrd(distributions="WAK.LB")},
+and if \eqn{\tau_5} satisfies additional constraints;
+in other cases \code{pelwak} will fit a generalized Pareto distribution
+(a special case of the Wakeby distribution) to the first three \eqn{L}-moments.
 }
 
 \value{A numeric vector containing the parameters of the distribution.}

@@ -194,7 +194,7 @@ c
       fc = (fval1/centr)/centr
       resg = wg(8)*fc
       resk = wgk(8)*fc
-      resabs = dabs(resk)
+      resabs = abs(resk)
       Do 10 j=1,7
         absc = hlgth*xgk(j)
         absc1 = centr-absc
@@ -212,7 +212,7 @@ c
         fsum = fval1+fval2
         resg = resg+wg(j)*fsum
         resk = resk+wgk(j)*fsum
-        resabs = resabs+wgk(j)*(dabs(fval1)+dabs(fval2))
+        resabs = resabs+wgk(j)*(abs(fval1)+abs(fval2))
    10 Continue
 
 C        tabsc1 = boun+dinf*(0.1d+01-centr)/centr
@@ -225,7 +225,7 @@ C  c           the integral, and estimate the error.
 C  c
 C        resg = wg(8)*fc
 C        resk = wgk(8)*fc
-C        resabs = dabs(resk)
+C        resabs = abs(resk)
 C        do 10 j=1,7
 C          absc = hlgth*xgk(j)
 C          absc1 = centr-absc
@@ -243,19 +243,19 @@ C          fv2(j) = fval2
 C          fsum = fval1+fval2
 C          resg = resg+wg(j)*fsum
 C          resk = resk+wgk(j)*fsum
-C          resabs = resabs+wgk(j)*(dabs(fval1)+dabs(fval2))
+C          resabs = resabs+wgk(j)*(abs(fval1)+abs(fval2))
 C     10 continue
       reskh = resk*0.5d+00
-      resasc = wgk(8)*dabs(fc-reskh)
+      resasc = wgk(8)*abs(fc-reskh)
       do 20 j=1,7
-        resasc = resasc+wgk(j)*(dabs(fv1(j)-reskh)+dabs(fv2(j)-reskh))
+        resasc = resasc+wgk(j)*(abs(fv1(j)-reskh)+abs(fv2(j)-reskh))
    20 continue
       result = resk*hlgth
       resasc = resasc*hlgth
       resabs = resabs*hlgth
-      abserr = dabs((resk-resg)*hlgth)
+      abserr = abs((resk-resg)*hlgth)
       if(resasc.ne.0.0d+00.and.abserr.ne.0.d0) abserr = resasc*
-     * dmin1(0.1d+01,(0.2d+03*abserr/resasc)**1.5d+00)
+     * min(0.1d+01,(0.2d+03*abserr/resasc)**1.5d+00)
       if(resabs.gt.uflow/(0.5d+02*epmach)) abserr = dmax1
      * ((epmach*0.5d+02)*resabs,abserr)
       return

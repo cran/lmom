@@ -157,8 +157,8 @@ lmrd(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
 
 \item{ylab}{Y axis label.}
 
-\item{\dots}{Additional arguments are passed to the \code{matplot} function
-      that draws the axis box and the lines for three-parameter distributions.}
+\item{\dots}{Additional arguments are passed to the function \code{matplot},
+      which draws the axis box and the lines for three-parameter distributions.}
 }
 \details{
 \code{lmrd} calls a sequence of graphics functions:

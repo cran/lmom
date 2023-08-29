@@ -5,6 +5,21 @@
        **************************************************
 
 
+Version 3.0     2023 Aug 29
+
+   o   [invisible to users] Cleanup of Fortran code: replaced DFLOAT by DBLE, to
+       enable compilation under a strict F2008 standard; modifications to avoid
+       warnings from CRAN's compiler (GCC 12.2.0) about "Fortran 2018 deleted
+       features"; specific names of intrinsic functions changed to generic;
+       double-precision constants occur only in DATA statements.
+
+   o   Corrected typos in documentation of cdfgev() and cdfgpa().
+
+   o   In help for pelkap() and pelwak(), noted that there are some
+       combinations of L-moment values for which these functions are unable to
+       fit a distribution.
+
+
 Version 2.9     2022 May 29
 
    o   [invisible to users] In evplot.default() and evpoints(), computation of
@@ -18,7 +33,7 @@ Version 2.9     2022 May 29
        (but much more complex) restrictions on trimmed sample L-moments.
 
    o   samlmu() and samlmu.s() try harder to compute defensible values when 'x'
-       contains Inf or -Inf. In particular, samlmu() no longer gives an error
+       contains Inf or -Inf.  In particular, samlmu() no longer gives an error
        when 'x' contains infinite values.
 
    o   samlmu() and samlmu.s() now warn "all data values equal" only when
@@ -42,7 +57,7 @@ Version 2.9     2022 May 29
 
    o   Fixed: samlmu() and samlmu.s(), when computing trimmed L-moments, could
        give incorrect values when extreme values were present in the 'x' values
-       that would be trimmed away. Example:
+       that would be trimmed away.  Example:
        'samlmu(c(1,2,3,6,1e20), trim=c(0,1))'.
 
    o   Fixed: samlmu.s(), with trimming at the upper end of the conceptual
@@ -57,7 +72,7 @@ Version 2.8     2019 Mar 11
 
    o   In lmrp(), 'symm=NA' now indicates asymmetry, similarly to 'symm=FALSE'.
 
-   o   [Invisible to users] Internal C code used by lmrp() and lmrq() changed
+   o   [invisible to users] Internal C code used by lmrp() and lmrq() changed
        to avoid a possible memory leak.
 
 
@@ -110,13 +125,13 @@ Version 2.3     2014 Feb  8
        were documented as being inferred from the names of 'lmom' -- for
        example, when 'lmom' was a numeric vector returned by lmrp() or lmrq().
 
-   o   [Invisible to users] Some internal calls to .Fortran() altered, to avoid
+   o   [invisible to users] Some internal calls to .Fortran() altered, to avoid
        a NOTE when building the package for CRAN under R version 3.1.0.
        (Internal functions lmrxxx() and pelxxx() now use switch() to ensure
        that, in calls to .Fortran(), argument '.NAME' is always a character
        string and is recognizable as such to CRAN's code checks.)
 
-   o   [Invisible to users] Minor changes to internal Fortran code (routine
+   o   [invisible to users] Minor changes to internal Fortran code (routine
        LMRGPA).
 
 

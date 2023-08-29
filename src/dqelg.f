@@ -98,13 +98,13 @@ c***first executable statement  dqelg
         e0 = epstab(k3)
         e1 = epstab(k2)
         e2 = res
-        e1abs = dabs(e1)
+        e1abs = abs(e1)
         delta2 = e2-e1
-        err2 = dabs(delta2)
-        tol2 = dmax1(dabs(e2),e1abs)*epmach
+        err2 = abs(delta2)
+        tol2 = max(abs(e2),e1abs)*epmach
         delta3 = e1-e0
-        err3 = dabs(delta3)
-        tol3 = dmax1(e1abs,dabs(e0))*epmach
+        err3 = abs(delta3)
+        tol3 = max(e1abs,abs(e0))*epmach
         if(err2.gt.tol2.or.err3.gt.tol3) go to 10
 c
 c           if e0, e1 and e2 are equal to within machine
@@ -119,15 +119,15 @@ c ***jump out of do-loop
    10   e3 = epstab(k1)
         epstab(k1) = e1
         delta1 = e1-e3
-        err1 = dabs(delta1)
-        tol1 = dmax1(e1abs,dabs(e3))*epmach
+        err1 = abs(delta1)
+        tol1 = max(e1abs,abs(e3))*epmach
 c
 c           if two elements are very close to each other, omit
 c           a part of the table by adjusting the value of n
 c
         if(err1.le.tol1.or.err2.le.tol2.or.err3.le.tol3) go to 20
         ss = 0.1d+01/delta1+0.1d+01/delta2-0.1d+01/delta3
-        epsinf = dabs(ss*e1)
+        epsinf = abs(ss*e1)
 c
 c           test to detect irregular behaviour in the table, and
 c           eventually omit a part of the table adjusting the value
@@ -144,7 +144,7 @@ c
    30   res = e1+0.1d+01/ss
         epstab(k1) = res
         k1 = k1-2
-        error = err2+dabs(res-e2)+err3
+        error = err2+abs(res-e2)+err3
         if(error.gt.abserr) go to 40
         abserr = error
         result = res
@@ -174,11 +174,11 @@ c
 c
 c           compute error estimate
 c
-   90 abserr = dabs(result-res3la(3))+dabs(result-res3la(2))
-     *  +dabs(result-res3la(1))
+   90 abserr = abs(result-res3la(3))+abs(result-res3la(2))
+     *  +abs(result-res3la(1))
       res3la(1) = res3la(2)
       res3la(2) = res3la(3)
       res3la(3) = result
-  100 abserr = dmax1(abserr,0.5d+01*epmach*dabs(result))
+  100 abserr = max(abserr,0.5d+01*epmach*abs(result))
       return
       end

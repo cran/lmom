@@ -1,5 +1,5 @@
 C
-C  Fortran code for R package "lmom", version 2.5.
+C  Fortran code for R package "lmom", version 3.0.
 C  Based on the LMOMENTS Fortran package, version 3.04.
 C
 C  The following routines are called from R functions:
@@ -46,7 +46,7 @@ C
 C  * Functions called from R have been converted into subroutines.
 C    Affected routines: CDFWAK.
 C
-C  * CDFWAK's X argument is an array of dimension 1; its length, NX,
+C  * CDFWAK's argument X is an array of dimension 1; its length, NX,
 C    is an additional argument.
 C
 C  * Routines that call DERF declare it as EXTERNAL, to avoid a conflict
@@ -56,23 +56,27 @@ C    Affected routines: LMRGNO, PELGNO.
 C
 C  * PELWAK uses a different procedure if unable to fit a Wakeby
 C    distribution using all 5 L-moments.  Rather than attempting to fit
-C    a Wakeby distribution with lowwr bound zero, it immediately fits
+C    a Wakeby distribution with lower bound zero, it immediately fits
 C    a generalized Pareto distribution to the first 3 L-moments.
 C
 C  * Routine PELWA0 is not in the LMOMENTS Fortran package.
 C
 C  * Routine SAMLM is based on routine SAMLMU in the LMOMENTS
-C    Forrtan package but has additional arguments.
+C    Fortran package but has additional arguments.
 C
-C===================================================== CDFWAK.FOR
+C===================================================== cdfwak.f
       SUBROUTINE CDFWAK(X,NX,PARA,CDF,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
 C*                                                                     *
 C***********************************************************************
 C
@@ -91,7 +95,7 @@ C
 C         EPS,MAXIT CONTROL THE TEST FOR CONVERGENCE OF THE ITERATION
 C         ZINCMX IS THE LARGEST PERMITTED ITERATIVE STEP
 C         ZMULT CONTROLS WHAT HAPPENS WHEN THE ITERATION STEPS BELOW ZERO
-C         UFL SHOULD BE CHOSEN SO THAT DEXP(UFL) JUST DOES NOT CAUSE
+C         UFL SHOULD BE CHOSEN SO THAT EXP(UFL) JUST DOES NOT CAUSE
 C           UNDERFLOW
 C
       DATA EPS/1D-8/,MAXIT/20/,ZINCMX/3D0/,ZMULT/0.2D0/
@@ -116,12 +120,12 @@ C
       Z=P1
       EB=ZERO
       BZ=-B*Z
-      IF(BZ.GE.UFL)EB=DEXP(BZ)
+      IF(BZ.GE.UFL)EB=EXP(BZ)
       GB=Z
-      IF(DABS(B).GT.EPS)GB=(ONE-EB)/B
-      ED=DEXP(D*Z)
+      IF(ABS(B).GT.EPS)GB=(ONE-EB)/B
+      ED=EXP(D*Z)
       GD=-Z
-      IF(DABS(D).GT.EPS)GD=(ONE-ED)/D
+      IF(ABS(D).GT.EPS)GD=(ONE-ED)/D
       Q10=XI+A*GB-C*GD
 C
 C         COMPUTE Z=5 (F=0.9933) QUANTILE
@@ -129,12 +133,12 @@ C
       Z=FIVE
       EB=ZERO
       BZ=-B*Z
-      IF(BZ.GE.UFL)EB=DEXP(BZ)
+      IF(BZ.GE.UFL)EB=EXP(BZ)
       GB=Z
-      IF(DABS(B).GT.EPS)GB=(ONE-EB)/B
-      ED=DEXP(D*Z)
+      IF(ABS(B).GT.EPS)GB=(ONE-EB)/B
+      ED=EXP(D*Z)
       GD=-Z
-      IF(DABS(D).GT.EPS)GD=(ONE-ED)/D
+      IF(ABS(D).GT.EPS)GD=(ONE-ED)/D
       Q99=XI+A*GB-C*GD
 C
 C         LOOP OVER X VALUES
@@ -166,9 +170,9 @@ C         OTHERWISE START AT Z=0.7 (CLOSE TO F=0.5).
       Z=P7
       IF(XX.LT.Q10)Z=ZERO
       IF(XX.LT.Q99)GOTO 10
-      IF(D.LT.ZERO)Z=DLOG((XX-XI-A/B)*D/C+ONE)/D
+      IF(D.LT.ZERO)Z=LOG((XX-XI-A/B)*D/C+ONE)/D
       IF(D.EQ.ZERO)Z=(XX-XI-A/B)/C
-      IF(D.GT.ZERO)Z=DLOG((XX-XI)*D/C+ONE)/D
+      IF(D.GT.ZERO)Z=LOG((XX-XI)*D/C+ONE)/D
    10 CONTINUE
 C
 C         HALLEY'S METHOD, WITH MODIFICATIONS:
@@ -180,12 +184,12 @@ C
       DO 30 IT=1,MAXIT
       EB=ZERO
       BZ=-B*Z
-      IF(BZ.GE.UFL)EB=DEXP(BZ)
+      IF(BZ.GE.UFL)EB=EXP(BZ)
       GB=Z
-      IF(DABS(B).GT.EPS)GB=(ONE-EB)/B
-      ED=DEXP(D*Z)
+      IF(ABS(B).GT.EPS)GB=(ONE-EB)/B
+      ED=EXP(D*Z)
       GD=-Z
-      IF(DABS(D).GT.EPS)GD=(ONE-ED)/D
+      IF(ABS(D).GT.EPS)GD=(ONE-ED)/D
       XEST=XI+A*GB-C*GD
       FUNC=XX-XEST
       DERIV1=A*EB+C*ED
@@ -197,7 +201,7 @@ C
       ZNEW=Z+ZINC
       IF(ZNEW.LE.ZERO)GOTO 20
       Z=ZNEW
-      IF(DABS(ZINC).LE.EPS)GOTO 200
+      IF(ABS(ZINC).LE.EPS)GOTO 200
       GOTO 30
    20 Z=Z*ZMULT
    30 CONTINUE
@@ -218,20 +222,20 @@ C
   110 CONTINUE
       CDF(IX)=ONE
       IF(XX.GE.XI+A/B)GOTO 290
-      Z=-DLOG(ONE-(XX-XI)*B/A)/B
+      Z=-LOG(ONE-(XX-XI)*B/A)/B
       GOTO 200
 C
 C         SPECIAL CASE A=0: WAKEBY IS GENERALIZED PARETO, NO UPPER BOUND
 C
   120 CONTINUE
-      Z=DLOG(ONE+(XX-XI)*D/C)/D
+      Z=LOG(ONE+(XX-XI)*D/C)/D
       GOTO 200
 C
 C         CONVERT Z VALUE TO PROBABILITY
 C
   200 CDF(IX)=ONE
       IF(-Z.LT.UFL)RETURN
-      CDF(IX)=ONE-DEXP(-Z)
+      CDF(IX)=ONE-EXP(-Z)
 C
   290 CONTINUE
 C
@@ -250,15 +254,21 @@ C7000 FORMAT(' *** ERROR *** ROUTINE CDFWAK : PARAMETERS INVALID')
 C7010 FORMAT(' ** WARNING ** ROUTINE CDFWAK :',
 C    *  ' ITERATION HAS NOT CONVERGED. RESULT MAY BE UNRELIABLE.')
       END
-C===================================================== LMREXP.FOR
+C===================================================== lmrexp.f
       SUBROUTINE LMREXP(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Replaced DFLOAT by DBLE.                                       *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -285,7 +295,8 @@ C
       XMOM(2)=HALF*A
       IF(NMOM.EQ.2)RETURN
       DO 10 J=3,NMOM
-   10 XMOM(J)=TWO/DFLOAT(J*(J-1))
+      XMOM(J)=TWO/DBLE(J*(J-1))
+   10 CONTINUE
       RETURN
 C
  1000 IFAIL=7000
@@ -296,15 +307,19 @@ C
 C7000 FORMAT(' *** ERROR *** ROUTINE LMREXP : PARAMETERS INVALID')
 C7010 FORMAT(' *** ERROR *** ROUTINE LMREXP : PARAMETER NMOM TOO LARGE')
       END
-C===================================================== LMRGAM.FOR
+C===================================================== lmrgam.f
       SUBROUTINE LMRGAM(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
 C*                                                                     *
 C***********************************************************************
 C
@@ -355,14 +370,14 @@ C
 C
 C         LAMBDA-2
 C
-      XMOM(2)=BETA*CONST*DEXP(DLGAMA(ALPHA+HALF)-DLGAMA(ALPHA))
+      XMOM(2)=BETA*CONST*EXP(DLGAMA(ALPHA+HALF)-DLGAMA(ALPHA))
       IF(NMOM.EQ.2)RETURN
 C
 C         HIGHER MOMENTS
 C
       IF(ALPHA.LT.ONE)GOTO 10
       Z=ONE/ALPHA
-      XMOM(3)=DSQRT(Z)*(((A3*Z+A2)*Z+A1)*Z+A0)/((B2*Z+B1)*Z+ONE)
+      XMOM(3)=SQRT(Z)*(((A3*Z+A2)*Z+A1)*Z+A0)/((B2*Z+B1)*Z+ONE)
       IF(NMOM.EQ.3)RETURN
       XMOM(4)=(((C3*Z+C2)*Z+C1)*Z+C0)/((D2*Z+D1)*Z+ONE)
       IF(NMOM.GT.4)IFAIL=7010
@@ -382,15 +397,20 @@ C
 C7000 FORMAT(' *** ERROR *** ROUTINE LMRGAM : PARAMETERS INVALID')
 C7010 FORMAT(' *** ERROR *** ROUTINE LMRGAM : PARAMETER NMOM TOO LARGE')
       END
-C===================================================== LMRGEV.FOR
+C===================================================== lmrgev.f
       SUBROUTINE LMRGEV(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -439,19 +459,20 @@ C
 C
 C         TEST FOR K=0
 C
-      IF(DABS(G).GT.SMALL)GOTO 20
+      IF(ABS(G).GT.SMALL)GOTO 20
       XMOM(1)=U+A*ZMOM(1)
       IF(NMOM.EQ.1)RETURN
       XMOM(2)=A*ZMOM(2)
       IF(NMOM.EQ.2)RETURN
       DO 10 I=3,NMOM
-   10 XMOM(I)=ZMOM(I)
+      XMOM(I)=ZMOM(I)
+   10 CONTINUE
       RETURN
    20 CONTINUE
 C
 C         FIRST 2 MOMENTS
 C
-      GAM=DEXP(DLGAMA(ONE+G))
+      GAM=EXP(DLGAMA(ONE+G))
       XMOM(1)=U+A*(ONE-GAM)/G
       IF(NMOM.EQ.1)RETURN
       XX2=ONE-TWO**(-G)
@@ -485,15 +506,20 @@ C
 C7000 FORMAT(' *** ERROR *** ROUTINE LMRGEV : PARAMETERS INVALID')
 C7010 FORMAT(' *** ERROR *** ROUTINE LMRGEV : PARAMETER NMOM TOO LARGE')
       END
-C===================================================== LMRGLO.FOR
+C===================================================== lmrglo.f
       SUBROUTINE LMRGLO(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -600,7 +626,7 @@ C
       U=PARA(1)
       A=PARA(2)
       G=PARA(3)
-      IF(A.LE.ZERO.OR.DABS(G).GE.ONE)GOTO 1000
+      IF(A.LE.ZERO.OR.ABS(G).GE.ONE)GOTO 1000
       IF(NMOM.GT.20)GOTO 1010
 C
 C         FIRST 2 MOMENTS
@@ -608,8 +634,8 @@ C
       GG=G*G
       ALAM1=-G*(C1+GG*C2)
       ALAM2=ONE+GG*(C1+GG*C2)
-      IF(DABS(G).GT.SMALL)ALAM2=G*PI/DSIN(G*PI)
-      IF(DABS(G).GT.SMALL)ALAM1=(ONE-ALAM2)/G
+      IF(ABS(G).GT.SMALL)ALAM2=G*PI/SIN(G*PI)
+      IF(ABS(G).GT.SMALL)ALAM1=(ONE-ALAM2)/G
       XMOM(1)=U+A*ALAM1
       IF(NMOM.EQ.1)RETURN
       XMOM(2)=A*ALAM2
@@ -621,7 +647,8 @@ C
       KMAX=M/2
       SUM=Z(KMAX,M)
       DO 10 K=KMAX-1,1,-1
-   10 SUM=SUM*GG+Z(K,M)
+      SUM=SUM*GG+Z(K,M)
+   10 CONTINUE
       IF(M.NE.M/2*2)SUM=-G*SUM
       XMOM(M)=SUM
    20 CONTINUE
@@ -635,15 +662,20 @@ C
 C7000 FORMAT(' *** ERROR *** ROUTINE LMRGLO : PARAMETERS INVALID')
 C7010 FORMAT(' *** ERROR *** ROUTINE LMRGLO : PARAMETER NMOM TOO LARGE')
       END
-C===================================================== LMRGNO.FOR
+C===================================================== lmrgno.f
       SUBROUTINE LMRGNO(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -703,19 +735,20 @@ C----
 C
 C         TEST FOR K=0
 C
-      IF(DABS(G).GT.EPS)GOTO 5
+      IF(ABS(G).GT.EPS)GOTO 5
       XMOM(1)=U
       IF(NMOM.EQ.1)RETURN
       XMOM(2)=A*ZMOM(2)
       IF(NMOM.EQ.2)RETURN
       DO 2 I=3,NMOM
-    2 XMOM(I)=ZMOM(I)
+      XMOM(I)=ZMOM(I)
+    2 CONTINUE
       RETURN
     5 CONTINUE
 C
 C         LAMBDA-1
 C
-      EGG=DEXP(HALF*G*G)
+      EGG=EXP(HALF*G*G)
       ALAM1=(ONE-EGG)/G
       XMOM(1)=U+A*ALAM1
       IF(NMOM.EQ.1)RETURN
@@ -736,12 +769,13 @@ C
       XMIN=CC-RANGE
       XMAX=CC+RANGE
       DO 10 M=3,NMOM
-   10 SUM(M)=ZERO
+      SUM(M)=ZERO
+   10 CONTINUE
       N=16
       XINC=(XMAX-XMIN)/N
       DO 30 I=1,N-1
       X=XMIN+I*XINC
-      E=DEXP(-((X-CC)**2))
+      E=EXP(-((X-CC)**2))
       D=DERF(X)
       P1=ONE
       P=D
@@ -752,21 +786,24 @@ C
       P2=P1
       P1=P
       P=(C1*D*P1-C2*P2)/C3
-   20 SUM(M)=SUM(M)+E*P
+      SUM(M)=SUM(M)+E*P
+   20 CONTINUE
    30 CONTINUE
       DO 40 M=3,NMOM
-   40 EST(M)=SUM(M)*XINC
+      EST(M)=SUM(M)*XINC
+   40 CONTINUE
 C
 C         - DOUBLE THE NUMBER OF ORDINATES UNTIL CONVERGED
 C
       DO 90 IT=1,MAXIT
       DO 50 M=3,NMOM
-   50 ESTX(M)=EST(M)
+      ESTX(M)=EST(M)
+   50 CONTINUE
       N=N*2
       XINC=(XMAX-XMIN)/N
       DO 70 I=1,N-1,2
       X=XMIN+I*XINC
-      E=DEXP(-((X-CC)**2))
+      E=EXP(-((X-CC)**2))
       D=DERF(X)
       P1=ONE
       P=D
@@ -777,7 +814,8 @@ C
       P2=P1
       P1=P
       P=(C1*D*P1-C2*P2)/C3
-   60 SUM(M)=SUM(M)+E*P
+      SUM(M)=SUM(M)+E*P
+   60 CONTINUE
    70 CONTINUE
 C
 C         --- TEST FOR CONVERGENCE
@@ -785,16 +823,17 @@ C
       NOTCGD=0
       DO 80 M=NMOM,3,-1
       EST(M)=SUM(M)*XINC
-      IF(DABS(EST(M)-ESTX(M)).GT.EPS*DABS(EST(M)))NOTCGD=M
+      IF(ABS(EST(M)-ESTX(M)).GT.EPS*ABS(EST(M)))NOTCGD=M
    80 CONTINUE
       IF(NOTCGD.EQ.0)GOTO 100
    90 CONTINUE
 C
       IFAIL=7100+(NOTCGD-1)
   100 CONTINUE
-      CONST=-DEXP(CC*CC)*RRTPI/(ALAM2*G)
+      CONST=-EXP(CC*CC)*RRTPI/(ALAM2*G)
       DO 110 M=3,NMOM
-  110 XMOM(M)=CONST*EST(M)
+      XMOM(M)=CONST*EST(M)
+  110 CONTINUE
       RETURN
 C
  1000 IFAIL=7000
@@ -808,13 +847,13 @@ C7100 FORMAT(' ** WARNING ** ROUTINE LMRGNO :',
 C    *  ' ITERATION HAS NOT CONVERGED. ONLY THE FIRST',I3,
 C    *  ' L-MOMENTS ARE RELIABLE.')
       END
-C===================================================== LMRGPA.FOR
+C===================================================== lmrgpa.f
       SUBROUTINE LMRGPA(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
 C*                                                                     *
@@ -874,15 +913,19 @@ C
 C7000 FORMAT(' *** ERROR *** ROUTINE LMRGPA : PARAMETERS INVALID')
 C7010 FORMAT(' *** ERROR *** ROUTINE LMRGPA : PARAMETER NMOM TOO LARGE')
       END
-C===================================================== LMRGUM.FOR
+C===================================================== lmrgum.f
       SUBROUTINE LMRGUM(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -925,7 +968,8 @@ C
       XMOM(2)=A*ZMOM(2)
       IF(NMOM.EQ.2)RETURN
       DO 10 J=3,NMOM
-   10 XMOM(J)=ZMOM(J)
+      XMOM(J)=ZMOM(J)
+   10 CONTINUE
       RETURN
 C
  1000 IFAIL=7000
@@ -936,15 +980,20 @@ C
 C7000 FORMAT(' *** ERROR *** ROUTINE LMRGUM : PARAMETERS INVALID')
 C7010 FORMAT(' *** ERROR *** ROUTINE LMRGUM : PARAMETER NMOM TOO LARGE')
       END
-C===================================================== LMRKAP.FOR
+C===================================================== lmrkap.f
       SUBROUTINE LMRKAP(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -991,7 +1040,7 @@ C
       DLGAM=DLGAMA(ONE+G)
       ICASE=1
       IF(H.GT.ZERO)ICASE=3
-      IF(DABS(H).LT.SMALL)ICASE=2
+      IF(ABS(H).LT.SMALL)ICASE=2
       IF(G.EQ.ZERO)ICASE=ICASE+3
       GOTO(10,30,50,70,90,110),ICASE
 C
@@ -999,46 +1048,52 @@ C         - CASE H<0, G NONZERO
 C
    10 DO 20 IR=1,NMOM
       R=IR
-      ARG=DLGAM+DLGAMA(-R/H-G)-DLGAMA(-R/H)-G*DLOG(-H)
-      IF(DABS(ARG).GT.OFL)GOTO 1020
-   20 BETA(IR)=DEXP(ARG)
+      ARG=DLGAM+DLGAMA(-R/H-G)-DLGAMA(-R/H)-G*LOG(-H)
+      IF(ABS(ARG).GT.OFL)GOTO 1020
+      BETA(IR)=EXP(ARG)
+   20 CONTINUE
       GOTO 130
 C
 C         - CASE H SMALL, G NONZERO
 C
    30 DO 40 IR=1,NMOM
       R=IR
-   40 BETA(IR)=DEXP(DLGAM-G*DLOG(R))*(ONE-HALF*H*G*(ONE+G)/R)
+      BETA(IR)=EXP(DLGAM-G*LOG(R))*(ONE-HALF*H*G*(ONE+G)/R)
+   40 CONTINUE
       GOTO 130
 C
 C         - CASE H>0, G NONZERO
 C
    50 DO 60 IR=1,NMOM
       R=IR
-      ARG=DLGAM+DLGAMA(ONE+R/H)-DLGAMA(ONE+G+R/H)-G*DLOG(H)
-      IF(DABS(ARG).GT.OFL)GOTO 1020
-   60 BETA(IR)=DEXP(ARG)
+      ARG=DLGAM+DLGAMA(ONE+R/H)-DLGAMA(ONE+G+R/H)-G*LOG(H)
+      IF(ABS(ARG).GT.OFL)GOTO 1020
+      BETA(IR)=EXP(ARG)
+   60 CONTINUE
       GOTO 130
 C
 C         - CASE H<0, G=0
 C
    70 DO 80 IR=1,NMOM
       R=IR
-   80 BETA(IR)=EU+DLOG(-H)+DIGAMD(-R/H)
+      BETA(IR)=EU+LOG(-H)+DIGAMD(-R/H)
+   80 CONTINUE
       GOTO 130
 C
 C         - CASE H SMALL, G=0
 C
    90 DO 100 IR=1,NMOM
       R=IR
-  100 BETA(IR)=EU+DLOG(R)
+      BETA(IR)=EU+LOG(R)
+  100 CONTINUE
       GOTO 130
 C
 C         - CASE H>0, G=0
 C
   110 DO 120 IR=1,NMOM
       R=IR
-  120 BETA(IR)=EU+DLOG(H)+DIGAMD(ONE+R/H)
+      BETA(IR)=EU+LOG(H)+DIGAMD(ONE+R/H)
+  120 CONTINUE
       GOTO 130
 C
 C         LAMBDA-1
@@ -1085,15 +1140,19 @@ C7010 FORMAT(' *** ERROR *** ROUTINE LMRKAP : PARAMETER NMOM TOO LARGE')
 C7020 FORMAT(' *** ERROR *** ROUTINE LMRKAP :',
 C    *  ' CALCULATIONS OF L-MOMENTS HAVE BROKEN DOWN')
       END
-C===================================================== LMRNOR.FOR
+C===================================================== lmrnor.f
       SUBROUTINE LMRNOR(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1132,7 +1191,8 @@ C
       XMOM(2)=PARA(2)*ZMOM(2)
       IF(NMOM.EQ.2)RETURN
       DO 10 M=3,NMOM
-   10 XMOM(M)=ZMOM(M)
+      XMOM(M)=ZMOM(M)
+   10 CONTINUE
       RETURN
 C
  1000 IFAIL=7000
@@ -1143,15 +1203,19 @@ C
 C7000 FORMAT(' *** ERROR *** ROUTINE LMRNOR : PARAMETERS INVALID')
 C7010 FORMAT(' *** ERROR *** ROUTINE LMRNOR : PARAMETER NMOM TOO LARGE')
       END
-C===================================================== LMRPE3.FOR
+C===================================================== lmrpe3.f
       SUBROUTINE LMRPE3(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1207,10 +1271,10 @@ C
 C         LAMBDA-2
 C
       GAMMA=PARA(3)
-      IF(DABS(GAMMA).LT.SMALL)GOTO 20
+      IF(ABS(GAMMA).LT.SMALL)GOTO 20
       ALPHA=FOUR/(GAMMA*GAMMA)
-      BETA=DABS(HALF*SD*GAMMA)
-      ALAM2=CONST*DEXP(DLGAMA(ALPHA+HALF)-DLGAMA(ALPHA))
+      BETA=ABS(HALF*SD*GAMMA)
+      ALAM2=CONST*EXP(DLGAMA(ALPHA+HALF)-DLGAMA(ALPHA))
       XMOM(2)=ALAM2*BETA
       IF(NMOM.EQ.2)RETURN
 C
@@ -1218,7 +1282,7 @@ C         HIGHER MOMENTS
 C
       IF(ALPHA.LT.ONE)GOTO 10
       Z=ONE/ALPHA
-      XMOM(3)=DSQRT(Z)*(((A3*Z+A2)*Z+A1)*Z+A0)/((B2*Z+B1)*Z+ONE)
+      XMOM(3)=SQRT(Z)*(((A3*Z+A2)*Z+A1)*Z+A0)/((B2*Z+B1)*Z+ONE)
       IF(GAMMA.LT.ZERO)XMOM(3)=-XMOM(3)
       IF(NMOM.EQ.3)RETURN
       XMOM(4)=(((C3*Z+C2)*Z+C1)*Z+C0)/((D2*Z+D1)*Z+ONE)
@@ -1252,13 +1316,13 @@ C
 C7000 FORMAT(' *** ERROR *** ROUTINE LMRPE3 : PARAMETERS INVALID')
 C7010 FORMAT(' *** ERROR *** ROUTINE LMRPE3 : PARAMETER NMOM TOO LARGE')
       END
-C===================================================== LMRWAK.FOR
+C===================================================== lmrwak.f
       SUBROUTINE LMRWAK(PARA,XMOM,NMOM,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
 C*                                                                     *
@@ -1330,13 +1394,13 @@ C7000 FORMAT(' *** ERROR *** ROUTINE LMRWAK : PARAMETERS INVALID')
 C7010 FORMAT(' *** ERROR *** ROUTINE LMRWAK : PARAMETER NMOM TOO LARGE')
       END
 
-C===================================================== PELEXP.FOR
+C===================================================== pelexp.f
       SUBROUTINE PELEXP(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
 C*                                                                     *
@@ -1365,13 +1429,13 @@ C
 C
 C 7000 FORMAT(' *** ERROR *** ROUTINE PELEXP : L-MOMENTS INVALID')
       END
-C===================================================== PELGAM.FOR
+C===================================================== pelgam.f
       SUBROUTINE PELGAM(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
 C*                                                                     *
@@ -1422,15 +1486,19 @@ C
 C
 C 7000 FORMAT(' *** ERROR *** ROUTINE PELGAM : L-MOMENTS INVALID')
       END
-C===================================================== PELGEV.FOR
+C===================================================== pelgev.f
       SUBROUTINE PELGEV(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1475,14 +1543,14 @@ C
       IFAIL=0
       T3=XMOM(3)
       IF(XMOM(2).LE.ZERO)GOTO 1000
-      IF(DABS(T3).GE.ONE)GOTO 1000
+      IF(ABS(T3).GE.ONE)GOTO 1000
       IF(T3.LE.ZERO)GOTO 10
 C
 C         RATIONAL-FUNCTION APPROXIMATION FOR TAU3 BETWEEN 0 AND 1
 C
       Z=ONE-T3
       G=(-ONE+Z*(C1+Z*(C2+Z*C3)))/(ONE+Z*(D1+Z*D2))
-      IF(DABS(G).LT.SMALL)GOTO 50
+      IF(ABS(G).LT.SMALL)GOTO 50
       GOTO 40
 C
 C         RATIONAL-FUNCTION APPROXIMATION FOR TAU3 BETWEEN -0.8 AND 0
@@ -1492,7 +1560,7 @@ C
 C
 C         NEWTON-RAPHSON ITERATION FOR TAU3 LESS THAN -0.8
 C
-      IF(T3.LE.-P97)G=ONE-DLOG(ONE+T3)/DL2
+      IF(T3.LE.-P97)G=ONE-LOG(ONE+T3)/DL2
       T0=(T3+THREE)*HALF
       DO 20 IT=1,MAXIT
       X2=TWO**(-G)
@@ -1503,7 +1571,7 @@ C
       DERIV=(XX2*X3*DL3-XX3*X2*DL2)/(XX2*XX2)
       GOLD=G
       G=G-(T-T0)/DERIV
-      IF(DABS(G-GOLD).LE.EPS*G)GOTO 30
+      IF(ABS(G-GOLD).LE.EPS*G)GOTO 30
    20 CONTINUE
       IFAIL=7020
    30 CONTINUE
@@ -1511,7 +1579,7 @@ C
 C         ESTIMATE ALPHA,XI
 C
    40 PARA(3)=G
-      GAM=DEXP(DLGAMA(ONE+G))
+      GAM=EXP(DLGAMA(ONE+G))
       PARA(2)=XMOM(2)*G/(GAM*(ONE-TWO**(-G)))
       PARA(1)=XMOM(1)-PARA(2)*(ONE-GAM)/G
       RETURN
@@ -1530,15 +1598,19 @@ C 7000 FORMAT(' *** ERROR *** ROUTINE PELGEV : L-MOMENTS INVALID')
 C 7020 FORMAT(' ** WARNING ** ROUTINE PELGEV :',
 C    *  ' ITERATION HAS NOT CONVERGED. RESULTS MAY BE UNRELIABLE.')
       END
-C===================================================== PELGLO.FOR
+C===================================================== pelglo.f
       SUBROUTINE PELGLO(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1564,12 +1636,12 @@ C         ESTIMATE K
 C
       IFAIL=0
       G=-XMOM(3)
-      IF(XMOM(2).LE.ZERO.OR.DABS(G).GE.ONE)GOTO 1000
-      IF(DABS(G).LE.SMALL)GOTO 10
+      IF(XMOM(2).LE.ZERO.OR.ABS(G).GE.ONE)GOTO 1000
+      IF(ABS(G).LE.SMALL)GOTO 10
 C
 C         ESTIMATE ALPHA, XI
 C
-      GG=G*PI/DSIN(G*PI)
+      GG=G*PI/SIN(G*PI)
       A=XMOM(2)/GG
       PARA(1)=XMOM(1)-A*(ONE-GG)/G
       PARA(2)=A
@@ -1588,15 +1660,19 @@ C
 C
 C 7000 FORMAT(' *** ERROR *** ROUTINE PELGLO : L-MOMENTS INVALID')
       END
-C===================================================== PELGNO.FOR
+C===================================================== pelgno.f
       SUBROUTINE PELGNO(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1633,13 +1709,13 @@ C
 C
       IFAIL=0
       T3=XMOM(3)
-      IF(XMOM(2).LE.ZERO.OR.DABS(T3).GE.ONE)GOTO 1000
-      IF(DABS(T3).GE.P95)GOTO 1010
-      IF(DABS(T3).LE.SMALL)GOTO 30
+      IF(XMOM(2).LE.ZERO.OR.ABS(T3).GE.ONE)GOTO 1000
+      IF(ABS(T3).GE.P95)GOTO 1010
+      IF(ABS(T3).LE.SMALL)GOTO 30
 C
       TT=T3*T3
       G=-T3*(A0+TT*(A1+TT*(A2+TT*A3)))/(ONE+TT*(B1+TT*(B2+TT*B3)))
-      E=DEXP(HALF*G*G)
+      E=EXP(HALF*G*G)
       A=XMOM(2)*G/(E*DERF(HALF*G))
       U=XMOM(1)+A*(E-ONE)/G
       PARA(1)=U
@@ -1664,15 +1740,19 @@ C 7000 FORMAT(' *** ERROR *** ROUTINE PELGNO : L-MOMENTS INVALID')
 C 7010 FORMAT(' *** ERROR *** ROUTINE PELGNO :',
 C    *  ' TAU-3 TOO LARGE FOR ROUTINE')
       END
-C===================================================== PELGPA.FOR
+C===================================================== pelgpa.f
       SUBROUTINE PELGPA(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1692,7 +1772,7 @@ C
       IFAIL=0
       T3=XMOM(3)
       IF(XMOM(2).LE.ZERO)GOTO 1000
-      IF(DABS(T3).GE.ONE)GOTO 1000
+      IF(ABS(T3).GE.ONE)GOTO 1000
       G=(ONE-THREE*T3)/(ONE+T3)
       PARA(3)=G
       PARA(2)=(ONE+G)*(TWO+G)*XMOM(2)
@@ -1704,13 +1784,13 @@ C
 C
 C 7000 FORMAT(' *** ERROR *** ROUTINE PELGPA : L-MOMENTS INVALID')
       END
-C===================================================== PELGUM.FOR
+C===================================================== pelgum.f
       SUBROUTINE PELGUM(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
 C*                                                                     *
@@ -1743,15 +1823,19 @@ C
 C
 C 7000 FORMAT(' *** ERROR *** ROUTINE PELGUM : L-MOMENTS INVALID')
       END
-C===================================================== PELKAP.FOR
+C===================================================== pelkap.f
       SUBROUTINE PELKAP(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1798,8 +1882,8 @@ C         EPS,MAXIT CONTROL THE TEST FOR CONVERGENCE OF N-R ITERATION
 C         MAXSR IS THE MAX. NO. OF STEPLENGTH REDUCTIONS PER ITERATION
 C         HSTART IS THE STARTING VALUE FOR H
 C         BIG IS USED TO INITIALIZE THE CRITERION FUNCTION
-C         OFLEXP IS SUCH THAT DEXP(OFLEXP) JUST DOES NOT CAUSE OVERFLOW
-C         OFLGAM IS SUCH THAT DEXP(DLGAMA(OFLGAM)) JUST DOES NOT CAUSE
+C         OFLEXP IS SUCH THAT EXP(OFLEXP) JUST DOES NOT CAUSE OVERFLOW
+C         OFLGAM IS SUCH THAT EXP(DLGAMA(OFLGAM)) JUST DOES NOT CAUSE
 C           OVERFLOW
 C
       DATA EPS/1D-6/,MAXIT/20/,MAXSR/10/,HSTART/1.001D0/,BIG/10D0/
@@ -1816,12 +1900,13 @@ C----
       T3=XMOM(3)
       T4=XMOM(4)
       DO 10 I=1,4
-   10 PARA(I)=ZERO
+      PARA(I)=ZERO
+   10 CONTINUE
 C
 C         TEST FOR FEASIBILITY
 C
       IF(XMOM(2).LE.ZERO)GOTO 1000
-      IF(DABS(T3).GE.ONE.OR.DABS(T4).GE.ONE)GOTO 1000
+      IF(ABS(T3).GE.ONE.OR.ABS(T4).GE.ONE)GOTO 1000
       IF(T4.LE.(FIVE*T3*T3-ONE)/FOUR)GOTO 1000
       IF(T4.GE.(FIVE*T3*T3+ONE)/SIX )GOTO 1010
 C
@@ -1855,15 +1940,15 @@ C           TAU.  - L-MOMENT RATIOS
 C
       IF(G.GT.OFLGAM)GOTO 1020
       IF(H.GT.ZERO)GOTO 20
-      U1=DEXP(DLGAMA(  -ONE/H-G)-DLGAMA(  -ONE/H+ONE))
-      U2=DEXP(DLGAMA(  -TWO/H-G)-DLGAMA(  -TWO/H+ONE))
-      U3=DEXP(DLGAMA(-THREE/H-G)-DLGAMA(-THREE/H+ONE))
-      U4=DEXP(DLGAMA( -FOUR/H-G)-DLGAMA( -FOUR/H+ONE))
+      U1=EXP(DLGAMA(  -ONE/H-G)-DLGAMA(  -ONE/H+ONE))
+      U2=EXP(DLGAMA(  -TWO/H-G)-DLGAMA(  -TWO/H+ONE))
+      U3=EXP(DLGAMA(-THREE/H-G)-DLGAMA(-THREE/H+ONE))
+      U4=EXP(DLGAMA( -FOUR/H-G)-DLGAMA( -FOUR/H+ONE))
       GOTO 30
-   20 U1=DEXP(DLGAMA(  ONE/H)-DLGAMA(  ONE/H+ONE+G))
-      U2=DEXP(DLGAMA(  TWO/H)-DLGAMA(  TWO/H+ONE+G))
-      U3=DEXP(DLGAMA(THREE/H)-DLGAMA(THREE/H+ONE+G))
-      U4=DEXP(DLGAMA( FOUR/H)-DLGAMA( FOUR/H+ONE+G))
+   20 U1=EXP(DLGAMA(  ONE/H)-DLGAMA(  ONE/H+ONE+G))
+      U2=EXP(DLGAMA(  TWO/H)-DLGAMA(  TWO/H+ONE+G))
+      U3=EXP(DLGAMA(THREE/H)-DLGAMA(THREE/H+ONE+G))
+      U4=EXP(DLGAMA( FOUR/H)-DLGAMA( FOUR/H+ONE+G))
    30 CONTINUE
       ALAM2=U1-TWO*U2
       ALAM3=-U1+SIX*U2-SIX*U3
@@ -1876,7 +1961,7 @@ C
 C
 C         - IF NEARER THAN BEFORE, EXIT THIS LOOP
 C
-      DIST=DMAX1(DABS(E1),DABS(E2))
+      DIST=MAX(ABS(E1),ABS(E2))
       IF(DIST.LT.XDIST)GOTO 50
 C
 C         - OTHERWISE, HALVE THE STEPLENGTH AND TRY AGAIN
@@ -1958,10 +2043,10 @@ C         REDUCE STEP IF G AND H ARE OUTSIDE THE PARAMETER SPACE
 C
       FACTOR=ONE
       IF(G.LE.-ONE)FACTOR=P8*(XG+ONE)/DEL1
-      IF(H.LE.-ONE)FACTOR=DMIN1(FACTOR,P8*(XH+ONE)/DEL2)
-      IF(Z.LE.-ONE)FACTOR=DMIN1(FACTOR,P8*(XZ+ONE)/(XZ-Z))
+      IF(H.LE.-ONE)FACTOR=MIN(FACTOR,P8*(XH+ONE)/DEL2)
+      IF(Z.LE.-ONE)FACTOR=MIN(FACTOR,P8*(XZ+ONE)/(XZ-Z))
       IF(H.LE.ZERO.AND.G*H.LE.-ONE)
-     *  FACTOR=DMIN1(FACTOR,P8*(XG*XH+ONE)/(XG*XH-G*H))
+     *  FACTOR=MIN(FACTOR,P8*(XG*XH+ONE)/(XG*XH-G*H))
       IF(FACTOR.EQ.ONE)GOTO 80
       DEL1=DEL1*FACTOR
       DEL2=DEL2*FACTOR
@@ -1986,10 +2071,10 @@ C
       PARA(3)=G
       TEMP=DLGAMA(ONE+G)
       IF(TEMP.GT.OFLEXP)GOTO 1030
-      GAM=DEXP(TEMP)
-      TEMP=(ONE+G)*DLOG(DABS(H))
+      GAM=EXP(TEMP)
+      TEMP=(ONE+G)*LOG(ABS(H))
       IF(TEMP.GT.OFLEXP)GOTO 1030
-      HH=DEXP(TEMP)
+      HH=EXP(TEMP)
       PARA(2)=XMOM(2)*G*HH/(ALAM2*GAM)
       PARA(1)=XMOM(1)-PARA(2)/G*(ONE-GAM*U1/HH)
       RETURN
@@ -2004,13 +2089,13 @@ C
       RETURN
 C
       END
-C===================================================== PELNOR.FOR
+C===================================================== pelnor.f
       SUBROUTINE PELNOR(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
 C*                                                                     *
@@ -2040,15 +2125,20 @@ C
 C
 C 7000 FORMAT(' *** ERROR *** ROUTINE PELNOR : L-MOMENTS INVALID')
       END
-C===================================================== PELPE3.FOR
+C===================================================== pelpe3.f
       SUBROUTINE PELPE3(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -2082,7 +2172,7 @@ C
       DATA PI3,ROOTPI/9.4247780D0,1.7724539D0/
 C
       IFAIL=0
-      T3=DABS(XMOM(3))
+      T3=ABS(XMOM(3))
       IF(XMOM(2).LE.ZERO.OR.T3.GE.ONE)GOTO 1000
       IF(T3.LE.SMALL)GOTO 100
       IF(T3.GE.THIRD)GOTO 10
@@ -2093,8 +2183,8 @@ C
       T=ONE-T3
       ALPHA=T*(D1+T*(D2+T*D3))/(ONE+T*(D4+T*(D5+T*D6)))
    20 CONTINUE
-      RTALPH=DSQRT(ALPHA)
-      BETA=ROOTPI*XMOM(2)*DEXP(DLGAMA(ALPHA)-DLGAMA(ALPHA+HALF))
+      RTALPH=SQRT(ALPHA)
+      BETA=ROOTPI*XMOM(2)*EXP(DLGAMA(ALPHA)-DLGAMA(ALPHA+HALF))
       PARA(1)=XMOM(1)
       PARA(2)=BETA*RTALPH
       PARA(3)=TWO/RTALPH
@@ -2111,20 +2201,26 @@ C
 C
  1000 IFAIL=7000
       DO 1010 I=1,3
- 1010 PARA(I)=ZERO
+      PARA(I)=ZERO
+ 1010 CONTINUE
       RETURN
 C
 C 7000 FORMAT(' *** ERROR *** ROUTINE PELPE3 : L-MOMENTS INVALID')
       END
-C===================================================== PELWAK.FOR
+C===================================================== pelwak.f
       SUBROUTINE PELWAK(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -2158,9 +2254,9 @@ C
      *  X35/35D0/,X85/85D0/,X125/125D0/,X203/203D0/
 C
       IF(XMOM(2).LE.ZERO)GOTO 1000
-      IF(DABS(XMOM(3)).GE.ONE)GOTO 1000
-      IF(DABS(XMOM(4)).GE.ONE)GOTO 1000
-      IF(DABS(XMOM(5)).GE.ONE)GOTO 1000
+      IF(ABS(XMOM(3)).GE.ONE)GOTO 1000
+      IF(ABS(XMOM(4)).GE.ONE)GOTO 1000
+      IF(ABS(XMOM(5)).GE.ONE)GOTO 1000
       IFAIL=0
 C
 C         CALCULATE THE L-MOMENTS (LAMBDA'S)
@@ -2187,11 +2283,11 @@ C
       XC=XN1*XC2-XC1*XN2
       DISC=XB*XB-FOUR*XA*XC
       IF(DISC.LT.ZERO)GOTO 20
-      DISC=DSQRT(DISC)
+      DISC=SQRT(DISC)
       ROOT1=HALF*(-XB+DISC)/XA
       ROOT2=HALF*(-XB-DISC)/XA
-      B= DMAX1(ROOT1,ROOT2)
-      D=-DMIN1(ROOT1,ROOT2)
+      B= MAX(ROOT1,ROOT2)
+      D=-MIN(ROOT1,ROOT2)
       IF(D.GE.ONE)GOTO 20
 C
 C         ESTIMATE A, C AND XI
@@ -2231,17 +2327,23 @@ C
 C
  1000 IFAIL=7000
       DO 1010 I=1,5
- 1010 PARA(I)=ZERO
+      PARA(I)=ZERO
+ 1010 CONTINUE
       END
-C===================================================== PELWA0.FOR
+C===================================================== pelwa0.f
       SUBROUTINE PELWA0(XMOM,PARA,IFAIL)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.0    July 2008                                           *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -2268,8 +2370,8 @@ C
 C
       IF(XMOM(1).LE.ZERO)GOTO 1000
       IF(XMOM(2).LE.ZERO)GOTO 1000
-      IF(DABS(XMOM(3)).GE.ONE)GOTO 1000
-      IF(DABS(XMOM(4)).GE.ONE)GOTO 1000
+      IF(ABS(XMOM(3)).GE.ONE)GOTO 1000
+      IF(ABS(XMOM(4)).GE.ONE)GOTO 1000
       IFAIL=0
 C
 C         CALCULATE THE L-MOMENTS (LAMBDA'S)
@@ -2293,11 +2395,11 @@ C
       ZC=ZN1*ZC2-ZC1*ZN2
       DISC=ZB*ZB-FOUR*ZA*ZC
       IF(DISC.LT.ZERO)GOTO 20
-      DISC=DSQRT(DISC)
+      DISC=SQRT(DISC)
       ROOT1=HALF*(-ZB+DISC)/ZA
       ROOT2=HALF*(-ZB-DISC)/ZA
-      B= DMAX1(ROOT1,ROOT2)
-      D=-DMIN1(ROOT1,ROOT2)
+      B= MAX(ROOT1,ROOT2)
+      D=-MIN(ROOT1,ROOT2)
       IF(D.GE.ONE)GOTO 20
 C
 C         ESTIMATE A AND C
@@ -2330,32 +2432,32 @@ C
 C
  1000 IFAIL=7000
       DO 1010 I=1,5
- 1010 PARA(I)=ZERO
+      PARA(I)=ZERO
+ 1010 CONTINUE
       END
-C===================================================== DERF.FOR
+C===================================================== derf.f
       DOUBLE PRECISION FUNCTION DERF(X)
 C***********************************************************************
 C*                                                                     *
-C*  FORTRAN CODE WRITTEN FOR INCLUSION IN IBM RESEARCH REPORT RC20525, *
-C*  'FORTRAN ROUTINES FOR USE WITH THE METHOD OF L-MOMENTS, VERSION 3' *
+C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
-C*  VERSION 3     AUGUST 1996                                          *
+C*  Version 3.0    August 2023                                         *
 C*                                                                     *
 C***********************************************************************
 C
-C  ERROR FUNCTION
+C  Error function
 C
-C  BASED ON ALGORITHM 5666, J.F.HART ET AL. (1968) 'COMPUTER
-C  APPROXIMATIONS'
+C  Based on Algorithm 5666, J.F.Hart et al. (1968) 'Computer
+C  Approximations'
 C
-C  ACCURATE TO 15 DECIMAL PLACES
+C  Accurate to 15 decimal places
 C
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
       DATA ZERO/0D0/,ONE/1D0/,TWO/2D0/,THREE/3D0/,FOUR/4D0/,P65/0.65D0/
 C
-C         COEFFICIENTS OF RATIONAL-FUNCTION APPROXIMATION
+C         Coefficients of rational-function approximation
 C
       DATA P0,P1,P2,P3,P4,P5,P6/
      *  0.22020 68679 12376 1D3,    0.22121 35961 69931 1D3,
@@ -2368,44 +2470,65 @@ C
      *  0.86780 73220 29460 8D2,   0.16064 17757 92069 5D2,
      *  0.17556 67163 18264 2D1,   0.88388 34764 83184 4D-1/
 C
-C         C1 IS SQRT(2), C2 IS SQRT(2/PI)
-C         BIG IS THE POINT AT WHICH DERF=1 TO MACHINE PRECISION
+C         C1 is SQRT(2), C2 is SQRT(2/PI)
+C         BIG is the point at which DERF=1 to machine precision
 C
       DATA C1/1.4142 13562 37309 5D0/
       DATA C2/7.9788 45608 02865 4D-1/
       DATA BIG/6.25D0/,CRIT/5D0/
 C
-      DERF=ZERO
-      IF(X.EQ.ZERO)RETURN
-      XX=DABS(X)
-      IF(XX.GT.BIG)GOTO 20
-      EXPNTL=DEXP(-X*X)
-      ZZ=DABS(X*C1)
-      IF(XX.GT.CRIT)GOTO 10
-      DERF=EXPNTL*((((((P6*ZZ+P5)*ZZ+P4)*ZZ+P3)*ZZ+P2)*ZZ+P1)*ZZ+P0)/
-     *  (((((((Q7*ZZ+Q6)*ZZ+Q5)*ZZ+Q4)*ZZ+Q3)*ZZ+Q2)*ZZ+Q1)*ZZ+Q0)
-      IF(X.GT.ZERO)DERF=ONE-TWO*DERF
-      IF(X.LT.ZERO)DERF=TWO*DERF-ONE
-      RETURN
+      IF (X.EQ.ZERO) THEN
+        DERF=ZERO
+        RETURN
+      END IF
 C
-   10 DERF=EXPNTL*C2/(ZZ+ONE/(ZZ+TWO/(ZZ+THREE/(ZZ+FOUR/(ZZ+P65)))))
-      IF(X.GT.ZERO)DERF=ONE-DERF
-      IF(X.LT.ZERO)DERF=DERF-ONE
-      RETURN
+      XX=ABS(X)
+      IF (XX.GT.BIG) THEN
+        IF (X.LT.ZERO) THEN
+          DERF=-ONE
+        ELSE
+          DERF=ONE
+        END IF
+        RETURN
+      END IF
 C
-   20 DERF=ONE
-      IF(X.LT.ZERO)DERF=-ONE
-      RETURN
+      EXPNTL=EXP(-X*X)
+      ZZ=ABS(X*C1)
+      IF (XX.GT.CRIT) THEN
+        DERF=EXPNTL*C2/(ZZ+ONE/(ZZ+TWO/(ZZ+THREE/(ZZ+FOUR/(ZZ+P65)))))
+        IF (X.LT.ZERO) THEN
+          DERF=DERF-ONE
+        ELSE
+          DERF=ONE-DERF
+        END IF
+        RETURN
+      ELSE
+        DERF=EXPNTL*((((((P6*ZZ+P5)*ZZ+P4)*ZZ+P3)*ZZ+P2)*ZZ+P1)*ZZ+P0)/
+     *    (((((((Q7*ZZ+Q6)*ZZ+Q5)*ZZ+Q4)*ZZ+Q3)*ZZ+Q2)*ZZ+Q1)*ZZ+Q0)
+        IF (X.LT.ZERO) THEN
+          DERF=TWO*DERF-ONE
+        ELSE
+          DERF=ONE-TWO*DERF
+        END IF
+        RETURN
+      END IF
       END
-C===================================================== DIGAMD.FOR
+C===================================================== digamd.f
       DOUBLE PRECISION FUNCTION DIGAMD(X)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.6    January 2012                                        *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Double-precision constants occur only in DATA statements.      *
+C*    - Some IF constructs changed to IF-THEN(-ELSE)-ENDIF, sometimes  *
+C*      with rearrangement of code.                                    *
 C*                                                                     *
 C***********************************************************************
 C
@@ -2416,57 +2539,66 @@ C  BASED ON ALGORITHM AS103, APPL. STATIST. (1976) VOL.25 NO.3
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DATA ZERO/0D0/,HALF/0.5D0/,ONE/1D0/
-      DATA SMALL/1D-9/,CRIT/13D0/
+      DATA SMALL/1D-9/,CRIT/13D0/,VBIG/1D300/
 C
 C         C1...C7 ARE THE COEFFTS OF THE ASYMPTOTIC EXPANSION OF DIGAMD
-C         D1 IS  -(EULER'S CONSTANT)
+C         EU IS  -(EULER'S CONSTANT)
 C
-      DATA C1,C2,C3,C4,C5,C6,C7,D1/
+      DATA C1,C2,C3,C4,C5,C6,C7,EU/
      *  0.83333 33333 33333 333D-1,  -0.83333 33333 33333 333D-2,
      *  0.39682 53968 25396 825D-2,  -0.41666 66666 66666 666D-2,
      *  0.75757 57575 75757 575D-2,  -0.21092 79609 27960 928D-1,
      *  0.83333 33333 33333 333D-1,  -0.57721 56649 01532 861D 0/
-      DIGAMD=ZERO
-      IF(X.LE.ZERO)GOTO 1000
+C
+      IF (X.LE.ZERO) THEN; GOTO 1000; END IF
 C
 C         USE SMALL-X APPROXIMATION IF X.LE.SMALL
 C
-      IF(X.GT.SMALL)GOTO 10
-      DIGAMD=D1-ONE/X
-      RETURN
+      IF (X.LE.SMALL) THEN
+        DIGAMD=EU-ONE/X
+        RETURN
+      END IF
 C
 C         REDUCE TO DIGAMD(X+N) WHERE X+N.GE.CRIT
 C
-   10 Y=X
-   20 IF(Y.GE.CRIT)GOTO 30
+      DIGAMD=ZERO
+      Y=X
+   20 IF (Y.GE.CRIT) THEN; GOTO 30; END IF
       DIGAMD=DIGAMD-ONE/Y
       Y=Y+ONE
       GOTO 20
 C
 C         USE ASYMPTOTIC EXPANSION IF Y.GE.CRIT
 C
-   30 DIGAMD=DIGAMD+DLOG(Y)-HALF/Y
+   30 DIGAMD=DIGAMD+LOG(Y)-HALF/Y
       Y=ONE/(Y*Y)
       SUM=((((((C7*Y+C6)*Y+C5)*Y+C4)*Y+C3)*Y+C2)*Y+C1)*Y
       DIGAMD=DIGAMD-SUM
       RETURN
 C
 C1000 WRITE(6,7000)X
- 1000 DIGAMD=1D300
+ 1000 DIGAMD=VBIG
       RETURN
 C
 C7000 FORMAT(' *** ERROR *** ROUTINE DIGAMD :',
 C    *  ' ARGUMENT OUT OF RANGE :',D24.16)
       END
-C===================================================== DLGAMA.FOR
+C===================================================== dlgama.f
       DOUBLE PRECISION FUNCTION DLGAMA(X)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
 C*                                                                     *
-C*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
 C*                                                                     *
 C*  Version 1.6    January 2012                                        *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*  * Code cleanup:                                                    *
+C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Double-precision constants occur only in DATA statements.      *
+C*    - Some IF constructs changed to IF-THEN(-ELSE)-ENDIF, sometimes  *
+C*      with rearrangement of code.                                    *
 C*                                                                     *
 C***********************************************************************
 C
@@ -2475,7 +2607,7 @@ C
 C  BASED ON ALGORITHM ACM291, COMMUN. ASSOC. COMPUT. MACH. (1966)
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      DATA SMALL,CRIT,BIG,TOOBIG/1D-7,13D0,1D9,2D36/
+      DATA SMALL/1D-5/,CRIT/13D0/,BIG/1D9/,VBIG/1D300/
 C
 C         C0 IS 0.5*LOG(2*PI)
 C         C1...C7 ARE THE COEFFTS OF THE ASYMPTOTIC EXPANSION OF DLGAMA
@@ -2492,22 +2624,24 @@ C
       DATA S2/ 0.82246 70334 24113 218D 0/
 C
       DATA ZERO/0D0/,HALF/0.5D0/,ONE/1D0/,TWO/2D0/
+C
       DLGAMA=ZERO
       IF(X.LE.ZERO)GOTO 1000
       IF(X.GT.TOOBIG)GOTO 1000
 C
 C         USE SMALL-X APPROXIMATION IF X IS NEAR 0, 1 OR 2
 C
-      IF(DABS(X-TWO).GT.SMALL)GOTO 10
-      DLGAMA=DLOG(X-ONE)
+      IF (X.LE.SMALL) THEN
+        DLGAMA=-LOG(X)+S1*X
+        RETURN
+      END IF
+      IF(ABS(X-TWO).GT.SMALL)GOTO 10
+      DLGAMA=LOG(X-ONE)
       XX=X-TWO
       GOTO 20
-   10 IF(DABS(X-ONE).GT.SMALL)GOTO 30
+   10 IF(ABS(X-ONE).GT.SMALL)GOTO 40
       XX=X-ONE
    20 DLGAMA=DLGAMA+XX*(S1+XX*S2)
-      RETURN
-   30 IF(X.GT.SMALL)GOTO 40
-      DLGAMA=-DLOG(X)+S1*X
       RETURN
 C
 C         REDUCE TO DLGAMA(X+N) WHERE X+N.GE.CRIT
@@ -2519,20 +2653,21 @@ C
    50 Z=Z*Y
       Y=Y+ONE
       IF(Y.LT.CRIT)GOTO 50
-      SUM1=SUM1-DLOG(Z)
+      SUM1=SUM1-LOG(Z)
 C
 C         USE ASYMPTOTIC EXPANSION IF Y.GE.CRIT
 C
-   60 SUM1=SUM1+(Y-HALF)*DLOG(Y)-Y+C0
+   60 SUM1=SUM1+(Y-HALF)*LOG(Y)-Y+C0
       SUM2=ZERO
-      IF(Y.GE.BIG)GOTO 70
-      Z=ONE/(Y*Y)
-      SUM2=((((((C7*Z+C6)*Z+C5)*Z+C4)*Z+C3)*Z+C2)*Z+C1)/Y
-   70 DLGAMA=SUM1+SUM2
+      IF (Y.LT.BIG) THEN
+        Z=ONE/(Y*Y)
+        SUM2=((((((C7*Z+C6)*Z+C5)*Z+C4)*Z+C3)*Z+C2)*Z+C1)/Y
+      END IF
+      DLGAMA=SUM1+SUM2
       RETURN
 C
 C1000 WRITE(6,7000)X
- 1000 DLGAMA=1D300
+ 1000 DLGAMA=VBIG
       RETURN
 C
 C7000 FORMAT(' *** ERROR *** ROUTINE DLGAMA :',

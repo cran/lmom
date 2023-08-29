@@ -5,7 +5,7 @@
 #*                                                                     *
 #*  J. R. M. HOSKING <jrmhosking@gmail.com>                            *
 #*                                                                     *
-#*  Version 2.7    March 2019                                          *
+#*  Version 2.9    May 2022                                            *
 #*                                                                     *
 #***********************************************************************
 
@@ -13,7 +13,7 @@
 #  Specifications for distributions, used by cdf...(), qua...(), lmr...(), pel...()
 #-------------------------------------------------------------------------------
 
-# 'lmom.dist' contains specifications for each distribution that the "lmom" package knows about
+# 'lmom.dist' contains specifications for each distribution that package "lmom" knows about
 #
 # name        - 3-character abbreviation for the distribution
 # npara       - number of parameters
