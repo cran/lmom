@@ -69,11 +69,12 @@ would attempt to fit a Wakeby distribution with lower bound zero.)
 The kappa and Wakeby distributions have 4 and 5 parameters respectively
 but cannot attain all possible values of the first 4 or 5 \eqn{L}-moments.
 Function \code{pelkap} can fit only kappa distributions with
-\eqn{\tau_4 <= (1 + 5 \tau_3^2) / 6}{tau_4 <= (1 + 5 * tau_3^2) / 6}
+\eqn{\tau_4 \le (1 + 5 \tau_3^2) / 6}{tau_4 <= (1 + 5 * tau_3^2) / 6}
 (the limit is the \eqn{(\tau_3, \tau_4)} relation satisfied by the generalized logistic distribution),
 and will give an error if \code{lmom} does not satisfy this constraint.
 Function \code{pelwak} can fit a Wakeby distribution only if
-the \eqn{(\tau_3,\tau_4)} values lie above a line plotted by \code{lmrd(distributions="WAK.LB")},
+the \eqn{(\tau_3,\tau_4)} values, when plotted on an \eqn{L}-moment ratio diagram,
+lie above a line plotted by \code{lmrd(distributions="WAK.LB")},
 and if \eqn{\tau_5} satisfies additional constraints;
 in other cases \code{pelwak} will fit a generalized Pareto distribution
 (a special case of the Wakeby distribution) to the first three \eqn{L}-moments.

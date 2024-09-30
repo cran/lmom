@@ -171,7 +171,7 @@ or quantile function can use either form of parametrization.
 Functions \code{cdf...}, \code{qua...}, \code{lmr...}, \code{pel...},
 and \code{samlmu} are analogous to Fortran routines from
 the LMOMENTS package, version 3.04, available from StatLib at
-\url{http://lib.stat.cmu.edu/general/lmoments}.
+\url{https://lib.stat.cmu.edu/general/lmoments}.
 Functions \code{cdfwak} and \code{samlmu}, and all the \code{lmr...} and \code{pel...}
 functions, internally call Fortran code that is derived from the
 LMOMENTS package.

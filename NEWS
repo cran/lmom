@@ -5,6 +5,34 @@
        **************************************************
 
 
+Version 3.2     2024 Sep 29
+
+   o   Removed inappropriate WRITE statement from Fortran code. (Bug introduced
+       at version 3.1.)
+
+   o   Corrected invalid URL in help file "lmom-package".
+
+
+Version 3.1     2024 Sep 25
+
+   o   In lmrd(fg=...), colour 'fg' is now also used by default for the legend
+       box (if one is drawn, i.e. if 'bty' is supplied as a list element of
+       'legend.lmrd').
+
+   o   [invisible to users] Cleanup of Fortran code: changed routine names that
+       conflict with names of Fortran intrinsic functions recognized by CRAN's
+       compiler (GCC 14.2.0); modifications to avoid warnings from CRAN's
+       compiler about "obsolescent features"; specific names of intrinsic
+       functions changed to generic (two instances missed at version 3.0); in
+       (newly renamed) routine XLGAMA, removed an occurrence of a variable used
+       when undefined.
+
+   o   Minor changes to help for "pel-functions" (changes in section "Details").
+
+   o   Fixed: lmrd() would apply 'font' (when supplied in '...') to tick mark
+       labels, not to plotted points.
+
+
 Version 3.0     2023 Aug 29
 
    o   [invisible to users] Cleanup of Fortran code: replaced DFLOAT by DBLE, to

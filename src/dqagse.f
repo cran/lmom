@@ -152,7 +152,7 @@ c***routines called  d1mach,dqelg,dqk21,dqpsrt
 c***end prologue  dqagse
 c
       double precision a,abseps,abserr,alist,area,area1,area12,area2,a1,
-     *  a2,b,blist,b1,b2,correc,dabs,defabs,defab1,defab2,d1mach,dmax1,
+     *  a2,b,blist,b1,b2,correc,defabs,defab1,defab2,d1mach,
      *  dres,elist,epmach,epsabs,epsrel,erlarg,erlast,errbnd,errmax,
      *  error1,error2,erro12,errsum,ertest,oflow,resabs,reseps,result,
      *  res3la,rlist,rlist2,small,uflow

@@ -153,8 +153,8 @@ c***references  (none)
 c***routines called  d1mach,dqelg,dqk15i,dqpsrt
 c***end prologue  dqagie
       double precision abseps,abserr,alist,area,area1,area12,area2,a1,
-     *  a2,blist,boun,bound,b1,b2,correc,dabs,defabs,defab1,defab2,
-     *  dmax1,dres,d1mach,elist,epmach,epsabs,epsrel,erlarg,erlast,
+     *  a2,blist,boun,bound,b1,b2,correc,defabs,defab1,defab2,
+     *  dres,d1mach,elist,epmach,epsabs,epsrel,erlarg,erlast,
      *  errbnd,errmax,error1,error2,erro12,errsum,ertest,oflow,resabs,
      *  reseps,result,res3la,rlist,rlist2,small,uflow
       integer id,ier,ierro,inf,iord,iroff1,iroff2,iroff3,jupbnd,k,ksgn,

@@ -143,15 +143,13 @@ lmrd(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
       if a legend box is to be drawn; other arguments set by default are
       \code{x}, \code{y}, \code{legend}, \code{col}, \code{lty}, and \code{lwd}.
 
-      Not used if \code{distributions=FALSE}.}
+      Not used if \code{distributions} is \code{FALSE}.}
 
-\item{xlegend}{x coordinate of the upper left corner of the legend.
-      Default: the minimum x value.
-      Not used if \code{distributions=FALSE} or \code{legend.lmrd=FALSE}.}
+\item{xlegend, ylegend}{x and y coordinates of the upper left corner of the legend.
+      Default: coordinates of the upper left corner of the plot region,
+      shifted to the right and downwards, each by an amount equal to 1\% of the range of the x axis.
 
-\item{ylegend}{y coordinate of the upper left corner of the legend.
-      Default: the maximum y value.
-      Not used if \code{distributions=FALSE} or \code{legend.lmrd=FALSE}.}
+      Not used if \code{distributions} is \code{FALSE} or if \code{legend.lmrd} is \code{FALSE}.}
 
 \item{xlab}{X axis label.}
 

@@ -70,7 +70,7 @@ c***references  (none)
 c***routines called  d1mach
 c***end prologue  dqk21
 c
-      double precision a,absc,abserr,b,centr,dabs,dhlgth,dmax1,dmin1,
+      double precision a,absc,abserr,b,centr,dhlgth,
      *  d1mach,epmach,fc,fsum,fval1,fval2,fv1,fv2,hlgth,resabs,resasc,
      *  resg,resk,reskh,result,uflow,wg,wgk,xgk
       Double Precision fin(21),fout(21)
@@ -216,7 +216,7 @@ C       fv2(jtwm1) = fval2
       abserr = abs((resk-resg)*hlgth)
       if(resasc.ne.0.0d+00.and.abserr.ne.0.0d+00)
      *  abserr = resasc*min(0.1d+01,(0.2d+03*abserr/resasc)**1.5d+00)
-      if(resabs.gt.uflow/(0.5d+02*epmach)) abserr = dmax1
-     *  ((epmach*0.5d+02)*resabs,abserr)
+      if(resabs.gt.uflow/(0.5d+02*epmach))
+     *  abserr = max((epmach*0.5d+02)*resabs,abserr)
       return
       end

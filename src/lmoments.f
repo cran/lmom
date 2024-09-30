@@ -32,13 +32,14 @@ C    SAMLM  (in separate file samlm.f)
 C
 C  The following routines are called from other Fortran routines:
 C
-C    DERF
 C    DIGAMD
-C    DLGAMA
+C    XERF
+C    XLGAMA
 C
-C  Fortran code differences from the LMOMENTS Fortran package:
+C  Fortran code differences from the LMOMENTS Fortran package,
+C  version 3.04:
 C
-C  * No messages are written.  Instead, routines that are called from R
+C  * No messages are written. Instead, routines that are called from R
 C    each have a parameter IFAIL that on return contains an error flag
 C    (usually, the statement number of the FORMAT statement that would
 C    have controlled the output from the original Fortran routine).
@@ -46,16 +47,11 @@ C
 C  * Functions called from R have been converted into subroutines.
 C    Affected routines: CDFWAK.
 C
-C  * CDFWAK's argument X is an array of dimension 1; its length, NX,
-C    is an additional argument.
+C  * Routine CDFWAK's argument X is an array of dimension 1; its length,
+C    NX, is an additional argument.
 C
-C  * Routines that call DERF declare it as EXTERNAL, to avoid a conflict
-C    with any intrinsic function of the same name that the Fortran
-C    compiler may have access to.
-C    Affected routines: LMRGNO, PELGNO.
-C
-C  * PELWAK uses a different procedure if unable to fit a Wakeby
-C    distribution using all 5 L-moments.  Rather than attempting to fit
+C  * Routine PELWAK uses a different procedure if unable to fit a Wakeby
+C    distribution using all 5 L-moments. Rather than attempting to fit
 C    a Wakeby distribution with lower bound zero, it immediately fits
 C    a generalized Pareto distribution to the first 3 L-moments.
 C
@@ -63,6 +59,14 @@ C  * Routine PELWA0 is not in the LMOMENTS Fortran package.
 C
 C  * Routine SAMLM is based on routine SAMLMU in the LMOMENTS
 C    Fortran package but has additional arguments.
+C
+C  * Routines DERF and DLGAMA have been renamed XERF and XLGAMA, to
+C    assuage compilers that warn that names DERF and DLGAMA conflict
+C    with those of Fortran intrinsic functions (even when the names
+C    are declared EXTERNAL when used in other routines).
+C
+C  * Code in several routines has been cleaned up to enable compilation
+C    by, and to avoid warnings from, modern compilers.
 C
 C===================================================== cdfwak.f
       SUBROUTINE CDFWAK(X,NX,PARA,CDF,IFAIL)
@@ -76,7 +80,7 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*                                                                     *
 C***********************************************************************
 C
@@ -267,7 +271,7 @@ C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
 C*    - Replaced DFLOAT by DBLE.                                       *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
@@ -319,7 +323,10 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name DLGAMA changed to XLGAMA.                           *
 C*                                                                     *
 C***********************************************************************
 C
@@ -332,7 +339,7 @@ C  XMOM   *OUTPUT* ARRAY OF LENGTH NMOM. ON EXIT, CONTAINS UP TO 4 OF
 C                  THE L-MOMENTS LAMBDA-1, LAMBDA-2, TAU-3, TAU-4.
 C  NMOM   * INPUT* NUMBER OF L-MOMENTS TO BE FOUND. AT MOST 4.
 C
-C  OTHER ROUTINES USED: DLGAMA
+C  OTHER ROUTINES USED: XLGAMA
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DOUBLE PRECISION PARA(2),XMOM(NMOM)
@@ -370,7 +377,7 @@ C
 C
 C         LAMBDA-2
 C
-      XMOM(2)=BETA*CONST*EXP(DLGAMA(ALPHA+HALF)-DLGAMA(ALPHA))
+      XMOM(2)=BETA*CONST*EXP(XLGAMA(ALPHA+HALF)-XLGAMA(ALPHA))
       IF(NMOM.EQ.2)RETURN
 C
 C         HIGHER MOMENTS
@@ -409,8 +416,11 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - All DO loops now end with CONTINUE.                            *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name DLGAMA changed to XLGAMA.                           *
 C*                                                                     *
 C***********************************************************************
 C
@@ -424,7 +434,7 @@ C  XMOM   *OUTPUT* ARRAY OF LENGTH NMOM. ON EXIT, CONTAINS THE L-MOMENTS
 C                  LAMBDA-1, LAMBDA-2, TAU-3, TAU-4, ... .
 C  NMOM   * INPUT* NUMBER OF L-MOMENTS TO BE FOUND. AT MOST 20.
 C
-C  OTHER ROUTINES USED: DLGAMA
+C  OTHER ROUTINES USED: XLGAMA
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DOUBLE PRECISION PARA(3),XMOM(NMOM),ZMOM(20)
@@ -472,7 +482,7 @@ C
 C
 C         FIRST 2 MOMENTS
 C
-      GAM=EXP(DLGAMA(ONE+G))
+      GAM=EXP(XLGAMA(ONE+G))
       XMOM(1)=U+A*(ONE-GAM)/G
       IF(NMOM.EQ.1)RETURN
       XX2=ONE-TWO**(-G)
@@ -518,7 +528,7 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
@@ -674,8 +684,11 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - All DO loops now end with CONTINUE.                            *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name DERF changed to XERF.                               *
 C*                                                                     *
 C***********************************************************************
 C
@@ -689,12 +702,11 @@ C  XMOM   *OUTPUT* ARRAY OF LENGTH NMOM. ON EXIT, CONTAINS THE L-MOMENTS
 C                  LAMBDA-1, LAMBDA-2, TAU-3, TAU-4, ... .
 C  NMOM   * INPUT* NUMBER OF L-MOMENTS TO BE FOUND. AT MOST 20.
 C
-C  OTHER ROUTINES USED: DERF
+C  OTHER ROUTINES USED: XERF
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DOUBLE PRECISION PARA(3),XMOM(NMOM),EST(20),ESTX(20),SUM(20),
      *  ZMOM(20)
-      EXTERNAL DERF
       DATA ZERO/0D0/,HALF/0.5D0/,ONE/1D0/
 C
 C         ARRAY ZMOM CONTAINS L-MOMENTS OF THE STANDARD NORMAL DIST.
@@ -755,7 +767,7 @@ C
 C
 C         LAMBDA-2
 C
-      ALAM2=EGG*DERF(HALF*G)/G
+      ALAM2=EGG*XERF(HALF*G)/G
       XMOM(2)=A*ALAM2
       IF(NMOM.EQ.2)RETURN
 C
@@ -776,7 +788,7 @@ C
       DO 30 I=1,N-1
       X=XMIN+I*XINC
       E=EXP(-((X-CC)**2))
-      D=DERF(X)
+      D=XERF(X)
       P1=ONE
       P=D
       DO 20 M=3,NMOM
@@ -804,7 +816,7 @@ C
       DO 70 I=1,N-1,2
       X=XMIN+I*XINC
       E=EXP(-((X-CC)**2))
-      D=DERF(X)
+      D=XERF(X)
       P1=ONE
       P=D
       DO 60 M=3,NMOM
@@ -992,8 +1004,17 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - All DO loops now end with CONTINUE.                            *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Code cleanup:                                                    *
+C*    - Remove computed GOTO.                                          *
+C*    - Rename functions whose names generate a warning from the       *
+C*      compiler used by CRAN (GCC 14.2).                              *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name DLGAMA changed to XLGAMA.                           *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1006,7 +1027,7 @@ C  XMOM   *OUTPUT* ARRAY OF LENGTH NMOM. ON EXIT, CONTAINS THE L-MOMENTS
 C                  LAMBDA-1, LAMBDA-2, TAU-3, TAU-4, ... .
 C  NMOM   * INPUT* NUMBER OF L-MOMENTS TO BE FOUND. AT MOST 20.
 C
-C  OTHER ROUTINES USED: DLGAMA,DIGAMD
+C  OTHER ROUTINES USED: DIGAMD,XLGAMA
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DOUBLE PRECISION PARA(4),XMOM(NMOM),BETA(20)
@@ -1037,68 +1058,68 @@ C
 C
 C         CALCULATE FUNCTIONS OCCURRING IN THE PWM'S BETA-SUB-R
 C
-      DLGAM=DLGAMA(ONE+G)
-      ICASE=1
-      IF(H.GT.ZERO)ICASE=3
-      IF(ABS(H).LT.SMALL)ICASE=2
-      IF(G.EQ.ZERO)ICASE=ICASE+3
-      GOTO(10,30,50,70,90,110),ICASE
+      XLGAM=XLGAMA(ONE+G)
 C
-C         - CASE H<0, G NONZERO
+      IF (G.EQ.ZERO) THEN
+        IF (H.LT.ZERO) THEN
 C
-   10 DO 20 IR=1,NMOM
-      R=IR
-      ARG=DLGAM+DLGAMA(-R/H-G)-DLGAMA(-R/H)-G*LOG(-H)
-      IF(ABS(ARG).GT.OFL)GOTO 1020
-      BETA(IR)=EXP(ARG)
-   20 CONTINUE
-      GOTO 130
+C         - CASE G=0, H<0
 C
-C         - CASE H SMALL, G NONZERO
+          DO 20 IR=1,NMOM
+          R=IR
+          BETA(IR)=EU+LOG(-H)+DIGAMD(-R/H)
+   20     CONTINUE
+        ELSE IF (ABS(H).LT.SMALL) THEN
 C
-   30 DO 40 IR=1,NMOM
-      R=IR
-      BETA(IR)=EXP(DLGAM-G*LOG(R))*(ONE-HALF*H*G*(ONE+G)/R)
-   40 CONTINUE
-      GOTO 130
+C         - CASE G=0, H SMALL
 C
-C         - CASE H>0, G NONZERO
+          DO 40 IR=1,NMOM
+          R=IR
+          BETA(IR)=EU+LOG(R)
+   40     CONTINUE
+        ELSE
 C
-   50 DO 60 IR=1,NMOM
-      R=IR
-      ARG=DLGAM+DLGAMA(ONE+R/H)-DLGAMA(ONE+G+R/H)-G*LOG(H)
-      IF(ABS(ARG).GT.OFL)GOTO 1020
-      BETA(IR)=EXP(ARG)
-   60 CONTINUE
-      GOTO 130
+C         - CASE G=0, H>0
 C
-C         - CASE H<0, G=0
+          DO 60 IR=1,NMOM
+          R=IR
+          BETA(IR)=EU+LOG(H)+DIGAMD(ONE+R/H)
+   60     CONTINUE
+        ENDIF
+      ELSE
+        IF (H.LT.ZERO) THEN
 C
-   70 DO 80 IR=1,NMOM
-      R=IR
-      BETA(IR)=EU+LOG(-H)+DIGAMD(-R/H)
-   80 CONTINUE
-      GOTO 130
+C         - CASE G NONZERO, H<0
 C
-C         - CASE H SMALL, G=0
+          DO 80 IR=1,NMOM
+          R=IR
+          ARG=XLGAM+XLGAMA(-R/H-G)-XLGAMA(-R/H)-G*LOG(-H)
+          IF(ABS(ARG).GT.OFL)GOTO 1020
+          BETA(IR)=EXP(ARG)
+   80     CONTINUE
+        ELSE IF (ABS(H).LT.SMALL) THEN
 C
-   90 DO 100 IR=1,NMOM
-      R=IR
-      BETA(IR)=EU+LOG(R)
-  100 CONTINUE
-      GOTO 130
+C         - CASE G NONZERO, H SMALL
 C
-C         - CASE H>0, G=0
+          DO 100 IR=1,NMOM
+          R=IR
+          BETA(IR)=EXP(XLGAM-G*LOG(R))*(ONE-HALF*H*G*(ONE+G)/R)
+  100     CONTINUE
+        ELSE
 C
-  110 DO 120 IR=1,NMOM
-      R=IR
-      BETA(IR)=EU+LOG(H)+DIGAMD(ONE+R/H)
-  120 CONTINUE
-      GOTO 130
+C         - CASE G NONZERO, H>0
+C
+          DO 120 IR=1,NMOM
+          R=IR
+          ARG=XLGAM+XLGAMA(ONE+R/H)-XLGAMA(ONE+G+R/H)-G*LOG(H)
+          IF(ABS(ARG).GT.OFL)GOTO 1020
+          BETA(IR)=EXP(ARG)
+  120     CONTINUE
+        ENDIF
+      ENDIF
 C
 C         LAMBDA-1
 C
-  130 CONTINUE
       IF(G.EQ.ZERO)XMOM(1)=U+A*BETA(1)
       IF(G.NE.ZERO)XMOM(1)=U+A*(ONE-BETA(1))/G
       IF(NMOM.EQ.1)RETURN
@@ -1215,7 +1236,10 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name DLGAMA changed to XLGAMA.                           *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1229,7 +1253,7 @@ C  XMOM   *OUTPUT* ARRAY OF LENGTH NMOM. ON EXIT, CONTAINS UP TO 4 OF
 C                  THE L-MOMENTS LAMBDA-1, LAMBDA-2, TAU-3, TAU-4.
 C  NMOM   * INPUT* NUMBER OF L-MOMENTS TO BE FOUND. AT MOST 4.
 C
-C  OTHER ROUTINES USED: DLGAMA
+C  OTHER ROUTINES USED: XLGAMA
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DOUBLE PRECISION PARA(3),XMOM(NMOM)
@@ -1274,7 +1298,7 @@ C
       IF(ABS(GAMMA).LT.SMALL)GOTO 20
       ALPHA=FOUR/(GAMMA*GAMMA)
       BETA=ABS(HALF*SD*GAMMA)
-      ALAM2=CONST*EXP(DLGAMA(ALPHA+HALF)-DLGAMA(ALPHA))
+      ALAM2=CONST*EXP(XLGAMA(ALPHA+HALF)-XLGAMA(ALPHA))
       XMOM(2)=ALAM2*BETA
       IF(NMOM.EQ.2)RETURN
 C
@@ -1449,8 +1473,6 @@ C                  LAMBDA-2.
 C  PARA   *OUTPUT* ARRAY OF LENGTH 2. ON EXIT, CONTAINS THE PARAMETERS
 C                  IN THE ORDER ALPHA, BETA (SHAPE, SCALE).
 C
-C  OTHER ROUTINES USED: DLGAMA
-C
 C  METHOD: RATIONAL APPROXIMATION IS USED TO EXPRESS ALPHA AS A FUNCTION
 C  OF L-CV. RELATIVE ACCURACY OF THE  APPROXIMATION IS BETTER THAN 5E-5.
 C
@@ -1498,7 +1520,10 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name DLGAMA changed to XLGAMA.                           *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1511,7 +1536,7 @@ C                  LAMBDA-2, TAU-3.
 C  PARA   *OUTPUT* ARRAY OF LENGTH 3. ON EXIT, CONTAINS THE PARAMETERS
 C                  IN THE ORDER XI, ALPHA, K (LOCATION, SCALE, SHAPE).
 C
-C  OTHER ROUTINES USED: DLGAMA
+C  OTHER ROUTINES USED: XLGAMA
 C
 C  METHOD: FOR  -0.8 LE TAU3 LT 1,  K IS APPROXIMATED BY RATIONAL
 C  FUNCTIONS AS IN DONALDSON (1996, COMMUN. STATIST. SIMUL. COMPUT.).
@@ -1579,7 +1604,7 @@ C
 C         ESTIMATE ALPHA,XI
 C
    40 PARA(3)=G
-      GAM=EXP(DLGAMA(ONE+G))
+      GAM=EXP(XLGAMA(ONE+G))
       PARA(2)=XMOM(2)*G/(GAM*(ONE-TWO**(-G)))
       PARA(1)=XMOM(1)-PARA(2)*(ONE-GAM)/G
       RETURN
@@ -1610,7 +1635,7 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1672,7 +1697,10 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name DERF changed to XERF.                               *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1685,13 +1713,12 @@ C                  LAMBDA-2, TAU-3. ABS(TAU3) MAY NOT EXCEED 0.95.
 C  PARA   *OUTPUT* ARRAY OF LENGTH 3. ON EXIT, CONTAINS THE PARAMETERS
 C                  IN THE ORDER XI, ALPHA, K (LOCATION, SCALE, SHAPE).
 C
-C  OTHER ROUTINES USED: DERF
+C  OTHER ROUTINES USED: XERF
 C
 C  METHOD: RATIONAL-FUNCTION APPROXIMATION OF K IN TERMS OF TAU-3
 C
       IMPLICIT DOUBLE PRECISION (A-H,O-Z)
       DOUBLE PRECISION XMOM(3),PARA(3)
-      EXTERNAL DERF
       DATA ZERO/0D0/,HALF/0.5D0/,ONE/1D0/
       DATA P95/0.95D0/
       DATA ROOTPI/1.772453850905516027D0/
@@ -1716,7 +1743,7 @@ C
       TT=T3*T3
       G=-T3*(A0+TT*(A1+TT*(A2+TT*A3)))/(ONE+TT*(B1+TT*(B2+TT*B3)))
       E=EXP(HALF*G*G)
-      A=XMOM(2)*G/(E*DERF(HALF*G))
+      A=XMOM(2)*G/(E*XERF(HALF*G))
       U=XMOM(1)+A*(E-ONE)/G
       PARA(1)=U
       PARA(2)=A
@@ -1752,7 +1779,7 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1835,7 +1862,10 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name DLGAMA changed to XLGAMA.                           *
 C*                                                                     *
 C***********************************************************************
 C
@@ -1864,7 +1894,7 @@ C  N.B.  PARAMETERS ARE SOMETIMES NOT UNIQUELY DEFINED BY THE FIRST 4
 C  L-MOMENTS. IN SUCH CASES THE ROUTINE RETURNS THE SOLUTION FOR WHICH
 C  THE H PARAMETER IS LARGEST.
 C
-C  OTHER ROUTINES USED: DLGAMA,DIGAMD
+C  OTHER ROUTINES USED: XLGAMA,DIGAMD
 C
 C  THE SHAPE PARAMETERS K AND H ARE ESTIMATED USING NEWTON-RAPHSON
 C  ITERATION ON THE RELATIONSHIP BETWEEN (TAU-3,TAU-4) AND (K,H).
@@ -1883,7 +1913,7 @@ C         MAXSR IS THE MAX. NO. OF STEPLENGTH REDUCTIONS PER ITERATION
 C         HSTART IS THE STARTING VALUE FOR H
 C         BIG IS USED TO INITIALIZE THE CRITERION FUNCTION
 C         OFLEXP IS SUCH THAT EXP(OFLEXP) JUST DOES NOT CAUSE OVERFLOW
-C         OFLGAM IS SUCH THAT EXP(DLGAMA(OFLGAM)) JUST DOES NOT CAUSE
+C         OFLGAM IS SUCH THAT EXP(XLGAMA(OFLGAM)) JUST DOES NOT CAUSE
 C           OVERFLOW
 C
       DATA EPS/1D-6/,MAXIT/20/,MAXSR/10/,HSTART/1.001D0/,BIG/10D0/
@@ -1940,15 +1970,15 @@ C           TAU.  - L-MOMENT RATIOS
 C
       IF(G.GT.OFLGAM)GOTO 1020
       IF(H.GT.ZERO)GOTO 20
-      U1=EXP(DLGAMA(  -ONE/H-G)-DLGAMA(  -ONE/H+ONE))
-      U2=EXP(DLGAMA(  -TWO/H-G)-DLGAMA(  -TWO/H+ONE))
-      U3=EXP(DLGAMA(-THREE/H-G)-DLGAMA(-THREE/H+ONE))
-      U4=EXP(DLGAMA( -FOUR/H-G)-DLGAMA( -FOUR/H+ONE))
+      U1=EXP(XLGAMA(  -ONE/H-G)-XLGAMA(  -ONE/H+ONE))
+      U2=EXP(XLGAMA(  -TWO/H-G)-XLGAMA(  -TWO/H+ONE))
+      U3=EXP(XLGAMA(-THREE/H-G)-XLGAMA(-THREE/H+ONE))
+      U4=EXP(XLGAMA( -FOUR/H-G)-XLGAMA( -FOUR/H+ONE))
       GOTO 30
-   20 U1=EXP(DLGAMA(  ONE/H)-DLGAMA(  ONE/H+ONE+G))
-      U2=EXP(DLGAMA(  TWO/H)-DLGAMA(  TWO/H+ONE+G))
-      U3=EXP(DLGAMA(THREE/H)-DLGAMA(THREE/H+ONE+G))
-      U4=EXP(DLGAMA( FOUR/H)-DLGAMA( FOUR/H+ONE+G))
+   20 U1=EXP(XLGAMA(  ONE/H)-XLGAMA(  ONE/H+ONE+G))
+      U2=EXP(XLGAMA(  TWO/H)-XLGAMA(  TWO/H+ONE+G))
+      U3=EXP(XLGAMA(THREE/H)-XLGAMA(THREE/H+ONE+G))
+      U4=EXP(XLGAMA( FOUR/H)-XLGAMA( FOUR/H+ONE+G))
    30 CONTINUE
       ALAM2=U1-TWO*U2
       ALAM3=-U1+SIX*U2-SIX*U3
@@ -2069,7 +2099,7 @@ C
   110 IFAIL=0
       PARA(4)=H
       PARA(3)=G
-      TEMP=DLGAMA(ONE+G)
+      TEMP=XLGAMA(ONE+G)
       IF(TEMP.GT.OFLEXP)GOTO 1030
       GAM=EXP(TEMP)
       TEMP=(ONE+G)*LOG(ABS(H))
@@ -2137,8 +2167,11 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - All DO loops now end with CONTINUE.                            *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name DLGAMA changed to XLGAMA.                           *
 C*                                                                     *
 C***********************************************************************
 C
@@ -2150,7 +2183,7 @@ C                  LAMBDA-2 AND TAU-3.
 C  PARA   *OUTPUT* ARRAY OF LENGTH 3. ON EXIT, CONTAINS THE PARAMETERS
 C                  IN THE ORDER MU, SIGMA, GAMMA (MEAN, S.D., SKEWNESS).
 C
-C  OTHER ROUTINES USED: DLGAMA
+C  OTHER ROUTINES USED: XLGAMA
 C
 C  METHOD: RATIONAL APPROXIMATION IS USED TO EXPRESS ALPHA, THE SHAPE
 C  PARAMETER OF THE GAMMA DISTRIBUTION, AS A FUNCTION OF TAU-3.
@@ -2184,7 +2217,7 @@ C
       ALPHA=T*(D1+T*(D2+T*D3))/(ONE+T*(D4+T*(D5+T*D6)))
    20 CONTINUE
       RTALPH=SQRT(ALPHA)
-      BETA=ROOTPI*XMOM(2)*EXP(DLGAMA(ALPHA)-DLGAMA(ALPHA+HALF))
+      BETA=ROOTPI*XMOM(2)*EXP(XLGAMA(ALPHA)-XLGAMA(ALPHA+HALF))
       PARA(1)=XMOM(1)
       PARA(2)=BETA*RTALPH
       PARA(3)=TWO/RTALPH
@@ -2219,7 +2252,7 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
@@ -2342,7 +2375,7 @@ C*  Version 1.0    July 2008                                           *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
@@ -2435,84 +2468,6 @@ C
       PARA(I)=ZERO
  1010 CONTINUE
       END
-C===================================================== derf.f
-      DOUBLE PRECISION FUNCTION DERF(X)
-C***********************************************************************
-C*                                                                     *
-C*  Fortran code written for R package "lmom"                          *
-C*                                                                     *
-C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
-C*                                                                     *
-C*  Version 3.0    August 2023                                         *
-C*                                                                     *
-C***********************************************************************
-C
-C  Error function
-C
-C  Based on Algorithm 5666, J.F.Hart et al. (1968) 'Computer
-C  Approximations'
-C
-C  Accurate to 15 decimal places
-C
-      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
-      DATA ZERO/0D0/,ONE/1D0/,TWO/2D0/,THREE/3D0/,FOUR/4D0/,P65/0.65D0/
-C
-C         Coefficients of rational-function approximation
-C
-      DATA P0,P1,P2,P3,P4,P5,P6/
-     *  0.22020 68679 12376 1D3,    0.22121 35961 69931 1D3,
-     *  0.11207 92914 97870 9D3,    0.33912 86607 83830 0D2,
-     *  0.63739 62203 53165 0D1,    0.70038 30644 43688 1D0,
-     *  0.35262 49659 98910 9D-1/
-      DATA Q0,Q1,Q2,Q3,Q4,Q5,Q6,Q7/
-     *  0.44041 37358 24752 2D3,   0.79382 65125 19948 4D3,
-     *  0.63733 36333 78831 1D3,   0.29656 42487 79673 7D3,
-     *  0.86780 73220 29460 8D2,   0.16064 17757 92069 5D2,
-     *  0.17556 67163 18264 2D1,   0.88388 34764 83184 4D-1/
-C
-C         C1 is SQRT(2), C2 is SQRT(2/PI)
-C         BIG is the point at which DERF=1 to machine precision
-C
-      DATA C1/1.4142 13562 37309 5D0/
-      DATA C2/7.9788 45608 02865 4D-1/
-      DATA BIG/6.25D0/,CRIT/5D0/
-C
-      IF (X.EQ.ZERO) THEN
-        DERF=ZERO
-        RETURN
-      END IF
-C
-      XX=ABS(X)
-      IF (XX.GT.BIG) THEN
-        IF (X.LT.ZERO) THEN
-          DERF=-ONE
-        ELSE
-          DERF=ONE
-        END IF
-        RETURN
-      END IF
-C
-      EXPNTL=EXP(-X*X)
-      ZZ=ABS(X*C1)
-      IF (XX.GT.CRIT) THEN
-        DERF=EXPNTL*C2/(ZZ+ONE/(ZZ+TWO/(ZZ+THREE/(ZZ+FOUR/(ZZ+P65)))))
-        IF (X.LT.ZERO) THEN
-          DERF=DERF-ONE
-        ELSE
-          DERF=ONE-DERF
-        END IF
-        RETURN
-      ELSE
-        DERF=EXPNTL*((((((P6*ZZ+P5)*ZZ+P4)*ZZ+P3)*ZZ+P2)*ZZ+P1)*ZZ+P0)/
-     *    (((((((Q7*ZZ+Q6)*ZZ+Q5)*ZZ+Q4)*ZZ+Q3)*ZZ+Q2)*ZZ+Q1)*ZZ+Q0)
-        IF (X.LT.ZERO) THEN
-          DERF=TWO*DERF-ONE
-        ELSE
-          DERF=ONE-TWO*DERF
-        END IF
-        RETURN
-      END IF
-      END
 C===================================================== digamd.f
       DOUBLE PRECISION FUNCTION DIGAMD(X)
 C***********************************************************************
@@ -2525,7 +2480,7 @@ C*  Version 1.6    January 2012                                        *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - Double-precision constants occur only in DATA statements.      *
 C*    - Some IF constructs changed to IF-THEN(-ELSE)-ENDIF, sometimes  *
 C*      with rearrangement of code.                                    *
@@ -2583,8 +2538,90 @@ C
 C7000 FORMAT(' *** ERROR *** ROUTINE DIGAMD :',
 C    *  ' ARGUMENT OUT OF RANGE :',D24.16)
       END
-C===================================================== dlgama.f
-      DOUBLE PRECISION FUNCTION DLGAMA(X)
+C===================================================== xerf.f
+      DOUBLE PRECISION FUNCTION XERF(X)
+C***********************************************************************
+C*                                                                     *
+C*  Fortran code written for R package "lmom"                          *
+C*                                                                     *
+C*  J. R. M. Hosking <jrmhosking@gmail.com>                            *
+C*                                                                     *
+C*  Version 3.0    August 2023                                         *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name changed from DERF to XERF, to avoid conflict with   *
+C*    Fortran standard intrinsic function.                             *
+C*                                                                     *
+C***********************************************************************
+C
+C  Error function
+C
+C  Based on Algorithm 5666, J.F.Hart et al. (1968) 'Computer
+C  Approximations'
+C
+C  Accurate to 15 decimal places
+C
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      DATA ZERO/0D0/,ONE/1D0/,TWO/2D0/,THREE/3D0/,FOUR/4D0/,P65/0.65D0/
+C
+C         Coefficients of rational-function approximation
+C
+      DATA P0,P1,P2,P3,P4,P5,P6/
+     *  0.22020 68679 12376 1D3,    0.22121 35961 69931 1D3,
+     *  0.11207 92914 97870 9D3,    0.33912 86607 83830 0D2,
+     *  0.63739 62203 53165 0D1,    0.70038 30644 43688 1D0,
+     *  0.35262 49659 98910 9D-1/
+      DATA Q0,Q1,Q2,Q3,Q4,Q5,Q6,Q7/
+     *  0.44041 37358 24752 2D3,   0.79382 65125 19948 4D3,
+     *  0.63733 36333 78831 1D3,   0.29656 42487 79673 7D3,
+     *  0.86780 73220 29460 8D2,   0.16064 17757 92069 5D2,
+     *  0.17556 67163 18264 2D1,   0.88388 34764 83184 4D-1/
+C
+C         C1 is SQRT(2), C2 is SQRT(2/PI)
+C         BIG is the point at which XERF=1 to machine precision
+C
+      DATA C1/1.4142 13562 37309 5D0/
+      DATA C2/7.9788 45608 02865 4D-1/
+      DATA BIG/6.25D0/,CRIT/5D0/
+C
+      IF (X.EQ.ZERO) THEN
+        XERF=ZERO
+        RETURN
+      END IF
+C
+      XX=ABS(X)
+      IF (XX.GT.BIG) THEN
+        IF (X.LT.ZERO) THEN
+          XERF=-ONE
+        ELSE
+          XERF=ONE
+        END IF
+        RETURN
+      END IF
+C
+      EXPNTL=EXP(-X*X)
+      ZZ=ABS(X*C1)
+      IF (XX.GT.CRIT) THEN
+        XERF=EXPNTL*C2/(ZZ+ONE/(ZZ+TWO/(ZZ+THREE/(ZZ+FOUR/(ZZ+P65)))))
+        IF (X.LT.ZERO) THEN
+          XERF=XERF-ONE
+        ELSE
+          XERF=ONE-XERF
+        END IF
+        RETURN
+      ELSE
+        XERF=EXPNTL*((((((P6*ZZ+P5)*ZZ+P4)*ZZ+P3)*ZZ+P2)*ZZ+P1)*ZZ+P0)/
+     *    (((((((Q7*ZZ+Q6)*ZZ+Q5)*ZZ+Q4)*ZZ+Q3)*ZZ+Q2)*ZZ+Q1)*ZZ+Q0)
+        IF (X.LT.ZERO) THEN
+          XERF=TWO*XERF-ONE
+        ELSE
+          XERF=ONE-TWO*XERF
+        END IF
+        RETURN
+      END IF
+      END
+C===================================================== xlgama.f
+      DOUBLE PRECISION FUNCTION XLGAMA(X)
 C***********************************************************************
 C*                                                                     *
 C*  Fortran code written for R package "lmom"                          *
@@ -2595,10 +2632,15 @@ C*  Version 1.6    January 2012                                        *
 C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - Double-precision constants occur only in DATA statements.      *
 C*    - Some IF constructs changed to IF-THEN(-ELSE)-ENDIF, sometimes  *
 C*      with rearrangement of code.                                    *
+C*                                                                     *
+C*  Version 3.1    September 2024                                      *
+C*  * Routine name changed from DLGAMA to XLGAMA, to avoid conflict    *
+C*    with Fortran intrinsic function.                                 *
+C*  * Removed unneeded (and uninitialized) variable TOOBIG.            *
 C*                                                                     *
 C***********************************************************************
 C
@@ -2610,7 +2652,7 @@ C
       DATA SMALL/1D-5/,CRIT/13D0/,BIG/1D9/,VBIG/1D300/
 C
 C         C0 IS 0.5*LOG(2*PI)
-C         C1...C7 ARE THE COEFFTS OF THE ASYMPTOTIC EXPANSION OF DLGAMA
+C         C1...C7 ARE THE COEFFTS OF THE ASYMPTOTIC EXPANSION OF XLGAMA
 C
       DATA C0,C1,C2,C3,C4,C5,C6,C7/
      *   0.91893 85332 04672 742D 0,  0.83333 33333 33333 333D-1,
@@ -2625,26 +2667,25 @@ C
 C
       DATA ZERO/0D0/,HALF/0.5D0/,ONE/1D0/,TWO/2D0/
 C
-      DLGAMA=ZERO
+      XLGAMA=ZERO
       IF(X.LE.ZERO)GOTO 1000
-      IF(X.GT.TOOBIG)GOTO 1000
 C
 C         USE SMALL-X APPROXIMATION IF X IS NEAR 0, 1 OR 2
 C
       IF (X.LE.SMALL) THEN
-        DLGAMA=-LOG(X)+S1*X
+        XLGAMA=-LOG(X)+S1*X
         RETURN
       END IF
       IF(ABS(X-TWO).GT.SMALL)GOTO 10
-      DLGAMA=LOG(X-ONE)
+      XLGAMA=LOG(X-ONE)
       XX=X-TWO
       GOTO 20
    10 IF(ABS(X-ONE).GT.SMALL)GOTO 40
       XX=X-ONE
-   20 DLGAMA=DLGAMA+XX*(S1+XX*S2)
+   20 XLGAMA=XLGAMA+XX*(S1+XX*S2)
       RETURN
 C
-C         REDUCE TO DLGAMA(X+N) WHERE X+N.GE.CRIT
+C         REDUCE TO XLGAMA(X+N) WHERE X+N.GE.CRIT
 C
    40 SUM1=ZERO
       Y=X
@@ -2663,13 +2704,13 @@ C
         Z=ONE/(Y*Y)
         SUM2=((((((C7*Z+C6)*Z+C5)*Z+C4)*Z+C3)*Z+C2)*Z+C1)/Y
       END IF
-      DLGAMA=SUM1+SUM2
+      XLGAMA=SUM1+SUM2
       RETURN
 C
 C1000 WRITE(6,7000)X
- 1000 DLGAMA=VBIG
+ 1000 XLGAMA=VBIG
       RETURN
 C
-C7000 FORMAT(' *** ERROR *** ROUTINE DLGAMA :',
+C7000 FORMAT(' *** ERROR *** ROUTINE XLGAMA :',
 C    *  ' ARGUMENT OUT OF RANGE :',D24.16)
       END

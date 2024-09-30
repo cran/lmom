@@ -57,16 +57,16 @@ eq. (7) for \code{lmrp}, eq. (5) for \code{lmrq}.
 Integrals in those expressions are computed by numerical integration.
 }
 
-\value{If \code{verbose=FALSE} and \code{ratios=FALSE},
+\value{If \code{verbose} is \code{FALSE} and \code{ratios} is \code{FALSE},
 a numeric vector containing the \eqn{L}-moments.
 
-If \code{verbose=FALSE} and \code{ratios=TRUE},
+If \code{verbose} is \code{FALSE} and \code{ratios} is \code{TRUE},
 a numeric vector containing the \eqn{L}-moments (of orders 1 and 2)
 and \eqn{L}-moment ratios (of orders 3 and higher).
 
-If \code{verbose=TRUE}, a data frame with columns as follows:
-\item{value}{\eqn{L}-moments (if \code{ratios=FALSE}),
-or \eqn{L}-moments and \eqn{L}-moment ratios (if \code{ratios=TRUE}).}
+If \code{verbose} is \code{TRUE}, a data frame with columns as follows:
+\item{value}{\eqn{L}-moments (if \code{ratios} is \code{FALSE}),
+or \eqn{L}-moments and \eqn{L}-moment ratios (if \code{ratios} is \code{TRUE}).}
 \item{abs.error}{Estimate of the absolute error in the computed value.}
 \item{message}{\code{"OK"} or a character string giving the error message
 resulting from the numerical integration.}

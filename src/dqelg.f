@@ -48,7 +48,7 @@ c                       (should be zero at first call)
 c
 c***end prologue  dqelg
 c
-      double precision abserr,dabs,delta1,delta2,delta3,dmax1,d1mach,
+      double precision abserr,delta1,delta2,delta3,d1mach,
      *  epmach,epsinf,epstab,error,err1,err2,err3,e0,e1,e1abs,e2,e3,
      *  oflow,res,result,res3la,ss,tol1,tol2,tol3
       integer i,ib,ib2,ie,indx,k1,k2,k3,limexp,n,newelm,nres,num

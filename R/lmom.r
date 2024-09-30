@@ -910,7 +910,7 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
       bad<-which(f<0 | f>1 | is.na(f))[1]
       parstring<-if (length(c(...))==0) character(0)
         else paste(c(", parameter(s)",...),collapse=" ")
-      stop("Value of distribution function is not in the range [0,1] for argument ",
+      stop("value of distribution function is not in the range [0,1] for argument ",
         x[bad],parstring,": function value ",f[bad])
     }
     out<-f^(1+t1)*(1-f)^(1+t2)
@@ -960,7 +960,7 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
     if (allsymm) {
       p1<-pfunc2(x1<-(+1),...)
       while (p1<=0.75 & is.finite(x1)) p1<-pfunc2(x1<-2*x1, ...)
-      if (!is.finite(x1)) stop("Distribution function does not approach 1 for large positive values of its argument")
+      if (!is.finite(x1)) stop("distribution function does not approach 1 for large positive values of its argument")
       uu<-uniroot.f(f=function(x) pfunc2(x,...)-0.75,med,x1,ftol=0.1)
       q3<-uu$root
       scale<-q3-med
@@ -970,10 +970,10 @@ lmrp<-function(pfunc, ..., bounds=c(-Inf,Inf), symm=FALSE, order=1:4,
     } else {
       p0<-pfunc2(x0<-(-1),...)
       while (p0>=0.25 & is.finite(x0)) p0<-pfunc2(x0<-2*x0, ...)
-      if (!is.finite(x0)) stop("Distribution function does not approach 0 for large negative values of its argument")
+      if (!is.finite(x0)) stop("distribution function does not approach 0 for large negative values of its argument")
       p1<-pfunc2(x1<-(+1),...)
       while (p1<=0.75 & is.finite(x1)) p1<-pfunc2(x1<-2*x1, ...)
-      if (!is.finite(x1)) stop("Distribution function does not approach 1 for large positive values of its argument")
+      if (!is.finite(x1)) stop("distribution function does not approach 1 for large positive values of its argument")
       uu<-uniroot.f(f=function(x) pfunc2(x,...)-0.25,x0,x1,ftol=0.1)
       q1<-uu$root
       uu<-uniroot.f(f=function(x) pfunc2(x,...)-0.75,x0,x1,ftol=0.1)
@@ -1176,7 +1176,7 @@ lmrq<-function(qfunc, ..., symm=FALSE, order=1:4, ratios=TRUE, trim=0, acc=1e-6,
       bad<-which(is.na(qval))[1]
       parstring<-if (length(c(...))==0) character(0)
         else paste(c(", parameter(s)",...),collapse=" ")
-      stop("Quantile function returned ",qval[bad]," for argument ",u[bad],parstring)
+      stop("quantile function returned ",qval[bad]," for argument ",u[bad],parstring)
     }
     if (!identical(order(qval[order(u)]),seq(along=qval))) {
       ou<-order(u)
@@ -1185,7 +1185,7 @@ lmrq<-function(qfunc, ..., symm=FALSE, order=1:4, ratios=TRUE, trim=0, acc=1e-6,
       bad<-which(diff(qq)<0)[1]
       parstring<-if (length(c(...))==0) character(0)
         else paste(c(" for parameter(s)",...),collapse=" ")
-      stop("Quantile function is not increasing on the interval ",
+      stop("quantile function is not increasing on the interval ",
         uu[bad]," to ",uu[bad+1],parstring)
     }
     # if (notrim) return(qval*(2*u-1)) else   # no speed advantage
@@ -1776,23 +1776,30 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
   if (any(is.na(match2))) stop("unknown 2-parameter distribution(s)",
     paste(twopar[is.na(match2)],collapse=" "))
 #
-# Three-parameter distributions
+# Plot frame - axes, etc.
+#
+# - But first, a workaround to avoid passing 'font' (if supplied as part of '...') to plot().
+#   Needed because as of R 4.3.2 (and since at least R 1.2.2) plot() applies 'font' to
+#   tick mark labels, even overriding 'font.axis'.
+  localPlot<-function(font,...) graphics::plot.default(...)
 #
   if (missing(xlim)) xlim<-range(0,0.6,x,na.rm=TRUE)
   if (missing(ylim)) ylim<-range(0,0.4,y,na.rm=TRUE)
+  localPlot(0, 0, type="n", xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, frame.plot=FALSE, ...)
+#
+# Three-parameter distributions
+#
   if (length(distributions)==0) {
-    matplot(0,0,type="n",xlim=xlim,ylim=ylim,xlab=xlab,ylab=ylab,frame.plot=FALSE,...)
     legend.lmrd<-FALSE
   } else {
    col.lines <- if (!missing(col) && (x.missing || length(col)>1)) col else lmrd.3par$col[matchdist]
    if (missing(lty)) lty<-lmrd.3par$lty[matchdist]
-   lwd<-rep_len(lwd,length(distributions))
-   matplot(round(lmrd.data[,1],2), lmrd.data[,toupper(distributions)], type="l",
-     xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, col=col.lines, lty=lty, lwd=lwd,
-     frame.plot=FALSE, ...)
+   lwd<-rep_len(lwd, length(distributions))
+   matlines(round(lmrd.data[,1],2), lmrd.data[,toupper(distributions)], type="l",
+     col=col.lines, lty=lty, lwd=lwd, ...)
   }
 #
-# Framing elements of plot (box, lines at x=0 and y=0)
+# More framing elements of plot (box, lines at x=0 and y=0)
 #
   fg<-list(...)$fg
   if (is.null(fg)) fg<-par("fg")
@@ -1809,9 +1816,9 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
       lmrd.2par$tau4[match2]>=pu[3] & lmrd.2par$tau4[match2]<=pu[4] )
     # Plot the points, don't clip at axis box
     if (any(match2>0)) {
-      points(lmrd.2par$tau3[match2],lmrd.2par$tau4[match2],pch=15,col="black",xpd=TRUE)
-      text(lmrd.2par$tau3[match2],lmrd.2par$tau4[match2],
-           lmrd.2par$text[match2],adj=c(-0.5,-0.25),xpd=TRUE)
+      points(lmrd.2par$tau3[match2], lmrd.2par$tau4[match2], pch=15, col="black", xpd=TRUE)
+      text(  lmrd.2par$tau3[match2], lmrd.2par$tau4[match2],
+             lmrd.2par$text[match2], adj=c(-0.5,-0.25), xpd=TRUE)
     }
   }
 #
@@ -1822,8 +1829,8 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
     parusr<-par("usr")
     if (missing(xlegend)) xlegend<-parusr[1]+0.01*(parusr[2]-parusr[1])
     if (missing(ylegend)) ylegend<-parusr[4]-0.01*(parusr[4]-parusr[3])*par("pin")[1]/par("pin")[2]
-    legend.args<-list(x=xlegend,y=ylegend,legend=toupper(distributions),
-      bty="n",col=col.lines,lty=lty,lwd=lwd)
+    legend.args<-list(x=xlegend, y=ylegend, legend=toupper(distributions),
+      bty="n", box.col=fg, col=col.lines, lty=lty, lwd=lwd)
     legend.args[names(legend.lmrd)]<-legend.lmrd
     do.call(legend,legend.args)
   }
@@ -1833,14 +1840,14 @@ lmrd<-function(x, y, distributions = "GLO GEV GPA GNO PE3", twopar,
   if (!x.missing) {
     if (missing(cex)) cex<-NULL
     col.pts <- if (!missing(col) && length(col)==1) col else par("col")
-    points(x,y,pch=pch,cex=cex,col=col.pts)
+    points(x, y, pch=pch, cex=cex, col=col.pts, ...)
   }
 #
   out<-list(lines=NULL,twopar=NULL,points=NULL)
   if (length(distributions)>0) out$lines<-list(
-    distributions=toupper(distributions),col.lines=col.lines, lty=lty, lwd=lwd)
+    distributions=toupper(distributions), col.lines=col.lines, lty=lty, lwd=lwd)
   if (length(twopar)>0) out$twopar<-twopar
-  if (!x.missing) out$points<-list(col.pts=col.pts,pch=pch,cex=cex)
+  if (!x.missing) out$points<-list(col.pts=col.pts, pch=pch, cex=cex)
   return(invisible(out))
 }
 
@@ -2244,7 +2251,7 @@ integrate<- function(f, lower, upper, ..., subdivisions=100,
     "roundoff error is detected in the extrapolation table",
     "the integral is probably divergent",
     "the input is invalid")
-  if(ier==6 || (ier>0 && stop.on.error)) stop(res$message)
+  if (ier==6 || (ier>0 && stop.on.error)) stop(res$message)
   res$call<-match.call()
   class(res)<-"integrate"
   res

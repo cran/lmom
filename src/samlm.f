@@ -14,7 +14,7 @@ C*                                                                     *
 C*  Version 3.0    August 2023                                         *
 C*  * Code cleanup:                                                    *
 C*    - Replaced DFLOAT by DBLE.                                       *
-C*    - Specific names of intrinsic functions changed to generic.      *                                                        *
+C*    - Specific names of intrinsic functions changed to generic.      *
 C*    - All DO loops now end with CONTINUE.                            *
 C*                                                                     *
 C***********************************************************************
