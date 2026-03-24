@@ -158,7 +158,7 @@ In the single-vector parametrization, this is achieved by
 The separate-arguments parametrization would need a more complex
 expression, such as
 \preformatted{
-  do.call( qnorm, c( list(.8,.9), pelnor(lmom) ) )
+  do.call( qnorm, c( list(c(.8,.9)), pelnor(lmom) ) )
 }
 
 In functions (\code{lmrp}, \code{lmrq}, \code{pelp}, \code{pelq}, \code{evplot},

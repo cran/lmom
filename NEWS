@@ -5,6 +5,11 @@
        **************************************************
 
 
+Version 3.3     2026 Mar 23
+
+   o   [invisble to users] Changed C code to avoid use of non-API entry points.
+
+
 Version 3.2     2024 Sep 29
 
    o   Removed inappropriate WRITE statement from Fortran code. (Bug introduced

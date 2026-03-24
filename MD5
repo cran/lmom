@@ -1,9 +1,9 @@
-60d66521d2f64261ad5e5ddfff293d65 *DESCRIPTION
+64ce3103d2ae57652a6388f7aa22cdf6 *DESCRIPTION
 cfa8e00b0b6d4841d8a7340dab6630a9 *NAMESPACE
-7fdcdd3defcb8ca34f14e0a038394273 *NEWS
+d5d7f9faf09b8bccadf42788b6d08bf9 *NEWS
 968bce171f82de79bf67c12262a9e63f *R/lmom.r
 17d3a4c19c764f8ab5474a39727504e0 *inst/CITATION
-bfbb98b83893141aaf138a982ed85980 *inst/lmom-manual.pdf
+8c563fb5c5f2cef6c3c7c4aed31503bf *inst/lmom-manual.pdf
 b842fdca9b0cb28a77aebf90e3400935 *man/cdfexp.Rd
 6c8ce575e2590ccc8980c19886bcc251 *man/cdfgam.Rd
 3239201f1679a24806a6d41c6050941e *man/cdfgev.Rd
@@ -18,13 +18,13 @@ f9a91d427227f3c504f11bf362259dee *man/cdfln3.Rd
 9eb7092385bc0ae4ddebea07d4feae29 *man/cdfwak.Rd
 e81f2d827c6171daec4241ecef393457 *man/cdfwei.Rd
 8869f9c758fb1da52cd93ea0093a16f9 *man/evplot.Rd
-f9b66e0c7ec670b532fc43b3c422a7bf *man/lmom-package.Rd
+4dfed078c691b35e9c96cbcb231bcc60 *man/lmom-package.Rd
 87948f0684a52a714b4d3eafd59aa9d6 *man/lmr-functions.Rd
 cf07b07ff49de9a196f77b107ff2322a *man/lmrd.Rd
 97834eec2c24c7975cdc69e629eb5828 *man/lmrdpoints.Rd
 06c0a821a7bb4063e0fcb4ea7c0780cc *man/lmrp.Rd
 e5fa94390d2a5173c3509f3ef4e230c6 *man/pel-functions.Rd
-7f36b9c36afc3095b995a4caf80ad8f5 *man/pelp.Rd
+277c03a1d78eaeed19fd5c3556a79b22 *man/pelp.Rd
 b8ac61ec7d258a0ea3bf7ffc23bc13fa *man/samlmu.Rd
 576255f02bcfc26f9461edb3ec6f335b *src/d1mach.f
 99de06d437c69c9675c74f69dfe20c8d *src/dqagie.f
@@ -34,6 +34,6 @@ e3b944b8a9a99c67104d3f11a6288bae *src/dqelg.f
 b66afdb152d75ca58d19ff58760ca9df *src/dqk21.f
 e5439c145a80972ca625bfe4e1421877 *src/dqpsrt.f
 75e2fc4b4b2c02a891510074cb1d1a97 *src/init.c
-fc99dd5fb631ea16abe3e48b2f1a2228 *src/lmomc.c
+1f6c0692d3b0e2b371cbe5e7b9f61c1b *src/lmomc.c
 edac9235d9ca924e66d36e6e99bb0f0f *src/lmoments.f
 d8907f859bbafa58034fd98f60dda945 *src/samlm.f

@@ -1,6 +1,14 @@
 
 #include <R.h>
 #include <Rinternals.h>
+#include <Rversion.h>
+
+// '#if' block is a workaround for R versions that do not have entry point R_getVar
+// Can be removed when R >= 4.5.0 can be assumed
+#if R_VERSION < R_Version(4, 5, 0)
+#define R_getVar(sym, rho, inherits) \
+  ((inherits) ? findVar((sym), (rho)) : findVarInFrame((rho), (sym)))
+#endif
 
 //-------------------------------------------------------------------------------
 //  C declaration of Fortran routines to be called from C
@@ -48,8 +56,7 @@ void F77_SUB(f)(double *fout, double *fin, int *n, SEXP env) {
   for (i=0; i<*n; i++) REAL(rin)[i]=fin[i];
 
   defineVar(install("x"),rin,env);
-
-  PROTECT(var = findVarInFrame(env, install("expr"))) ;
+  PROTECT(var = R_getVar(install("expr"), env, TRUE));  // R_getVar requires R >= 4.5.0
   PROTECT(rout = eval(var, env)) ;
 
   if (length(rout)!=*n) error("evaluation of integrand gave result of wrong length");

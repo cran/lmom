@@ -1,6 +1,6 @@
 Package: lmom
-Version: 3.2
-Date: 2024-09-29
+Version: 3.3
+Date: 2026-03-23
 Title: L-Moments
 Author: J. R. M. Hosking [aut, cre]
 Maintainer: J. R. M. Hosking <jrmhosking@gmail.com>
@@ -16,6 +16,6 @@ Depends: R (>= 3.0.0)
 Imports: stats, graphics
 License: Common Public License Version 1.0
 NeedsCompilation: yes
-Packaged: 2024-09-29 19:23:30 UTC; J
+Packaged: 2026-03-23 20:55:01 UTC; J
 Repository: CRAN
-Date/Publication: 2024-09-30 23:00:10 UTC
+Date/Publication: 2026-03-24 06:10:38 UTC

@@ -30,7 +30,7 @@ pelq(lmom, qfunc, start, type = c("n", "s", "ls", "lss"),
     \describe{
     \item{\code{"ls"}}{The distribution has a location parameter and a scale parameter.}
     \item{\code{"lss"}}{The distribution has a location parameter and a scale parameter,
-      and is symmetric about its median.}
+      and is symmetric about its location parameter.}
     \item{\code{"s"}}{The distribution has a scale parameter but not a location parameter.}
     \item{\code{"n"}}{The distribution has neither a location parameter
       nor a scale parameter.}}
